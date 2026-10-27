@@ -1,0 +1,1044 @@
+<title>Elements Spike</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout: one screen, header bar on top, the Pixi stage (board + two trays) fills the rest. Single deliberate dark "game table" look. */
+:root {
+  --table: #1a2023;
+  --panel: #242c30;
+  --panel-2: #2e383d;
+  --ink: #ece6d8;
+  --muted: #9ba6a2;
+  --brass: #e0b45c;
+  --danger: #e2644f;
+  --font-display: "Marcellus", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body {
+  background: var(--table); color: var(--ink); font-family: var(--font-ui); font-size: 15px;
+  display: flex; flex-direction: column;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+header {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding-block: 10px 6px;
+}
+.brand { font-family: var(--font-display); font-size: 22px; letter-spacing: 0.04em; }
+.brand small { font-family: var(--font-ui); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-left: 6px; }
+#status { flex: 1 1 200px; min-width: 0; font-weight: 600; font-size: 16px; text-wrap: balance; }
+#status .check { color: var(--danger); }
+.actions { display: flex; gap: 8px; }
+button {
+  font: inherit; font-weight: 600; color: var(--ink); background: var(--panel-2);
+  border: 1px solid #3c484e; border-radius: 10px; padding: 10px 14px; min-height: 44px;
+  touch-action: manipulation; cursor: pointer;
+}
+button:disabled { opacity: 0.4; cursor: default; }
+button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+button.primary { background: var(--brass); color: #231a08; border-color: var(--brass); }
+button.warn { background: #5a2a22; border-color: var(--danger); }
+button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-color: var(--brass); }
+#stage { position: relative; flex: 1 1 auto; min-height: 0; touch-action: none; }
+#stage canvas { display: block; touch-action: none; }
+#menu {
+  position: fixed; z-index: 20; top: calc(env(safe-area-inset-top, 0px) + 60px);
+  right: max(16px, env(safe-area-inset-right, 0px));
+  width: min(360px, calc(100vw - 32px)); max-height: calc(100% - 80px); overflow: auto;
+  background: var(--panel); border: 1px solid #3c484e; border-radius: 14px; padding: 16px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45); display: grid; gap: 14px;
+}
+.toggle { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: start; cursor: pointer; }
+.toggle input { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--brass); }
+.toggle span { font-weight: 600; }
+.toggle small { grid-column: 2; color: var(--muted); font-size: 13px; line-height: 1.4; }
+.choice { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; }
+.choice legend { padding: 0; margin-bottom: 10px; }
+.menu-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.legend { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; font-size: 13px; color: var(--muted); }
+.legend svg { display: inline-block; width: 15px; height: 15px; margin-right: 6px; vertical-align: -2px; }
+.menu-label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.hint { font-size: 13px; color: var(--muted); line-height: 1.45; }
+#editbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; padding-bottom: 6px; }
+#editbar .label { color: var(--brass); font-weight: 700; margin-right: 4px; }
+#banner {
+  position: absolute; z-index: 10; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: min(380px, calc(100% - 32px)); background: var(--panel); border: 1px solid var(--brass);
+  border-radius: 16px; padding: 22px; text-align: center; display: grid; gap: 14px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+}
+#banner h2 { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: 28px; text-wrap: balance; }
+#banner p { margin: 0; color: var(--muted); }
+#banner .menu-row { justify-content: center; }
+@media (max-width: 640px) {
+  .actions { flex-wrap: wrap; }
+}
+@media (max-width: 560px) {
+  .brand small { display: none; }
+  button { padding: 8px 10px; }
+  #status { order: 3; flex-basis: 100%; font-size: 15px; }
+}
+</style>
+
+<header>
+  <div class="brand">Elements<small>spike</small></div>
+  <div id="status" aria-live="polite"></div>
+  <div class="actions">
+    <button id="presetBtn" type="button" hidden>Default formation</button>
+    <button id="undoBtn" type="button">Undo</button>
+    <button id="newBtn" type="button">New game</button>
+    <button id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">Options</button>
+  </div>
+</header>
+<div id="editbar" hidden>
+  <span class="label">Set up a position</span>
+  <button id="eRemove" type="button" aria-pressed="false">Remove pieces</button>
+  <button id="eClear" type="button">Clear board</button>
+  <button id="eTurnW" type="button" aria-pressed="true">White to move</button>
+  <button id="eTurnB" type="button" aria-pressed="false">Black to move</button>
+  <button id="ePlay" type="button" class="primary">Play from here</button>
+  <button id="eCancel" type="button">Cancel</button>
+</div>
+<div id="stage">
+  <div id="banner" hidden>
+    <h2 id="bannerTitle"></h2>
+    <p id="bannerText"></p>
+    <div class="menu-row">
+      <button id="bNew" type="button" class="primary">New game</button>
+      <button id="bUndo" type="button">Undo last move</button>
+      <button id="bView" type="button">View board</button>
+    </div>
+  </div>
+</div>
+<div id="menu" hidden>
+  <fieldset class="choice">
+    <legend class="menu-label">Board orientation</legend>
+    <label class="toggle"><input id="orientFixed" type="radio" name="orient" value="fixed"><span>Fixed</span><small>White at the bottom, always.</small></label>
+    <label class="toggle"><input id="orientTurn" type="radio" name="orient" value="turn"><span>Turn to the player to move</span><small>Black's turn shows the board from Black's side. For passing the iPad back and forth.</small></label>
+    <label class="toggle"><input id="orientFace" type="radio" name="orient" value="face"><span>Face to face</span><small>Board stays fixed, Black's tray faces Black. For two players on opposite sides of the iPad.</small></label>
+  </fieldset>
+  <label class="toggle"><input id="optExact" type="checkbox"><span>Exact range (variant)</span><small>Every piece moves exactly its size, captures included. Water's route has exactly N steps. A combined piece moves exactly its larger size.</small></label>
+  <div class="menu-row">
+    <button id="drawBtn" type="button">Agree to a draw</button>
+    <button id="editBtn" type="button">Set up a position (debug)</button>
+  </div>
+  <div class="menu-label">How to read the pieces</div>
+  <div class="legend">
+    <span><svg viewBox="-10 -10 20 20"><rect x="-7" y="-7" width="14" height="14" rx="1.5" fill="#d9412b"/></svg>Fire · straight</span>
+    <span><svg viewBox="-10 -10 20 20"><path d="M0,-9L9,0L0,9L-9,0Z" fill="#f0c02f"/></svg>Wind · diagonal</span>
+    <span><svg viewBox="-10 -10 20 20"><path d="M0,-9C1.4,-5.6 6.4,-2 6.4,1.9A6.4,6.4 0 0 1 -6.4,1.9C-6.4,-2 -1.4,-5.6 0,-9Z" fill="#2d7fd6"/></svg>Water · river</span>
+    <span><svg viewBox="-10 -10 20 20"><path d="M8.3,3.4L3.4,8.3L-3.4,8.3L-8.3,3.4L-8.3,-3.4L-3.4,-8.3L3.4,-8.3L8.3,-3.4Z" fill="#94603a"/></svg>Earth · any way, can't capture</span>
+  </div>
+  <p class="hint">The shape shows how a piece moves. Size = dots (1–3) and piece size. The rim and the colour shade show the owner: lighter colours are White's, deeper ones Black's. The star is the Wizard. A small shape sitting on a bigger one is a combined piece; the outline underneath is the bigger element, or the attacker when Earth has joined it. Tap or drag a piece; dots show where it can go, a red ring is a capture, a gold + is a combine. Tap an opponent's piece to see where it can reach.</p>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@8.22.0/dist/pixi.min.js"></script>
+
+<script id="rules">
+// ---------- Rules (GAME_SPEC.md). Pure functions over plain data, no DOM. ----------
+var Rules = (() => {
+  const N = 9;
+  const ELS = ['fire', 'wind', 'water', 'earth'];
+  const ORTH = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  const DIAG = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
+  const ALL = ORTH.concat(DIAG);
+  const variant = { exact: false };
+
+  const sq = (x, y) => y * N + x;
+  const X = s => s % N;
+  const Y = s => (s / N) | 0;
+  const onBoard = (x, y) => x >= 0 && x < N && y >= 0 && y < N;
+  const onEdge = (x, y) => x === 0 || y === 0 || x === N - 1 || y === N - 1;
+  const name = s => 'abcdefghi'[X(s)] + (Y(s) + 1);
+  const parse = t => sq(t.charCodeAt(0) - 97, parseInt(t.slice(1), 10) - 1);
+  const other = o => (o === 'w' ? 'b' : 'w');
+  const dist = (a, b) => Math.max(Math.abs(X(a) - X(b)), Math.abs(Y(a) - Y(b)));
+
+  // A piece is {o:'w'|'b', wiz:true} or {o, els:[{e, s}]} with 1 or 2 elements.
+  const isPlainEarth = p => !p.wiz && p.els.length === 1 && p.els[0].e === 'earth';
+  const capturable = p => !isPlainEarth(p);
+  const isCapturer = p => !p.wiz && p.els.some(x => x.e !== 'earth');
+  const range = p => (p.wiz ? 1 : Math.max(...p.els.map(x => x.s)));
+  const moveTypes = p => {
+    if (p.wiz) return ['wizard'];
+    const es = p.els.map(x => x.e);
+    // Earth combined with another element moves only as that element (§5).
+    if (es.length === 2 && es.includes('earth')) return es.filter(e => e !== 'earth');
+    // Slides first, so a Water+X stack prefers the straight route when both reach a square.
+    return es.slice().sort((a, b) => (a === 'water') - (b === 'water'));
+  };
+  const canCombine = (a, b) =>
+    a.o === b.o && !a.wiz && !b.wiz && a.els.length === 1 && b.els.length === 1 && a.els[0].e !== b.els[0].e;
+  const combine = (a, b) => ({ o: a.o, els: a.els.concat(b.els) });
+
+  // Water: the squares one step can reach from c (§3 "Water movement rule").
+  function waterSteps(board, c) {
+    const x = X(c), y = Y(c), out = new Set();
+    for (const dy of [1, -1]) if (onBoard(x, y + dy)) out.add(sq(x, y + dy)); // flow
+    for (const [dx, dy] of ALL) { // bank around a plain Earth touching c
+      const ex = x + dx, ey = y + dy;
+      if (!onBoard(ex, ey)) continue;
+      const e = board[sq(ex, ey)];
+      if (!e || !isPlainEarth(e)) continue;
+      for (const [ax, ay] of ALL) {
+        const nx = x + ax, ny = y + ay;
+        if (onBoard(nx, ny) && Math.max(Math.abs(nx - ex), Math.abs(ny - ey)) === 1) out.add(sq(nx, ny));
+      }
+    }
+    if (onEdge(x, y)) for (const [dx, dy] of ORTH) { // bank along the edge
+      const nx = x + dx, ny = y + dy;
+      if (onBoard(nx, ny) && onEdge(nx, ny)) out.add(sq(nx, ny));
+    }
+    return out;
+  }
+
+  // Moves for the piece on `from`, ignoring Wizard safety. One move per destination,
+  // keeping the shortest route found. Each move: {from, to, path:[squares], as, kind}.
+  function pseudoMoves(board, from) {
+    const p = board[from];
+    const R = range(p), exact = variant.exact;
+    const out = new Map();
+    const landable = (t, as) => !t || (t.o !== p.o ? as !== 'earth' && capturable(t) : canCombine(p, t));
+    const add = (to, path, as) => {
+      const prev = out.get(to);
+      if (prev && prev.path.length <= path.length) return;
+      const t = board[to];
+      out.set(to, { from, to, path, as, kind: t ? (t.o === p.o ? 'combine' : 'capture') : 'move' });
+    };
+    for (const as of moveTypes(p)) {
+      if (as === 'water') {
+        const visited = new Set([from]), path = [from];
+        const walk = (c, k) => {
+          for (const n of waterSteps(board, c)) {
+            if (visited.has(n)) continue;
+            const t = board[n], steps = k + 1, ok = !exact || steps === R;
+            path.push(n);
+            if (!t) {
+              if (ok) add(n, path.slice(), as);
+              if (steps < R) { visited.add(n); walk(n, steps); visited.delete(n); }
+            } else if (ok && landable(t, as)) add(n, path.slice(), as);
+            path.pop();
+          }
+        };
+        walk(from, 0);
+        continue;
+      }
+      const dirs = as === 'fire' ? ORTH : as === 'wind' ? DIAG : ALL;
+      const max = as === 'wizard' ? 1 : R;
+      for (const [dx, dy] of dirs) {
+        const path = [from];
+        for (let k = 1; k <= max; k++) {
+          const x = X(from) + dx * k, y = Y(from) + dy * k;
+          if (!onBoard(x, y)) break;
+          const s = sq(x, y), t = board[s], ok = !exact || k === max || as === 'wizard';
+          path.push(s);
+          if (!t) { if (ok) add(s, path.slice(), as); continue; }
+          if (ok && landable(t, as)) add(s, path.slice(), as);
+          break;
+        }
+      }
+    }
+    return [...out.values()];
+  }
+
+  function applyBoard(board, m) {
+    const b = board.slice(), p = b[m.from], t = b[m.to];
+    b[m.from] = null;
+    b[m.to] = m.kind === 'combine' ? combine(p, t) : p;
+    return b;
+  }
+  const wizardSq = (board, o) => board.findIndex(p => p && p.wiz && p.o === o);
+  function attacked(board, target, by) {
+    for (let s = 0; s < board.length; s++) {
+      const p = board[s];
+      if (!p || p.o !== by || dist(s, target) > range(p)) continue;
+      if (pseudoMoves(board, s).some(m => m.to === target)) return true;
+    }
+    return false;
+  }
+  function inCheck(board, o) {
+    const w = wizardSq(board, o);
+    return w >= 0 && attacked(board, w, other(o));
+  }
+  function legalFrom(board, from) {
+    const o = board[from].o;
+    return pseudoMoves(board, from).filter(m => !inCheck(applyBoard(board, m), o));
+  }
+  function legalMoves(st) {
+    const out = [];
+    st.board.forEach((p, s) => { if (p && p.o === st.turn) out.push(...legalFrom(st.board, s)); });
+    return out;
+  }
+  const posKey = st =>
+    st.board.map(p => (!p ? '.' : p.o + (p.wiz ? 'Z' : p.els.map(x => x.e[0] + x.s).sort().join('')))).join('') + st.turn;
+
+  // ---------- Game state ----------
+  function reserveFor(o) {
+    const r = [{ o, wiz: true }];
+    for (const e of ELS) for (const s of [3, 2, 1]) r.push({ o, els: [{ e, s }] });
+    return r;
+  }
+  function newGame() {
+    return {
+      board: Array(N * N).fill(null), phase: 'setup', turn: 'w',
+      reserve: { w: reserveFor('w'), b: reserveFor('b') },
+      captured: { w: [], b: [] }, // pieces each player has taken
+      last: null, clock: 0, reps: {}, result: null, ply: 0,
+    };
+  }
+  // The designer's own formation (video [12:44]–[13:10]), as White sees it.
+  // Black gets the same formation from their side of the table (rotated 180°).
+  const DEFAULT_FORMATION = {
+    b3: ['wind', 3], c3: ['earth', 1], e3: ['earth', 3], g3: ['earth', 2], h3: ['wind', 2],
+    c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['fire', 1], g2: ['water', 3],
+    d1: ['fire', 3], e1: 'wizard', f1: ['fire', 2],
+  };
+  function defaultFormation() {
+    const board = Array(N * N).fill(null);
+    for (const [t, v] of Object.entries(DEFAULT_FORMATION)) {
+      const s = parse(t);
+      for (const [o, at] of [['w', s], ['b', sq(N - 1 - X(s), N - 1 - Y(s))]])
+        board[at] = v === 'wizard' ? { o, wiz: true } : { o, els: [{ e: v[0], s: v[1] }] };
+    }
+    return board;
+  }
+  function fromPosition(board, turn) {
+    const st = { ...newGame(), board: board.slice(), phase: 'play', turn, reserve: { w: [], b: [] } };
+    st.reps[posKey(st)] = 1;
+    return st;
+  }
+  const inZone = (o, s) => (o === 'w' ? Y(s) <= 2 : Y(s) >= 6);
+  // Formation (§6): Wizard first, then any element piece, one at a time, no stacks.
+  const canPick = (st, idx) => {
+    const r = st.reserve[st.turn];
+    return st.phase === 'setup' && !!r[idx] && (r[idx].wiz || !r.some(p => p.wiz));
+  };
+  const placeTargets = (st, idx) =>
+    canPick(st, idx) ? st.board.map((p, s) => s).filter(s => !st.board[s] && inZone(st.turn, s)) : [];
+  function place(st, idx, s) {
+    const o = st.turn, r = st.reserve[o].slice(), p = r.splice(idx, 1)[0];
+    const board = st.board.slice();
+    board[s] = p;
+    const ns = { ...st, board, reserve: { ...st.reserve, [o]: r }, turn: other(o), last: { place: true, to: s }, ply: st.ply + 1 };
+    if (!ns.reserve.w.length && !ns.reserve.b.length) {
+      ns.phase = 'play'; ns.turn = 'w'; ns.reps = { [posKey(ns)]: 1 };
+    }
+    return ns;
+  }
+
+  // Play a legal move, then run the end checks in spec order (§6).
+  function makeMove(st, m) {
+    const mover = st.turn, opp = other(mover), taken = st.board[m.to];
+    const ns = {
+      ...st, board: applyBoard(st.board, m), turn: opp, ply: st.ply + 1, last: m,
+      captured: m.kind === 'capture' ? { ...st.captured, [mover]: st.captured[mover].concat([taken]) } : st.captured,
+      clock: m.kind === 'move' ? st.clock + 1 : 0, reps: { ...st.reps },
+    };
+    const key = posKey(ns);
+    ns.reps[key] = (ns.reps[key] || 0) + 1;
+    const end = (winner, reason) => ({ ...ns, phase: 'over', result: { winner, reason } });
+    if (!ns.board.some(p => p && p.o === opp && isCapturer(p))) return end(mover, 'elimination');
+    const replies = legalMoves(ns), check = inCheck(ns.board, opp);
+    if (!replies.length && check) return end(mover, 'checkmate');
+    if (!replies.length) return end(null, 'stalemate');
+    if (ns.reps[key] >= 3) return end(null, 'repetition');
+    if (ns.clock >= 100) return end(null, 'fifty');
+    return ns;
+  }
+
+  return {
+    N, ELS, variant, sq, X, Y, name, parse, other, inZone, isCapturer, canCombine, combine, range,
+    pseudoMoves, legalFrom, legalMoves, inCheck, wizardSq, newGame, fromPosition, defaultFormation, canPick, placeTargets,
+    place, makeMove, reserveFor,
+  };
+})();
+</script>
+
+<script>
+// ---------- App: rendering (PixiJS) and interaction ----------
+(() => {
+const R = Rules;
+const C = {
+  home: 0xd9ccae, mid: 0xd6d4c6, grout: 0x2b2824, frame: 0x14191b, coord: 0x7d7160,
+  fire: 0xd9412b, wind: 0xf0c02f, water: 0x2d7fd6, earth: 0x94603a,
+  white: 0xfbf9f3, black: 0x1b1b20, whiteEdge: 0x2a2620, blackEdge: 0xe6e1d4,
+  last: 0xe9bf55, sel: 0x4f9e86, dot: 0x22302f, capture: 0xc8352a, combine: 0xa8740c,
+  check: 0xe0402f, route: 0x1d5fb4, ink: 0xece6d8, muted: 0x9ba6a2, brass: 0xe0b45c, tray: 0x000000,
+};
+const $ = id => document.getElementById(id);
+const stageEl = $('stage');
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ----- app state -----
+let history = [R.newGame()];
+let settings = { orient: 'fixed', exact: false }; // orient: 'fixed' | 'turn' | 'face'
+let sel = null;          // {type:'board', sq} | {type:'tray', idx} | {type:'palette', piece} | {type:'remove'}
+let targets = new Map(); // square -> move (board) or true (placement)
+let peek = null;         // {sq, moves} opponent piece being inspected
+let flip = false;        // view rotated 180°
+let editing = null;      // {board, turn} while setting up a debug position
+let bannerHidden = false;
+let anim = null, flipTimer = null;
+const cur = () => history[history.length - 1];
+const view = () => (editing ? { ...cur(), board: editing.board, phase: 'edit', turn: editing.turn, last: null } : cur());
+
+try { Object.assign(settings, JSON.parse(localStorage.getItem('elements-spike-settings') || '{}')); } catch (e) {}
+// older versions stored a rotate on/off switch
+const migrate = s => { if (!s.orient) s.orient = s.rotate ? 'turn' : 'fixed'; delete s.rotate; };
+migrate(settings);
+const saveSettings = () => { try { localStorage.setItem('elements-spike-settings', JSON.stringify(settings)); } catch (e) {} };
+
+// ----- Pixi -----
+const app = new PIXI.Application();
+const layers = {};
+let L = null; // layout
+let boardKey = '';
+
+async function boot(data) {
+  if (data && data.history && data.history.length) history = data.history;
+  if (data && data.settings) { Object.assign(settings, data.settings); migrate(settings); }
+  R.variant.exact = !!settings.exact;
+  await app.init({
+    resizeTo: stageEl, antialias: true, autoDensity: true, backgroundAlpha: 0,
+    resolution: Math.min(window.devicePixelRatio || 1, 3),
+  });
+  stageEl.prepend(app.canvas);
+  for (const k of ['board', 'hl', 'route', 'pieces', 'trays', 'drag']) layers[k] = app.stage.addChild(new PIXI.Container());
+  app.renderer.on('resize', () => { boardKey = ''; render(); });
+  new ResizeObserver(() => app.resize()).observe(stageEl);
+  bindInput();
+  bindUi();
+  flip = wantFlip();
+  render();
+  if (document.fonts) document.fonts.ready.then(() => { boardKey = ''; render(); });
+  window.claude?.hot?.snapshot?.(() => ({ history, settings }));
+}
+
+const wantFlip = () => settings.orient === 'turn' && !editing && cur().phase !== 'over' && cur().turn === 'b';
+
+// the board is three stone plates (one per 3-row zone) with a gap of PLATE_GAP squares between them
+const PLATE_GAP = 0.15, HF = 1 + 2 * PLATE_GAP / 9;  // HF: board height / width
+const rowTop = row => row * L.q + Math.floor(row / 3) * L.pg;
+
+function computeLayout() {
+  const w = app.screen.width, h = app.screen.height - 10, gap = 10;
+  let bx, by, B, top, bottom;
+  if (h >= w * 0.92) {
+    const T = Math.max(70, Math.min(140, (h - w - 2 * gap) / 2));
+    B = Math.floor(Math.min(w, (h - 2 * T - 2 * gap) / HF) / 9) * 9;
+    const BH = B * HF;
+    const y0 = Math.max(0, (h - (BH + 2 * T + 2 * gap)) / 2);
+    bx = (w - B) / 2; by = y0 + T + gap;
+    top = { x: bx, y: y0, w: B, h: T };
+    bottom = { x: bx, y: by + BH + gap, w: B, h: T };
+  } else {
+    const S = Math.max(150, Math.min(360, w - h - gap));
+    B = Math.floor(Math.min(h / HF, w - S - gap) / 9) * 9;
+    const BH = B * HF;
+    const x0 = Math.max(0, (w - (B + gap + S)) / 2);
+    bx = x0; by = (h - BH) / 2;
+    const th = (BH - gap) / 2;
+    top = { x: x0 + B + gap, y: by, w: S, h: th };
+    bottom = { x: x0 + B + gap, y: by + th + gap, w: S, h: th };
+  }
+  const q = B / 9, pg = q * PLATE_GAP;
+  const bottomOwner = flip ? 'b' : 'w';
+  // face to face: the top player's tray is turned 180° to read from their side
+  if (settings.orient === 'face') top.turned = true;
+  return { bx, by, B, BH: B * HF, q, pg, topOwner: R.other(bottomOwner), trays: { [bottomOwner]: bottom, [R.other(bottomOwner)]: top } };
+}
+
+// model square -> view centre
+function sqPos(s) {
+  const x = R.X(s), y = R.Y(s);
+  const col = flip ? 8 - x : x, row = flip ? y : 8 - y;
+  return { x: L.bx + (col + 0.5) * L.q, y: L.by + rowTop(row) + L.q / 2 };
+}
+function sqAt(px, py) {
+  const col = Math.floor((px - L.bx) / L.q), dy = py - L.by;
+  // a point in the gap between plates counts as the nearer row
+  let row = -1;
+  if (dy >= 0) for (let r = 0; r < 9; r++) if (dy < rowTop(r) + L.q + (r % 3 === 2 && r < 8 ? L.pg / 2 : 0)) { row = r; break; }
+  if (col < 0 || col > 8 || row < 0 || row > 8) return -1;
+  return flip ? R.sq(8 - col, row) : R.sq(col, 8 - row);
+}
+
+const clear = c => c.removeChildren().forEach(ch => ch.destroy({ children: true }));
+// each side has its own shade of every element: lighter and sunnier for White, deeper for Black
+const SHADE = {
+  w: { fire: 0xef6b4d, wind: 0xf8d65e, water: 0x5ba6ec, earth: 0xbb8a5f },
+  b: { fire: 0xa3271a, wind: 0xcf9a0c, water: 0x1c4c94, earth: 0x5b3820 },
+};
+const elColor = (e, o) => SHADE[o][e];
+
+// one outline per element, hinting at how it moves; k = half-size
+const SHAPES = {
+  fire(g, k) { const s = k * 0.86; return g.roundRect(-s, -s, 2 * s, 2 * s, k * 0.16); },  // square: rows and columns
+  wind(g, k) {                                                                              // diamond: diagonals
+    const d = k * 1.14, c = k * 0.12;
+    return g.moveTo(-c, -d + c).quadraticCurveTo(0, -d, c, -d + c).lineTo(d - c, -c).quadraticCurveTo(d, 0, d - c, c)
+      .lineTo(c, d - c).quadraticCurveTo(0, d, -c, d - c).lineTo(-d + c, c).quadraticCurveTo(-d, 0, -d + c, -c).closePath();
+  },
+  earth(g, k) {                                                                             // octagon: eight ways, a stop sign
+    const pts = [];
+    for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + i * Math.PI / 4; pts.push(k * Math.cos(a), k * Math.sin(a)); }
+    return g.poly(pts);
+  },
+  water(g, k) {                                                                             // drop: a river
+    const t = -k * 1.12, cy = k * 0.24, rr = k * 0.8;
+    return g.moveTo(0, t).bezierCurveTo(k * 0.18, t + k * 0.42, rr, cy - k * 0.5, rr, cy).arc(0, cy, rr, 0, Math.PI)
+      .bezierCurveTo(-rr, cy - k * 0.5, -k * 0.18, t + k * 0.42, 0, t).closePath();
+  },
+};
+const INSET = { fire: 1, wind: 1.414, earth: 1.08, water: 1.15 };  // keeps the owner rim even on every shape
+
+function pieceGfx(p, q) {
+  const g = new PIXI.Graphics();
+  const own = p.o === 'w' ? C.white : C.black, edge = p.o === 'w' ? C.whiteEdge : C.blackEdge;
+  if (p.wiz) {
+    const r = q * 0.43;
+    g.star(0, 0, 6, r, r * 0.56).fill(own).stroke({ width: Math.max(1.5, q * 0.035), color: edge });
+    g.circle(0, 0, r * 0.2).fill(edge);
+    return g;
+  }
+  const size = R.range(p);
+  const k = q * (0.25 + 0.055 * size);
+  const ring = Math.max(2.5, q * 0.075);
+  const rim = (e, kk) => { SHAPES[e](g, kk).fill(edge).stroke({ width: 2.4, color: edge, join: 'round' }); SHAPES[e](g, kk).fill(own); };
+  if (p.els.length === 1) {
+    const e = p.els[0].e;
+    rim(e, k); SHAPES[e](g, k - ring * INSET[e]).fill(elColor(e, p.o));
+  } else {
+    // a stack seen from above: one piece underneath, the other sitting on top.
+    // Earth inside an attacker moves only as the attacker, so the attacker goes underneath and sets the outline.
+    // Otherwise the bigger piece goes underneath; on a tie, the piece that was moved onto (els[1]).
+    const [a, b] = p.els;
+    const under = a.e === 'earth' ? b : b.e === 'earth' ? a : a.s > b.s ? a : b;
+    const top = under === a ? b : a;
+    const kt = k * 0.52;
+    rim(under.e, k); SHAPES[under.e](g, k - ring * INSET[under.e]).fill(elColor(under.e, p.o));
+    rim(top.e, kt); SHAPES[top.e](g, kt - ring * 0.6 * INSET[top.e]).fill(elColor(top.e, p.o));
+  }
+  // a stack never splits and moves at its larger size, so it shows one set of dots: its range
+  const pip = Math.max(2, q * 0.045), gap = pip * 2.6;
+  const pts = size === 1 ? [[0, 0]] : size === 2 ? [[-gap / 2, 0], [gap / 2, 0]] : [[-gap / 2, gap * 0.42], [gap / 2, gap * 0.42], [0, -gap * 0.48]];
+  for (const [x, y] of pts) g.circle(x, y, pip).fill(own).stroke({ width: 1, color: edge });
+  return g;
+}
+
+function text(str, size, color, weight = '600') {
+  const t = new PIXI.Text({
+    text: str, resolution: Math.min(window.devicePixelRatio || 1, 3),
+    style: { fontFamily: 'Figtree, system-ui, -apple-system, sans-serif', fontSize: size, fill: color, fontWeight: weight },
+  });
+  return t;
+}
+
+function drawBoard() {
+  const key = `${L.B}|${L.bx}|${L.by}|${flip}`;
+  if (key === boardKey) return;
+  boardKey = key;
+  clear(layers.board);
+  const g = new PIXI.Graphics();
+  const { bx, by, B, q } = L;
+  g.roundRect(bx - 6, by - 6, B + 12, L.BH + 12, 10).fill(C.frame);
+  // three sandstone plates; each square a separate tile with a thin gap, home zones warmer than the middle
+  for (let z = 0; z < 3; z++) g.roundRect(bx - 3, by + rowTop(z * 3) - 3, B + 6, 3 * q + 6, 7).fill(C.grout);
+  const ti = tileInset(), tr = q * 0.08;
+  for (let s = 0; s < 81; s++) {
+    const p = sqPos(s), y = R.Y(s);
+    const base = y >= 3 && y <= 5 ? C.mid : C.home;
+    const n = ((s * 2654435761) >>> 0) % 15 - 7;  // small, fixed tone variation per tile
+    g.roundRect(p.x - q / 2 + ti, p.y - q / 2 + ti, q - 2 * ti, q - 2 * ti, tr).fill(shade(base, n));
+    g.roundRect(p.x - q / 2 + ti, p.y + q / 2 - ti - q * 0.045, q - 2 * ti, q * 0.045, q * 0.02).fill({ color: 0x000000, alpha: 0.1 });
+  }
+  layers.board.addChild(g);
+  const fs = Math.max(9, q * 0.15);
+  for (let i = 0; i < 9; i++) {
+    const f = text('abcdefghi'[flip ? 8 - i : i], fs, C.coord);
+    f.anchor.set(1, 1); f.position.set(bx + (i + 1) * q - ti - 3, by + rowTop(8) + q - ti - 3);
+    const r = text(String(flip ? i + 1 : 9 - i), fs, C.coord);
+    r.anchor.set(0, 0); r.position.set(bx + ti + 3, by + rowTop(i) + ti + 2);
+    layers.board.addChild(f, r);
+  }
+}
+const tileInset = () => Math.max(1.5, L.q * 0.03);
+const shade = (c, d) => [16, 8, 0].reduce((acc, sh) => acc | (Math.max(0, Math.min(255, ((c >> sh) & 255) + d)) << sh), 0);
+
+function drawHighlights(st) {
+  clear(layers.hl); clear(layers.route);
+  const g = new PIXI.Graphics();
+  const { q } = L;
+  const ti = tileInset();
+  const box = (s, color, alpha) => { const p = sqPos(s); g.roundRect(p.x - q / 2 + ti, p.y - q / 2 + ti, q - 2 * ti, q - 2 * ti, q * 0.08).fill({ color, alpha }); };
+  if (st.last) {
+    if (!st.last.place) box(st.last.from, C.last, 0.45);
+    box(st.last.to, C.last, 0.6);
+  }
+  if (sel && sel.type === 'board') box(sel.sq, C.sel, 0.6);
+  if (peek) box(peek.sq, C.muted, 0.5);
+  if (st.phase === 'play' || (st.result && st.result.reason === 'checkmate')) {
+    const w = R.wizardSq(st.board, st.turn);
+    if (w >= 0 && R.inCheck(st.board, st.turn)) {
+      const p = sqPos(w);
+      g.circle(p.x, p.y, q * 0.48).fill({ color: C.check, alpha: 0.55 });
+    }
+  }
+  const mark = (s, kind, alpha) => {
+    const p = sqPos(s);
+    if (kind === 'capture') g.circle(p.x, p.y, q * 0.46).stroke({ width: q * 0.07, color: C.capture, alpha });
+    else if (kind === 'combine') {
+      g.circle(p.x, p.y, q * 0.46).stroke({ width: q * 0.06, color: C.combine, alpha });
+      const a = q * 0.42, l = q * 0.12, cx = p.x + a - l, cy = p.y - a + l;
+      g.circle(cx, cy, l * 1.05).fill({ color: C.combine, alpha });
+      g.rect(cx - l * 0.65, cy - l * 0.16, l * 1.3, l * 0.32).fill(0xffffff);
+      g.rect(cx - l * 0.16, cy - l * 0.65, l * 0.32, l * 1.3).fill(0xffffff);
+    } else g.circle(p.x, p.y, q * 0.14).fill({ color: C.dot, alpha: alpha * 0.55 });
+  };
+  for (const [s, m] of targets) mark(s, m === true ? 'move' : m.kind, 1);
+  if (peek) for (const m of peek.moves) mark(m.to, m.kind, 0.45);
+  layers.hl.addChild(g);
+  if (st.last && st.last.as === 'water' && !anim) drawRoute(st.last.path, 0.75);
+}
+
+function drawRoute(path, alpha) {
+  if (!path || path.length < 2) return;
+  const g = new PIXI.Graphics();
+  const w = Math.max(3, L.q * 0.08);
+  const pts = path.map(sqPos);
+  g.moveTo(pts[0].x, pts[0].y);
+  for (const p of pts.slice(1)) g.lineTo(p.x, p.y);
+  g.stroke({ width: w, color: C.route, alpha, cap: 'round', join: 'round' });
+  for (const p of pts.slice(1, -1)) g.circle(p.x, p.y, w * 0.9).fill({ color: C.route, alpha });
+  // arrow head at the end
+  const a = pts[pts.length - 2], b = pts[pts.length - 1];
+  const ang = Math.atan2(b.y - a.y, b.x - a.x), hl = w * 3;
+  g.poly([b.x, b.y, b.x - hl * Math.cos(ang - 0.5), b.y - hl * Math.sin(ang - 0.5), b.x - hl * Math.cos(ang + 0.5), b.y - hl * Math.sin(ang + 0.5)]).fill({ color: C.route, alpha });
+  layers.route.addChild(g);
+}
+
+function drawPieces(st) {
+  clear(layers.pieces);
+  st.board.forEach((p, s) => {
+    if (!p) return;
+    const g = pieceGfx(p, L.q);
+    const pos = sqPos(s);
+    g.position.set(pos.x, pos.y);
+    if (drag && drag.active && drag.src.type === 'board' && drag.src.sq === s) g.alpha = 0.3;
+    if (anim && anim.to === s) anim.gfx = g;
+    layers.pieces.addChild(g);
+  });
+  if (anim && anim.gfx) stepAnim(0);
+}
+
+// tray: setup = pieces to place, play = pieces taken, edit = palette
+function trayItems(st, o) {
+  if (editing) return R.reserveFor(o).map((p, i) => ({ p, i, on: true, chosen: sel && sel.type === 'palette' && sel.piece.o === o && sameKind(sel.piece, p) }));
+  if (st.phase === 'setup') return st.reserve[o].map((p, i) => ({ p, i, on: st.turn === o && R.canPick(st, i), chosen: sel && sel.type === 'tray' && st.turn === o && sel.idx === i }));
+  return st.captured[o].map((p, i) => ({ p, i, on: false, small: true }));
+}
+const sameKind = (a, b) => (a.wiz && b.wiz) || (!a.wiz && !b.wiz && a.els[0].e === b.els[0].e && a.els[0].s === b.els[0].s);
+
+function drawTrays(st) {
+  clear(layers.trays);
+  L.slots = [];
+  for (const o of ['w', 'b']) {
+    const t = L.trays[o];
+    const active = (st.phase === 'setup' || st.phase === 'play') && st.turn === o;
+    const box = layers.trays.addChild(new PIXI.Container());
+    const tcx = t.x + t.w / 2, tcy = t.y + t.h / 2;
+    if (t.turned) { box.pivot.set(tcx, tcy); box.position.set(tcx, tcy); box.rotation = Math.PI; }
+    const g = new PIXI.Graphics();
+    g.roundRect(t.x, t.y, t.w, t.h, 12).fill({ color: C.tray, alpha: 0.22 });
+    if (active) g.roundRect(t.x + 1, t.y + 1, t.w - 2, t.h - 2, 12).stroke({ width: 2, color: C.brass });
+    box.addChild(g);
+    const items = trayItems(st, o);
+    const who = o === 'w' ? 'White' : 'Black';
+    let label = who;
+    if (editing) label += ' · tap a piece, then a square';
+    else if (st.phase === 'setup') label += `${active ? ' · your turn' : ''} · ${items.length} to place`;
+    else {
+      if (st.phase === 'over') label += st.result.winner === o ? ' · wins' : st.result.winner ? ' · lost' : ' · draw';
+      else if (active) label += R.inCheck(st.board, o) ? ' · your move · Check!' : ' · your move';
+      label += items.length ? ` · took ${items.length}` : '';
+    }
+    const lt = text(label, Math.max(12, Math.min(16, L.q * 0.24)), active ? C.brass : C.muted, '700');
+    lt.position.set(t.x + 10, t.y + 6);
+    box.addChild(lt);
+    const top = t.y + lt.height + 10, aw = t.w - 12, ah = t.y + t.h - top - 4;
+    const n = Math.max(items.length, 1);
+    let best = { cell: 0, cols: n };
+    for (let rows = 1; rows <= 6; rows++) {
+      const cols = Math.ceil(n / rows);
+      const cell = Math.min(aw / cols, ah / rows, L.q * (st.phase === 'play' && !editing ? 0.75 : 1));
+      if (cell > best.cell) best = { cell, cols };
+    }
+    const { cell, cols } = best;
+    items.forEach((it, k) => {
+      const cx = t.x + 6 + (k % cols + 0.5) * cell, cy = top + (Math.floor(k / cols) + 0.5) * cell;
+      if (it.chosen) {
+        const hg = new PIXI.Graphics();
+        hg.roundRect(cx - cell / 2 + 1, cy - cell / 2 + 1, cell - 2, cell - 2, 8).fill({ color: C.sel, alpha: 0.7 });
+        box.addChild(hg);
+      }
+      const pg = pieceGfx(it.p, cell);
+      pg.position.set(cx, cy);
+      if (!it.on && !it.small) pg.alpha = 0.45;
+      if (drag && drag.active && drag.src.type === 'tray' && drag.src.idx === it.i && st.turn === o) pg.alpha = 0.25;
+      box.addChild(pg);
+      const [sx, sy] = t.turned ? [2 * tcx - cx, 2 * tcy - cy] : [cx, cy];
+      L.slots.push({ o, i: it.i, p: it.p, x: sx, y: sy, r: cell / 2, on: it.on });
+    });
+  }
+}
+
+function render() {
+  if (!layers.board) return;
+  L = computeLayout();
+  const st = view();
+  drawBoard();
+  drawHighlights(st);
+  drawPieces(st);
+  drawTrays(st);
+  drawDrag();
+  updateUi(st);
+}
+
+// ----- move animation -----
+function startAnim(m) {
+  if (reduceMotion) return;
+  const pts = m.path.map(sqPos);
+  const steps = pts.length - 1;
+  // one glide per square of the route, easing in and out, with a short rest on each square
+  const glide = 280, rest = 120;
+  anim = { to: m.to, pts, t: 0, glide, rest, dur: steps * glide + (steps - 1) * rest, gfx: null };
+  app.ticker.add(tick);
+}
+function tick(tk) { stepAnim(tk.deltaMS); }
+function stepAnim(dt) {
+  if (!anim) return;
+  anim.t = Math.min(anim.dur, anim.t + dt);
+  const segs = anim.pts.length - 1, per = anim.glide + anim.rest;
+  const i = Math.min(segs - 1, Math.floor(anim.t / per));
+  const u = Math.min(1, (anim.t - i * per) / anim.glide), r = 0.5 - 0.5 * Math.cos(Math.PI * u);
+  const a = anim.pts[i], b = anim.pts[i + 1];
+  if (anim.gfx && !anim.gfx.destroyed) anim.gfx.position.set(a.x + (b.x - a.x) * r, a.y + (b.y - a.y) * r);
+  if (anim.t >= anim.dur) endAnim();
+}
+function endAnim() {
+  app.ticker.remove(tick);
+  const had = !!anim;
+  anim = null;
+  if (had) render();
+}
+
+function scheduleFlip(delay) {
+  clearTimeout(flipTimer);
+  const want = wantFlip();
+  if (want === flip) return;
+  flipTimer = setTimeout(() => { flip = wantFlip(); boardKey = ''; render(); }, delay);
+}
+
+// ----- actions -----
+function push(st) {
+  history.push(st);
+  sel = null; targets = new Map(); peek = null; bannerHidden = false;
+}
+function doMove(m, animate) {
+  push(R.makeMove(cur(), m));
+  if (animate) startAnim(m);
+  render();
+  scheduleFlip(animate && anim ? anim.dur + 450 : 450);
+}
+function doPlace(idx, s) {
+  push(R.place(cur(), idx, s));
+  render();
+  scheduleFlip(450);
+}
+function undo() {
+  if (editing || history.length < 2) return;
+  endAnim();
+  history.pop();
+  sel = null; targets = new Map(); peek = null; bannerHidden = false;
+  clearTimeout(flipTimer); flip = wantFlip(); boardKey = '';
+  render();
+}
+function newGame() {
+  endAnim();
+  history = [R.newGame()];
+  sel = null; targets = new Map(); peek = null; editing = null; bannerHidden = false;
+  clearTimeout(flipTimer); flip = wantFlip(); boardKey = '';
+  render();
+}
+function selectBoard(s) {
+  const st = cur();
+  sel = { type: 'board', sq: s }; peek = null;
+  targets = new Map(R.legalFrom(st.board, s).map(m => [m.to, m]));
+}
+function selectTray(idx) {
+  sel = { type: 'tray', idx }; peek = null;
+  targets = new Map(R.placeTargets(cur(), idx).map(s => [s, true]));
+}
+function deselect() { sel = null; targets = new Map(); peek = null; }
+
+function editApply(s) {
+  const b = editing.board;
+  if (!sel) return;
+  if (sel.type === 'remove') { b[s] = null; return; }
+  const P = JSON.parse(JSON.stringify(sel.piece));
+  const E = b[s];
+  if (E && R.canCombine(P, E)) { b[s] = R.combine(E, P); return; }
+  if (P.wiz) { const w = R.wizardSq(b, P.o); if (w >= 0) b[w] = null; }
+  b[s] = P;
+}
+
+// ----- input -----
+let drag = null; // {id, x0, y0, x, y, active, src, ghost, offY}
+function hit(px, py) {
+  for (const sl of L.slots) if (Math.abs(px - sl.x) <= sl.r && Math.abs(py - sl.y) <= sl.r) return { type: 'slot', ...sl };
+  const s = sqAt(px, py);
+  return s >= 0 ? { type: 'sq', sq: s } : null;
+}
+function localPoint(e) {
+  const r = app.canvas.getBoundingClientRect();
+  return { x: e.clientX - r.left, y: e.clientY - r.top };
+}
+function draggableSrc(h) {
+  const st = cur();
+  if (editing || !h || st.phase === 'over' || anim) return null;
+  if (st.phase === 'setup' && h.type === 'slot' && h.o === st.turn && h.on) return { type: 'tray', idx: h.i };
+  if (st.phase === 'play' && h.type === 'sq' && st.board[h.sq] && st.board[h.sq].o === st.turn) return { type: 'board', sq: h.sq };
+  return null;
+}
+
+function bindInput() {
+  const cv = app.canvas;
+  cv.addEventListener('pointerdown', e => {
+    if (drag) return;
+    if (anim) endAnim();
+    const p = localPoint(e);
+    const h = hit(p.x, p.y);
+    // on touch, lift the dragged piece away from the finger, toward the far side from the player
+    const src = draggableSrc(h);
+    const facesTop = settings.orient === 'face' && cur().turn === L.topOwner;
+    const lift = e.pointerType === 'touch' ? L.q * 0.45 : 0;
+    drag = { id: e.pointerId, x0: p.x, y0: p.y, x: p.x, y: p.y, active: false, h, src, offY: facesTop ? lift : -lift };
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const p = localPoint(e);
+    drag.x = p.x; drag.y = p.y;
+    if (!drag.active && drag.src && Math.hypot(p.x - drag.x0, p.y - drag.y0) > 8) {
+      drag.active = true;
+      if (drag.src.type === 'board' && !(sel && sel.type === 'board' && sel.sq === drag.src.sq)) selectBoard(drag.src.sq);
+      if (drag.src.type === 'tray' && !(sel && sel.type === 'tray' && sel.idx === drag.src.idx)) selectTray(drag.src.idx);
+      render();
+    } else if (drag.active) drawDrag();
+  });
+  const finish = e => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const d = drag;
+    drag = null;
+    if (e.type === 'pointercancel') { render(); return; }
+    if (d.active) {
+      const s = sqAt(d.x, d.y + d.offY);
+      const m = targets.get(s);
+      if (m) {
+        if (d.src.type === 'tray') doPlace(d.src.idx, s);
+        else doMove(m, false);
+      } else render();
+      return;
+    }
+    tap(d.h);
+  };
+  cv.addEventListener('pointerup', finish);
+  cv.addEventListener('pointercancel', finish);
+  // keep iOS from scrolling or zooming the page while playing
+  document.addEventListener('touchmove', e => { if (e.target.closest && e.target.closest('#stage')) e.preventDefault(); }, { passive: false });
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  document.addEventListener('dblclick', e => e.preventDefault());
+}
+
+function tap(h) {
+  const st = cur();
+  if (editing) {
+    if (h && h.type === 'slot') {
+      sel = sel && sel.type === 'palette' && sel.piece.o === h.o && sameKind(sel.piece, h.p) ? null : { type: 'palette', piece: h.p };
+      $('eRemove').setAttribute('aria-pressed', 'false');
+    } else if (h && h.type === 'sq') editApply(h.sq);
+    render();
+    return;
+  }
+  if (st.phase === 'over' || !h) { deselect(); render(); return; }
+  if (h.type === 'sq' && targets.has(h.sq)) {
+    if (sel.type === 'tray') doPlace(sel.idx, h.sq);
+    else doMove(targets.get(h.sq), true);
+    return;
+  }
+  if (st.phase === 'setup') {
+    if (h.type === 'slot' && h.o === st.turn && h.on) {
+      if (sel && sel.type === 'tray' && sel.idx === h.i) deselect(); else selectTray(h.i);
+    } else deselect();
+    render();
+    return;
+  }
+  // play
+  if (h.type === 'sq') {
+    const p = st.board[h.sq];
+    if (p && p.o === st.turn) {
+      if (sel && sel.type === 'board' && sel.sq === h.sq) deselect(); else selectBoard(h.sq);
+    } else if (p && p.o !== st.turn) {
+      const same = peek && peek.sq === h.sq;
+      deselect();
+      if (!same) peek = { sq: h.sq, moves: R.pseudoMoves(st.board, h.sq) };
+    } else deselect();
+  } else deselect();
+  render();
+}
+
+function drawDrag() {
+  clear(layers.drag);
+  if (!drag || !drag.active) return;
+  const st = cur();
+  const p = drag.src.type === 'board' ? st.board[drag.src.sq] : st.reserve[st.turn][drag.src.idx];
+  if (!p) return;
+  const cx = drag.x, cy = drag.y + drag.offY;
+  const s = sqAt(cx, cy);
+  const m = targets.get(s);
+  const g = new PIXI.Graphics();
+  if (s >= 0) {
+    const pos = sqPos(s);
+    g.rect(pos.x - L.q / 2, pos.y - L.q / 2, L.q, L.q).stroke({ width: 3, color: m ? C.brass : C.muted, alpha: m ? 1 : 0.5 });
+  }
+  layers.drag.addChild(g);
+  if (m && m !== true && m.path.length > 2) {
+    clear(layers.route);
+    drawRoute(m.path, 0.55);
+  }
+  const pg = pieceGfx(p, L.q * 1.12);
+  pg.position.set(cx, cy);
+  pg.alpha = 0.95;
+  layers.drag.addChild(pg);
+}
+
+// ----- HTML UI -----
+const reasonText = {
+  elimination: (w, l) => `${l} has no capturing pieces left.`,
+  checkmate: () => 'Checkmate.',
+  stalemate: (w, l, t) => `${t} has no legal move (stalemate).`,
+  repetition: () => 'The same position came up three times.',
+  fifty: () => '50 moves each without a capture or a combine.',
+  agreement: () => 'Both players agreed to a draw.',
+};
+const nameOf = o => (o === 'w' ? 'White' : 'Black');
+
+function updateUi(st) {
+  const status = $('status');
+  if (editing) status.textContent = 'Debug: place any pieces, then play from here';
+  else if (st.phase === 'setup') {
+    const left = st.reserve[st.turn].length;
+    status.textContent = st.reserve[st.turn].some(p => p.wiz)
+      ? `${nameOf(st.turn)}: place your Wizard in your 3 rows`
+      : `${nameOf(st.turn)}: place a piece (${left} left)`;
+  } else if (st.phase === 'play') {
+    const check = R.inCheck(st.board, st.turn);
+    status.innerHTML = `${nameOf(st.turn)} to move${check ? ' · <span class="check">Check!</span>' : ''}`;
+  } else {
+    const r = st.result;
+    status.textContent = r.winner ? `${nameOf(r.winner)} wins` : 'Draw';
+  }
+  const over = !editing && st.phase === 'over';
+  $('banner').hidden = !over || bannerHidden;
+  if (over) {
+    const r = st.result, w = r.winner, l = w && R.other(w);
+    $('bannerTitle').textContent = w ? `${nameOf(w)} wins` : 'Draw';
+    $('bannerText').textContent = reasonText[r.reason](nameOf(w), nameOf(l), nameOf(st.turn));
+  }
+  $('presetBtn').hidden = !!editing || st.phase !== 'setup';
+  $('undoBtn').disabled = !!editing || history.length < 2;
+  $('drawBtn').disabled = !!editing || st.phase !== 'play';
+  $('editBtn').disabled = !!editing;
+  $('editbar').hidden = !editing;
+  for (const r of document.querySelectorAll('input[name="orient"]')) r.checked = r.value === settings.orient;
+  $('optExact').checked = settings.exact;
+  if (editing) {
+    $('eTurnW').setAttribute('aria-pressed', String(editing.turn === 'w'));
+    $('eTurnB').setAttribute('aria-pressed', String(editing.turn === 'b'));
+    $('eRemove').setAttribute('aria-pressed', String(!!sel && sel.type === 'remove'));
+  }
+}
+
+function bindUi() {
+  const menu = $('menu'), menuBtn = $('menuBtn');
+  const setMenu = open => { menu.hidden = !open; menuBtn.setAttribute('aria-expanded', String(open)); };
+  menuBtn.addEventListener('click', () => setMenu(menu.hidden));
+  document.addEventListener('pointerdown', e => { if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) setMenu(false); });
+  $('undoBtn').addEventListener('click', undo);
+  // fills both formations at once and starts play; Undo goes back to placing by hand
+  $('presetBtn').addEventListener('click', () => {
+    endAnim();
+    push(R.fromPosition(R.defaultFormation(), 'w'));
+    clearTimeout(flipTimer); flip = wantFlip(); boardKey = '';
+    render();
+  });
+  let armed = null;
+  const newBtn = $('newBtn');
+  newBtn.addEventListener('click', () => {
+    if (history.length < 2 && !editing) { newGame(); return; }
+    if (!armed) {
+      newBtn.textContent = 'Tap again to restart'; newBtn.classList.add('warn');
+      armed = setTimeout(() => { armed = null; newBtn.textContent = 'New game'; newBtn.classList.remove('warn'); }, 3000);
+      return;
+    }
+    clearTimeout(armed); armed = null; newBtn.textContent = 'New game'; newBtn.classList.remove('warn');
+    newGame();
+  });
+  for (const r of document.querySelectorAll('input[name="orient"]')) r.addEventListener('change', e => {
+    settings.orient = e.target.value; saveSettings(); clearTimeout(flipTimer); flip = wantFlip(); boardKey = ''; render();
+  });
+  $('optExact').addEventListener('change', e => {
+    settings.exact = e.target.checked; R.variant.exact = settings.exact; saveSettings();
+    if (sel && sel.type === 'board') selectBoard(sel.sq);
+    if (peek) peek.moves = R.pseudoMoves(cur().board, peek.sq);
+    render();
+  });
+  $('drawBtn').addEventListener('click', () => {
+    const st = cur();
+    if (st.phase !== 'play') return;
+    push({ ...st, phase: 'over', result: { winner: null, reason: 'agreement' } });
+    setMenu(false); render();
+  });
+  $('editBtn').addEventListener('click', () => {
+    const st = cur();
+    editing = { board: st.phase === 'setup' ? Array(81).fill(null) : st.board.slice(), turn: st.phase === 'play' ? st.turn : 'w' };
+    deselect(); setMenu(false); clearTimeout(flipTimer); flip = false; boardKey = ''; render();
+  });
+  $('eRemove').addEventListener('click', () => { sel = sel && sel.type === 'remove' ? null : { type: 'remove' }; render(); });
+  $('eClear').addEventListener('click', () => { editing.board = Array(81).fill(null); render(); });
+  $('eTurnW').addEventListener('click', () => { editing.turn = 'w'; render(); });
+  $('eTurnB').addEventListener('click', () => { editing.turn = 'b'; render(); });
+  $('ePlay').addEventListener('click', () => {
+    history = [R.fromPosition(editing.board, editing.turn)];
+    editing = null; deselect(); flip = wantFlip(); boardKey = ''; render();
+  });
+  $('eCancel').addEventListener('click', () => { editing = null; deselect(); flip = wantFlip(); boardKey = ''; render(); });
+  $('bNew').addEventListener('click', newGame);
+  $('bUndo').addEventListener('click', undo);
+  $('bView').addEventListener('click', () => { bannerHidden = true; render(); });
+}
+
+// for poking at the spike from the browser console
+window.spike = { Rules: R, cur, push: st => { push(st); render(); }, sqPos: s => sqPos(s), sqAt: (x, y) => sqAt(x, y), layout: () => L, anim: () => anim && anim.gfx && { x: anim.gfx.x, y: anim.gfx.y, t: anim.t } };
+
+const hot = window.claude?.hot;
+if (hot?.ready) hot.ready(boot); else boot(hot?.data ?? {});
+})();
+</script>

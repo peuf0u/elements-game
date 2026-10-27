@@ -1,0 +1,206 @@
+<title>Elements Board Look</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout: one reading column; a style switcher above one big board, notes beside it on wide screens. Same dark "game table" look as the spike. */
+:root {
+  --table: #1a2023;
+  --panel: #242c30;
+  --line: #3c484e;
+  --ink: #ece6d8;
+  --muted: #9ba6a2;
+  --brass: #e0b45c;
+  --font-display: "Marcellus", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+body {
+  background: var(--table); color: var(--ink); font-family: var(--font-ui); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+main { max-width: 940px; margin: 0 auto; display: grid; gap: 28px; }
+.eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+h1, h2 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 42px); letter-spacing: 0.02em; }
+h2 { font-size: 24px; }
+p { margin: 0; max-width: 64ch; }
+.muted { color: var(--muted); }
+.intro { display: grid; gap: 10px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 28px 24px; }
+.var { display: grid; gap: 8px; align-content: start; }
+.var h2 { font-size: 21px; display: flex; gap: 10px; align-items: baseline; }
+.var h2 span { font-family: var(--font-ui); font-size: 13px; font-weight: 700; color: var(--muted); }
+.var p { font-size: 14px; color: var(--muted); }
+svg { display: block; max-width: 100%; height: auto; }
+</style>
+
+<main>
+  <div class="intro">
+    <div class="eyebrow">Elements · design sketch</div>
+    <h1>Board look</h1>
+    <p>Variations on C, the three stone plates. They change the stone, the shape of the tiles, and whether the plates show whose side is whose. Each one uses the default formation and the stacked pieces, with two stacks in the middle.</p>
+  </div>
+  <div class="gallery" id="gallery"></div>
+</main>
+
+<script>
+const COL = { fire: '#d9412b', wind: '#f0c02f', water: '#2d7fd6', earth: '#94603a' };
+const SQ = { light: '#dbd3bf', dark: '#cbc2ab' };
+const OWN = { w: { fill: '#fbf9f3', edge: '#2a2620' }, b: { fill: '#1b1b20', edge: '#e6e1d4' } };
+const NAMES = { fire: 'Fire', wind: 'Wind', water: 'Water', earth: 'Earth' };
+const f = n => +n.toFixed(2);
+
+// shape outlines, centred on 0,0; k = half-size
+const SHAPES = {
+  fire(k) { // square: orthogonal, like a rook
+    const s = k * 0.86, c = k * 0.16;
+    return `M${f(-s + c)},${f(-s)}H${f(s - c)}Q${f(s)},${f(-s)} ${f(s)},${f(-s + c)}V${f(s - c)}Q${f(s)},${f(s)} ${f(s - c)},${f(s)}H${f(-s + c)}Q${f(-s)},${f(s)} ${f(-s)},${f(s - c)}V${f(-s + c)}Q${f(-s)},${f(-s)} ${f(-s + c)},${f(-s)}Z`;
+  },
+  wind(k) { // diamond: diagonal, like a bishop
+    const d = k * 1.14, c = k * 0.12;
+    return `M${f(-c)},${f(-d + c)}Q0,${f(-d)} ${f(c)},${f(-d + c)}L${f(d - c)},${f(-c)}Q${f(d)},0 ${f(d - c)},${f(c)}L${f(c)},${f(d - c)}Q0,${f(d)} ${f(-c)},${f(d - c)}L${f(-d + c)},${f(c)}Q${f(-d)},0 ${f(-d + c)},${f(-c)}Z`;
+  },
+  earth(k) { // octagon: eight directions, and a "stop" sign for the blocker
+    const r = k * 1.0, pts = [];
+    for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + i * Math.PI / 4; pts.push(`${f(r * Math.cos(a))},${f(r * Math.sin(a))}`); }
+    return `M${pts.join('L')}Z`;
+  },
+  water(k) { // drop: a river running forward and back
+    const t = -k * 1.12, cy = k * 0.24, rr = k * 0.8;
+    return `M0,${f(t)}C${f(k * 0.18)},${f(t + k * 0.42)} ${f(rr)},${f(cy - k * 0.5)} ${f(rr)},${f(cy)}A${f(rr)},${f(rr)} 0 0 1 ${f(-rr)},${f(cy)}C${f(-rr)},${f(cy - k * 0.5)} ${f(-k * 0.18)},${f(t + k * 0.42)} 0,${f(t)}Z`;
+  },
+};
+// how far in to step for an even rim, per shape
+const INSET = { fire: 1, wind: 1.414, earth: 1.08, water: 1.15 };
+// draw order for merged stacks: the narrower shape goes on top so the wider one shows around it
+const LAYER = { fire: 0, wind: 1, earth: 2, water: 3 };
+
+const sizeK = (q, s) => q * (0.25 + 0.055 * s);
+const ringW = q => Math.max(2.5, q * 0.075);
+
+function pips(n, x, y, q, o) {
+  const p = Math.max(2, q * 0.045), g = p * 2.6;
+  const pts = n === 1 ? [[0, 0]] : n === 2 ? [[-g / 2, 0], [g / 2, 0]] : [[-g / 2, g * 0.42], [g / 2, g * 0.42], [0, -g * 0.48]];
+  return pts.map(([a, b]) => `<circle cx="${f(x + a)}" cy="${f(y + b)}" r="${f(p)}" fill="${OWN[o].fill}" stroke="${OWN[o].edge}" stroke-width="1"/>`).join('');
+}
+const pathEl = (d, attrs) => `<path d="${d}" ${attrs}/>`;
+const edgeOf = (e, k, o) => pathEl(SHAPES[e](k), `fill="${OWN[o].edge}" stroke="${OWN[o].edge}" stroke-width="2.4" stroke-linejoin="round"`);
+const rimOf = (e, k, o) => pathEl(SHAPES[e](k), `fill="${OWN[o].fill}"`);
+const coreOf = (e, k, q) => pathEl(SHAPES[e](k - ringW(q) * INSET[e]), `fill="${COL[e]}"`);
+
+function single(e, s, q, o) {
+  const k = sizeK(q, s);
+  return edgeOf(e, k, o) + rimOf(e, k, o) + coreOf(e, k, q) + pips(s, 0, 0, q, o);
+}
+
+function wizard(q, o) {
+  const r = q * 0.43, ri = r * 0.56, pts = [];
+  for (let i = 0; i < 12; i++) { const a = -Math.PI / 2 + i * Math.PI / 6, rr = i % 2 ? ri : r; pts.push(`${f(rr * Math.cos(a))},${f(rr * Math.sin(a))}`); }
+  return `<path d="M${pts.join('L')}Z" fill="${OWN[o].fill}" stroke="${OWN[o].edge}" stroke-width="${f(Math.max(1.5, q * 0.035))}" stroke-linejoin="round"/><circle r="${f(r * 0.2)}" fill="${OWN[o].edge}"/>`;
+}
+
+// Earth inside an attacker: the attacker's piece with a small brown octagon core
+function earthStack(e, s, q, o) {
+  const k = sizeK(q, s), kc = k * 0.42;
+  return edgeOf(e, k, o) + rimOf(e, k, o) + coreOf(e, k, q)
+    + pathEl(SHAPES.earth(kc), `fill="${COL.earth}" stroke="${OWN[o].fill}" stroke-width="${f(q * 0.03)}"`)
+    + pips(s, 0, 0, q, o);
+}
+
+let clipN = 0;
+function combo(style, a, b, q, o) {
+  // a, b: {e, s}; range = larger size
+  if (a.e === 'earth' || b.e === 'earth') { const atk = a.e === 'earth' ? b : a; return earthStack(atk.e, Math.max(a.s, b.s), q, o); }
+  const s = Math.max(a.s, b.s), k = sizeK(q, s);
+  if (style === 'merged') {
+    const [lo, hi] = LAYER[a.e] < LAYER[b.e] ? [a, b] : [b, a];
+    return edgeOf(lo.e, k, o) + edgeOf(hi.e, k, o) + rimOf(lo.e, k, o) + rimOf(hi.e, k, o)
+      + coreOf(lo.e, k, q) + coreOf(hi.e, k, q) + pips(s, 0, 0, q, o);
+  }
+  if (style === 'stacked') {
+    // seen from above: the bigger piece underneath, the smaller one sitting on top
+    const [big, small] = a.s >= b.s ? [a, b] : [b, a];
+    const ks = k * 0.52;
+    return edgeOf(big.e, k, o) + rimOf(big.e, k, o) + coreOf(big.e, k, q)
+      + edgeOf(small.e, ks, o) + rimOf(small.e, ks, o) + pathEl(SHAPES[small.e](ks - ringW(q) * 0.6 * INSET[small.e]), `fill="${COL[small.e]}"`)
+      + pips(s, 0, 0, q, o);
+  }
+  // split: left half one element, right half the other
+  const id = `c${clipN++}`, W = q;
+  const half = (p, x) => `<clipPath id="${id}${x < 0 ? 'l' : 'r'}"><rect x="${x < 0 ? -W : 0}" y="${-W}" width="${W}" height="${2 * W}"/></clipPath>`
+    + `<g clip-path="url(#${id}${x < 0 ? 'l' : 'r'})">${edgeOf(p.e, k, o)}${rimOf(p.e, k, o)}${coreOf(p.e, k, q)}</g>`;
+  return half(a, -1) + half(b, 1)
+    + `<line x1="0" y1="${f(-k * 1.2)}" x2="0" y2="${f(k * 1.2)}" stroke="${OWN[o].fill}" stroke-width="${f(Math.max(1.5, q * 0.03))}"/>`
+    + `<line x1="0" y1="${f(-k * 1.2)}" x2="0" y2="${f(k * 1.2)}" stroke="${OWN[o].edge}" stroke-width="1" stroke-opacity="0.5" transform="translate(${f(q * 0.02)},0)"/>`
+    + pips(s, 0, 0, q, o);
+}
+
+
+const DEF = { b3: ['wind', 3], c3: ['earth', 1], e3: ['earth', 3], g3: ['earth', 2], h3: ['wind', 2],
+  c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['fire', 1], g2: ['water', 3],
+  d1: ['fire', 3], e1: 'wizard', f1: ['fire', 2] };
+const N = 9, Q = 64, PAD = 14;
+const cells = [];
+for (const [n, v] of Object.entries(DEF)) {
+  const x = 'abcdefghi'.indexOf(n[0]), y = N - +n[1];
+  cells.push({ x, y, o: 'w', v }, { x: N - 1 - x, y: N - 1 - y, o: 'b', v });
+}
+// two stacks in the middle zone
+cells.push({ x: 3, y: 4, o: 'w', stack: [{ e: 'fire', s: 2 }, { e: 'wind', s: 3 }] });
+cells.push({ x: 6, y: 3, o: 'b', stack: [{ e: 'water', s: 2 }, { e: 'earth', s: 1 }] });
+
+function stacked(a, b, q, o) { return combo('stacked', a, b, q, o); }
+function pieceAt(c, q) {
+  if (c.stack) return stacked(c.stack[0], c.stack[1], q, c.o);
+  return c.v === 'wizard' ? wizard(q, c.o) : single(c.v[0], c.v[1], q, c.o);
+}
+
+// small seeded noise so the stone tiles vary a little but stay the same every time
+let seed = 7;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const shade = (hex, d) => '#' + [1, 3, 5].map(i => Math.max(0, Math.min(255, parseInt(hex.slice(i, i + 2), 16) + d)).toString(16).padStart(2, '0')).join('');
+
+// v: slab = board base, gap = colour between tiles, home/mid = tile stone, homeB = Black's home if different,
+// r = tile corner radius, inset = half the gap between tiles, plateGap = extra gap between zones, jitter = tone variation
+const VARIANTS = [
+  { id: 'sand', name: 'Sandstone', note: 'C as you saw it: warm sand home plates, a paler, cooler middle.',
+    slab: '#14191b', gap: '#2b2824', home: '#d9ccae', mid: '#d6d4c6', r: 5, inset: 2, plateGap: 10, jitter: 14 },
+  { id: 'marble', name: 'Marble and basalt', note: 'Each side has its own stone: pale marble for White, dark basalt for Black, sandstone in the middle. You see whose half is whose at once.',
+    slab: '#14191b', gap: '#1d1c1a', home: '#e7e3da', homeB: '#4b5157', mid: '#d4c6a6', r: 5, inset: 2, plateGap: 10, jitter: 10 },
+  { id: 'slate', name: 'Slate', note: 'Dark grey-blue slate everywhere, a little lighter in the middle. Moody, and the coloured pieces glow on it.',
+    slab: '#0f1315', gap: '#161b1e', home: '#56636a', mid: '#6b777b', r: 4, inset: 2, plateGap: 10, jitter: 10 },
+  { id: 'clay', name: 'Terracotta', note: 'Warm fired-clay tiles at home and pale clay in the middle, like a courtyard floor.',
+    slab: '#14191b', gap: '#3a261c', home: '#c58b67', mid: '#dcc5a8', r: 4, inset: 2, plateGap: 10, jitter: 16 },
+  { id: 'pebble', name: 'River pebbles', note: 'Rounded grey stones with wide, mossy gaps. The softest and most natural of the set.',
+    slab: '#1b201b', gap: '#2f382c', home: '#cdc7b8', mid: '#c4c9bd', r: 15, inset: 4, plateGap: 12, jitter: 12 },
+  { id: 'carved', name: 'Carved block', note: 'One stone colour, tiles barely apart and bevelled like they’re carved from one block. The zones show only as the deeper cuts between plates.',
+    slab: '#14191b', gap: '#8b7b5c', home: '#d6c8a8', mid: '#d6c8a8', r: 3, inset: 1, plateGap: 9, jitter: 6, bevel: true },
+];
+
+function board(v) {
+  seed = 7;
+  const W = N * Q + PAD * 2, H = N * Q + PAD * 2 + v.plateGap * 2;
+  const ty = y => PAD + y * Q + Math.floor(y / 3) * v.plateGap;
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img" aria-label="${v.name} board">`;
+  s += `<rect width="${W}" height="${H}" rx="12" fill="${v.slab}"/>`;
+  for (let z = 0; z < 3; z++) s += `<rect x="${PAD - 4}" y="${ty(z * 3) - 4}" width="${N * Q + 8}" height="${3 * Q + 8}" rx="8" fill="${v.gap}"/>`;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const base = y < 3 ? (v.homeB || v.home) : y > 5 ? v.home : v.mid;
+    const tx = PAD + x * Q + v.inset, tyy = ty(y) + v.inset, t = Q - 2 * v.inset;
+    s += `<rect x="${tx}" y="${tyy}" width="${t}" height="${t}" rx="${v.r}" fill="${shade(base, Math.round((rnd() - 0.5) * v.jitter))}"/>`;
+    if (v.bevel) {
+      s += `<rect x="${tx}" y="${tyy}" width="${t}" height="${t}" rx="${v.r}" fill="none" stroke="#fff" stroke-opacity="0.35" stroke-width="1.5" stroke-dasharray="${t * 2} ${t * 2}"/>`;
+      s += `<rect x="${tx + 1}" y="${tyy + t - 3}" width="${t - 2}" height="3" rx="1.5" fill="#000" fill-opacity="0.16"/>`;
+    } else s += `<rect x="${tx}" y="${tyy + t - 3}" width="${t}" height="3" rx="1.5" fill="#000" fill-opacity="0.10"/>`;
+  }
+  for (const c of cells) s += `<g transform="translate(${PAD + c.x * Q + Q / 2},${ty(c.y) + Q / 2})">${pieceAt(c, Q)}</g>`;
+  return s + '</svg>';
+}
+
+document.getElementById('gallery').innerHTML = VARIANTS.map((v, i) =>
+  `<div class="var"><h2>${v.name} <span>C${i + 1}</span></h2>${board(v)}<p>${v.note}</p></div>`).join('');
+</script>

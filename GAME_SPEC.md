@@ -52,7 +52,11 @@ The designer names them "defensive, middle, attacking zone" ✅ `[11:39]` — pr
 General rules:
 - Every element can move **forwards and backwards**. ✅ `[03:48]`
 - A piece moves **up to N squares**, where N = its size (1–3). ✅ `[05:30]` + *(designer, Q&A)*
-  - 🔧 **Variant "Exact range":** a piece must move **exactly** N squares. The designer wants to playtest this, so the app should support it as a toggle.
+  - 🔧 **Variant "Exact range":** a piece must move **exactly** N squares. The designer wants to playtest this, so the app should support it as a toggle, **off by default**. ✅ *(designer, spike 2026-10-27)* When on, it applies the same way to every piece ✅ *(designer, spike 2026-10-27)*:
+    - Fire, Wind and Earth move exactly N squares, captures included.
+    - Water's route has exactly N steps.
+    - A combined piece moves exactly its range (the larger size), whichever element it moves as.
+    - The Wizard is unaffected (always 1).
 - Pieces cannot jump over other pieces; every square on the way must be empty, and only the final square may hold an enemy piece to capture. ✅ *(designer, Q&A)*
 - So Fire is a short-range rook, Wind a short-range bishop, and Earth a short-range queen that can't capture.
 
@@ -109,6 +113,7 @@ Example: Water size 3 (W) at b2, Earth (E) at c3. Ring around E = ○.
 - b2 → b3 → c4 — banking up and over the Earth
 - b2 → c2 → d2 → d1 — around the corner, then flowing **backward** down column d (the "come back" move from `[10:14]`)
 - ✗ b2 → a2 — a2 does not touch E, so this sideways step isn't allowed
+  - The ✗ is about that single step. Because this example sits in the real board corner, a2 *is* still reachable along the edge: b2 → b1 → a1 → a2 (flow, edge, edge). The same goes for a1, b1 and c1. ✅ *(designer, spike 2026-10-27)*
 - Tactical example ✅ `[10:19]`–`[10:47]`: the opponent blocks a Wind attack on their Fire by placing an Earth piece; that Earth now gives my Water a bend point, so my Water can capture the Fire, which would not have been possible without the Earth there.
 
 ### Wizard
@@ -149,6 +154,13 @@ Example: Water size 3 (W) at b2, Earth (E) at c3. Ring around E = ○.
   - Then they alternate placing single element pieces. **No stacks during setup**; combining only happens during play.
 - 🧪 Later: the Wizard gets its own, more restricted starting area (likely tied to the Castle idea in §7).
 - For beginners, the rulebook could suggest preset formations. 🧪 `[12:13]`–`[12:28]`
+  - **Default formation:** the designer's own formation `[12:44]`–`[13:10]` is the default preset in the spike. ✅ *(designer, spike 2026-10-27)* The squares and sizes were read off the video. 🟡 Shown for White; Black uses the same formation from their side of the table (rotated 180°: White's b3 is Black's h7).
+    ```
+     3  ·  W3 E1 ·  E3 ·  E2 W2 ·       W = Wind  E = Earth  R = Water  F = Fire
+     2  ·  ·  R1 W1 R2 F1 R3 ·  ·       Z = Wizard, number = size
+     1  ·  ·  ·  F3 Z  F2 ·  ·  ·
+        a  b  c  d  e  f  g  h  i
+    ```
 
 ### Phase 2 — Play
 - **White always moves first** ✅ *(designer, Q&A; the video said "by agreement" `[13:37]`)*. The app decides who plays White (alternate or random).
@@ -203,7 +215,7 @@ Example: a move that removes the opponent's last capturing piece **and** leaves 
 
 ## Open questions (deferred, none block v1)
 
-1. Under the `exactRange` variant, must Water take exactly N steps too? (Suggested: yes.)
+1. ~~Under the `exactRange` variant, must Water take exactly N steps too?~~ Yes, see §3. ✅ *(designer, spike 2026-10-27)*
 2. Draw rules are provisional chess defaults. Revisit after playtesting.
 3. Same-element combining is provisionally disallowed. Revisit if a use for it shows up.
 4. Wizard's own restricted starting area: shape and size (ties into the Castle idea).

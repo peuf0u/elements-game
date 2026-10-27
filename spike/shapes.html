@@ -1,0 +1,267 @@
+<title>Elements Piece Shapes</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Figtree:wght@400;600;700&display=swap">
+<style>
+/* Layout: one reading column; each section pairs a short rule with pieces drawn on real board squares. Same dark "game table" look as the spike. */
+:root {
+  --table: #1a2023;
+  --panel: #242c30;
+  --line: #3c484e;
+  --ink: #ece6d8;
+  --muted: #9ba6a2;
+  --brass: #e0b45c;
+  --font-display: "Marcellus", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+body {
+  background: var(--table); color: var(--ink); font-family: var(--font-ui); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+main { max-width: 940px; margin: 0 auto; display: grid; gap: 44px; }
+.eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+h1, h2 { font-family: var(--font-display); font-weight: 400; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 42px); letter-spacing: 0.02em; }
+h2 { font-size: 26px; }
+p { margin: 0; max-width: 64ch; }
+.muted { color: var(--muted); }
+section { display: grid; gap: 16px; }
+.intro { display: grid; gap: 10px; }
+
+.els { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.el { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 8px; align-content: start; }
+.el h3 { margin: 0; font-size: 17px; display: flex; gap: 8px; align-items: baseline; }
+.el h3 span { font-weight: 600; font-size: 13px; color: var(--muted); }
+.el p { font-size: 14px; color: var(--muted); }
+svg { display: block; max-width: 100%; height: auto; }
+
+.combos { overflow-x: auto; }
+.grid { display: grid; grid-template-columns: 120px repeat(3, minmax(150px, 1fr)); gap: 10px 14px; min-width: 600px; align-items: center; }
+.grid .head { display: grid; gap: 2px; align-self: end; }
+.grid .head b { font-size: 17px; }
+.grid .head small { color: var(--muted); font-size: 13px; line-height: 1.35; }
+.grid .row { font-weight: 700; }
+.grid .row small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+.cell { border-radius: 10px; padding: 4px; border: 2px solid transparent; justify-self: start; }
+.cell.pick { border-color: var(--brass); }
+
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tabs button {
+  font: inherit; font-weight: 600; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 16px; min-height: 44px; cursor: pointer;
+}
+.tabs button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-color: var(--brass); }
+.tabs button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.board { max-width: 620px; }
+
+.pick-box { background: var(--panel); border: 1px solid var(--brass); border-radius: 12px; padding: 18px; display: grid; gap: 10px; }
+.pick-box ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 64ch; }
+</style>
+
+<main>
+  <div class="intro">
+    <div class="eyebrow">Elements · design sketch</div>
+    <h1>Piece shapes</h1>
+    <p>Each element gets a shape that hints at how it moves, so you can read the board without relying on colour. Colour stays as a second cue. The dots still show size, and the owner still shows as the light or dark rim.</p>
+  </div>
+
+  <section>
+    <h2>One shape per element</h2>
+    <div class="els" id="els"></div>
+  </section>
+
+  <section>
+    <h2>Combined pieces: three ways</h2>
+    <p class="muted">Only three pairs really move two ways: Fire + Wind, Fire + Water and Wind + Water. A stack moves at its larger size, and it never splits again, so it only needs one set of dots: its range. Each example is a size 3 stacked with a size 1.</p>
+    <div class="combos"><div class="grid" id="combos"></div></div>
+    <p class="muted">Earth joining an attacker is different. The stack moves only as the attacker, so it keeps the attacker's shape, with a small brown octagon in the middle to show the Earth inside. It looks the same whichever option you pick:</p>
+    <div id="earth"></div>
+  </section>
+
+  <section>
+    <h2>On the board</h2>
+    <p class="muted">The same position with each option, at about the size you'd see on the iPad.</p>
+    <div class="tabs" role="group" aria-label="Combination style">
+      <button type="button" id="tabMerged" data-style="merged" aria-pressed="true">A · Merged</button>
+      <button type="button" id="tabStacked" data-style="stacked" aria-pressed="false">B · Stacked</button>
+      <button type="button" id="tabSplit" data-style="split" aria-pressed="false">C · Split</button>
+    </div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <section class="pick-box">
+    <div class="eyebrow">My pick</div>
+    <h2>A · Merged</h2>
+    <ul>
+      <li>The outline is exactly how the stack moves. Fire + Wind's square and diamond together make an eight-point star, and it moves in all eight directions (one kind per move).</li>
+      <li>A stack has a different outline from every single piece, so you can spot stacks across the board, which matters because taking one wins two elements.</li>
+      <li>Earth stacks keep the attacker's outline, which matches the rule that they move only as the attacker.</li>
+      <li>The weak point: Fire + Water and Wind + Water are less striking than Fire + Wind, and on a black piece the colours carry more of the load.</li>
+    </ul>
+  </section>
+</main>
+
+<script>
+const COL = { fire: '#d9412b', wind: '#f0c02f', water: '#2d7fd6', earth: '#94603a' };
+const SQ = { light: '#dbd3bf', dark: '#cbc2ab' };
+const OWN = { w: { fill: '#fbf9f3', edge: '#2a2620' }, b: { fill: '#1b1b20', edge: '#e6e1d4' } };
+const NAMES = { fire: 'Fire', wind: 'Wind', water: 'Water', earth: 'Earth' };
+const f = n => +n.toFixed(2);
+
+// shape outlines, centred on 0,0; k = half-size
+const SHAPES = {
+  fire(k) { // square: orthogonal, like a rook
+    const s = k * 0.86, c = k * 0.16;
+    return `M${f(-s + c)},${f(-s)}H${f(s - c)}Q${f(s)},${f(-s)} ${f(s)},${f(-s + c)}V${f(s - c)}Q${f(s)},${f(s)} ${f(s - c)},${f(s)}H${f(-s + c)}Q${f(-s)},${f(s)} ${f(-s)},${f(s - c)}V${f(-s + c)}Q${f(-s)},${f(-s)} ${f(-s + c)},${f(-s)}Z`;
+  },
+  wind(k) { // diamond: diagonal, like a bishop
+    const d = k * 1.14, c = k * 0.12;
+    return `M${f(-c)},${f(-d + c)}Q0,${f(-d)} ${f(c)},${f(-d + c)}L${f(d - c)},${f(-c)}Q${f(d)},0 ${f(d - c)},${f(c)}L${f(c)},${f(d - c)}Q0,${f(d)} ${f(-c)},${f(d - c)}L${f(-d + c)},${f(c)}Q${f(-d)},0 ${f(-d + c)},${f(-c)}Z`;
+  },
+  earth(k) { // octagon: eight directions, and a "stop" sign for the blocker
+    const r = k * 1.0, pts = [];
+    for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + i * Math.PI / 4; pts.push(`${f(r * Math.cos(a))},${f(r * Math.sin(a))}`); }
+    return `M${pts.join('L')}Z`;
+  },
+  water(k) { // drop: a river running forward and back
+    const t = -k * 1.12, cy = k * 0.24, rr = k * 0.8;
+    return `M0,${f(t)}C${f(k * 0.18)},${f(t + k * 0.42)} ${f(rr)},${f(cy - k * 0.5)} ${f(rr)},${f(cy)}A${f(rr)},${f(rr)} 0 0 1 ${f(-rr)},${f(cy)}C${f(-rr)},${f(cy - k * 0.5)} ${f(-k * 0.18)},${f(t + k * 0.42)} 0,${f(t)}Z`;
+  },
+};
+// how far in to step for an even rim, per shape
+const INSET = { fire: 1, wind: 1.414, earth: 1.08, water: 1.15 };
+// draw order for merged stacks: the narrower shape goes on top so the wider one shows around it
+const LAYER = { fire: 0, wind: 1, earth: 2, water: 3 };
+
+const sizeK = (q, s) => q * (0.25 + 0.055 * s);
+const ringW = q => Math.max(2.5, q * 0.075);
+
+function pips(n, x, y, q, o) {
+  const p = Math.max(2, q * 0.045), g = p * 2.6;
+  const pts = n === 1 ? [[0, 0]] : n === 2 ? [[-g / 2, 0], [g / 2, 0]] : [[-g / 2, g * 0.42], [g / 2, g * 0.42], [0, -g * 0.48]];
+  return pts.map(([a, b]) => `<circle cx="${f(x + a)}" cy="${f(y + b)}" r="${f(p)}" fill="${OWN[o].fill}" stroke="${OWN[o].edge}" stroke-width="1"/>`).join('');
+}
+const pathEl = (d, attrs) => `<path d="${d}" ${attrs}/>`;
+const edgeOf = (e, k, o) => pathEl(SHAPES[e](k), `fill="${OWN[o].edge}" stroke="${OWN[o].edge}" stroke-width="2.4" stroke-linejoin="round"`);
+const rimOf = (e, k, o) => pathEl(SHAPES[e](k), `fill="${OWN[o].fill}"`);
+const coreOf = (e, k, q) => pathEl(SHAPES[e](k - ringW(q) * INSET[e]), `fill="${COL[e]}"`);
+
+function single(e, s, q, o) {
+  const k = sizeK(q, s);
+  return edgeOf(e, k, o) + rimOf(e, k, o) + coreOf(e, k, q) + pips(s, 0, 0, q, o);
+}
+
+function wizard(q, o) {
+  const r = q * 0.43, ri = r * 0.56, pts = [];
+  for (let i = 0; i < 12; i++) { const a = -Math.PI / 2 + i * Math.PI / 6, rr = i % 2 ? ri : r; pts.push(`${f(rr * Math.cos(a))},${f(rr * Math.sin(a))}`); }
+  return `<path d="M${pts.join('L')}Z" fill="${OWN[o].fill}" stroke="${OWN[o].edge}" stroke-width="${f(Math.max(1.5, q * 0.035))}" stroke-linejoin="round"/><circle r="${f(r * 0.2)}" fill="${OWN[o].edge}"/>`;
+}
+
+// Earth inside an attacker: the attacker's piece with a small brown octagon core
+function earthStack(e, s, q, o) {
+  const k = sizeK(q, s), kc = k * 0.42;
+  return edgeOf(e, k, o) + rimOf(e, k, o) + coreOf(e, k, q)
+    + pathEl(SHAPES.earth(kc), `fill="${COL.earth}" stroke="${OWN[o].fill}" stroke-width="${f(q * 0.03)}"`)
+    + pips(s, 0, 0, q, o);
+}
+
+let clipN = 0;
+function combo(style, a, b, q, o) {
+  // a, b: {e, s}; range = larger size
+  if (a.e === 'earth' || b.e === 'earth') { const atk = a.e === 'earth' ? b : a; return earthStack(atk.e, Math.max(a.s, b.s), q, o); }
+  const s = Math.max(a.s, b.s), k = sizeK(q, s);
+  if (style === 'merged') {
+    const [lo, hi] = LAYER[a.e] < LAYER[b.e] ? [a, b] : [b, a];
+    return edgeOf(lo.e, k, o) + edgeOf(hi.e, k, o) + rimOf(lo.e, k, o) + rimOf(hi.e, k, o)
+      + coreOf(lo.e, k, q) + coreOf(hi.e, k, q) + pips(s, 0, 0, q, o);
+  }
+  if (style === 'stacked') {
+    // seen from above: the bigger piece underneath, the smaller one sitting on top
+    const [big, small] = a.s >= b.s ? [a, b] : [b, a];
+    const ks = k * 0.52;
+    return edgeOf(big.e, k, o) + rimOf(big.e, k, o) + coreOf(big.e, k, q)
+      + edgeOf(small.e, ks, o) + rimOf(small.e, ks, o) + pathEl(SHAPES[small.e](ks - ringW(q) * 0.6 * INSET[small.e]), `fill="${COL[small.e]}"`)
+      + pips(s, 0, 0, q, o);
+  }
+  // split: left half one element, right half the other
+  const id = `c${clipN++}`, W = q;
+  const half = (p, x) => `<clipPath id="${id}${x < 0 ? 'l' : 'r'}"><rect x="${x < 0 ? -W : 0}" y="${-W}" width="${W}" height="${2 * W}"/></clipPath>`
+    + `<g clip-path="url(#${id}${x < 0 ? 'l' : 'r'})">${edgeOf(p.e, k, o)}${rimOf(p.e, k, o)}${coreOf(p.e, k, q)}</g>`;
+  return half(a, -1) + half(b, 1)
+    + `<line x1="0" y1="${f(-k * 1.2)}" x2="0" y2="${f(k * 1.2)}" stroke="${OWN[o].fill}" stroke-width="${f(Math.max(1.5, q * 0.03))}"/>`
+    + `<line x1="0" y1="${f(-k * 1.2)}" x2="0" y2="${f(k * 1.2)}" stroke="${OWN[o].edge}" stroke-width="1" stroke-opacity="0.5" transform="translate(${f(q * 0.02)},0)"/>`
+    + pips(s, 0, 0, q, o);
+}
+
+// a strip of board squares holding pieces; cells: [[svg-fn | null], ...] rows
+function boardSvg(rows, q, startDark = false) {
+  const h = rows.length, w = rows[0].length;
+  let out = `<svg viewBox="0 0 ${w * q} ${h * q}" width="${w * q}" height="${h * q}" role="img">`;
+  rows.forEach((row, y) => row.forEach((cell, x) => {
+    out += `<rect x="${x * q}" y="${y * q}" width="${q}" height="${q}" fill="${(x + y + (startDark ? 1 : 0)) % 2 ? SQ.dark : SQ.light}"/>`;
+    if (cell) out += `<g transform="translate(${x * q + q / 2},${y * q + q / 2})">${cell(q)}</g>`;
+  }));
+  return out + '</svg>';
+}
+
+// --- one shape per element
+const ELS = [
+  ['fire', 'Square', 'Moves along rows and columns, like a rook. The square’s flat sides face those four directions.'],
+  ['wind', 'Diamond', 'Moves diagonally, like a bishop. The diamond’s points face the four diagonals.'],
+  ['water', 'Drop', 'Runs straight forward and back, and bends around Earth. A drop of water, tall like its path.'],
+  ['earth', 'Octagon', 'Moves one of eight ways and blocks lines. Eight sides, and the outline of a stop sign.'],
+];
+const elsHost = document.getElementById('els');
+for (const [e, shape, txt] of ELS) {
+  const row = o => [1, 2, 3].map(s => q => single(e, s, q, o));
+  elsHost.insertAdjacentHTML('beforeend', `<div class="el"><h3>${NAMES[e]} <span>${shape}</span></h3>${boardSvg([row('w'), row('b')], 64)}<p>${txt}</p></div>`);
+}
+elsHost.insertAdjacentHTML('beforeend', `<div class="el"><h3>Wizard <span>Star (unchanged)</span></h3>${boardSvg([[null, q => wizard(q, 'w'), null], [null, q => wizard(q, 'b'), null]], 64)}<p>Already has its own shape, so it stays as it is.</p></div>`);
+
+// --- combined pieces
+const STYLES = [
+  ['merged', 'A · Merged', 'Both outlines laid over each other. The outline shows every way the stack can move.'],
+  ['stacked', 'B · Stacked', 'Seen from above: the bigger piece below, the smaller one sitting on top, like the real pyramids.'],
+  ['split', 'C · Split', 'Half of one shape, half of the other. What the spike does now, with shapes.'],
+];
+const PAIRS = [
+  [{ e: 'fire', s: 3 }, { e: 'wind', s: 1 }, 'Fire + Wind', 'rows, columns or diagonals'],
+  [{ e: 'fire', s: 3 }, { e: 'water', s: 1 }, 'Fire + Water', 'rows and columns, or as a river'],
+  [{ e: 'wind', s: 3 }, { e: 'water', s: 1 }, 'Wind + Water', 'diagonals, or as a river'],
+];
+let html = '<div></div>' + STYLES.map(([, t, d]) => `<div class="head"><b>${t}</b><small>${d}</small></div>`).join('');
+for (const [a, b, name, moves] of PAIRS) {
+  html += `<div class="row">${name}<small>${moves}</small></div>`;
+  for (const [st] of STYLES) html += `<div class="cell${st === 'merged' ? ' pick' : ''}">${boardSvg([[q => combo(st, a, b, q, 'w'), q => combo(st, a, b, q, 'b')]], 76)}</div>`;
+}
+document.getElementById('combos').innerHTML = html;
+document.getElementById('earth').innerHTML = boardSvg([
+  ['fire', 'wind', 'water'].map(e => q => earthStack(e, 2, q, 'w')),
+  ['fire', 'wind', 'water'].map(e => q => earthStack(e, 2, q, 'b')),
+], 76);
+
+// --- on the board
+const P = (e, s, o) => q => single(e, s, q, o);
+const W = o => q => wizard(q, o);
+const S = (a, b, o) => Object.assign(style => q => combo(style, a, b, q, o), { stack: true });
+const fw = [{ e: 'fire', s: 2 }, { e: 'wind', s: 3 }], fwa = [{ e: 'fire', s: 3 }, { e: 'water', s: 1 }], wwa = [{ e: 'wind', s: 2 }, { e: 'water', s: 2 }];
+const POS = [
+  [null, P('earth', 2, 'b'), W('b'), P('fire', 2, 'b'), null, P('wind', 1, 'b'), null],
+  [P('water', 3, 'b'), null, S(...fw, 'b'), null, P('earth', 1, 'b'), null, null],
+  [null, null, null, P('water', 1, 'b'), null, S(...wwa, 'w'), null],
+  [null, P('fire', 1, 'w'), null, null, S(...fwa, 'b'), null, P('earth', 3, 'w')],
+  [P('wind', 2, 'w'), null, S(...fw, 'w'), q => earthStack('fire', 2, q, 'w'), null, P('water', 2, 'w'), null],
+  [null, P('earth', 1, 'w'), null, W('w'), P('fire', 3, 'w'), null, null],
+];
+const boardHost = document.getElementById('board');
+function showBoard(style) {
+  boardHost.innerHTML = boardSvg(POS.map(r => r.map(c => c && c.stack ? c(style) : c)), 84);
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.style === style)));
+}
+document.querySelectorAll('.tabs button').forEach(b => b.addEventListener('click', () => showBoard(b.dataset.style)));
+showBoard('merged');
+</script>
