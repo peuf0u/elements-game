@@ -1,0 +1,21 @@
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+
+# Source media: large, re-creatable from the YouTube video (see README)
+source/video.mp4
+source/audio.wav
+source/clip_*.wav
+source/frames/
