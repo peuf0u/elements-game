@@ -1,6 +1,7 @@
 // The experiments from the plan. Each one is a list of games to play; run.mjs plays them.
 import fs from 'node:fs';
 import { DEFAULT_FORMATION, PRESETS, mirror as mirrorFiles, without } from './formations.mjs';
+import { V03 } from './engine.mjs';
 
 let seed = 1;
 // n games of A against B, alternating colours: A is White in even games, Black in odd ones.
@@ -35,7 +36,7 @@ function roundRobin(tag, players, n, extra = {}) {
 }
 
 // Every pair of presets meets n times, half with each colour, both sides played by the same bot.
-function presetRoundRobin(bot, n, firstSeed) {
+function presetRoundRobin(bot, n, firstSeed, rules = {}) {
   const names = Object.keys(PRESETS), out = [];
   seed = firstSeed;
   for (let i = 0; i < names.length; i++)
@@ -43,7 +44,7 @@ function presetRoundRobin(bot, n, firstSeed) {
       for (let k = 0; k < n; k++) {
         const [w, b] = k % 2 ? [names[j], names[i]] : [names[i], names[j]];
         out.push({ tag: `${names[i]} v ${names[j]}`, a: k % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, randomOpening: 2, maxPlies: 1000,
-          whiteFormation: PRESETS[w], blackFormation: PRESETS[b], labels: { w, b } });
+          whiteFormation: PRESETS[w], blackFormation: PRESETS[b], labels: { w, b }, ...rules });
       }
   return out;
 }
@@ -278,6 +279,61 @@ export const EXPERIMENTS = {
       ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
         both(`${name}: without ${piece} (${square})`, bot, bot, 150 * s, { fa: without(f, square), fb: f, ...ro, ...v })),
     ]);
+  },
+  // 12. Rules v0.3 (GAME_SPEC §3: Water bends diagonally, one way per move). The key tests again.
+  // a. The strongest bot, Deep 20k, on v0.2 and v0.3 Water from Wind 3 held back: equal games and
+  //    the handicap test without Water 3, Fire 3 or Wind 3.
+  v03strong: s => {
+    const bot = { type: 'deep', nodes: 20000, weights: 'tuned' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000 };
+    seed = 1900000;
+    return [['v0.2', {}], ['v0.3', V03]].flatMap(([name, v]) => [
+      ...Array.from({ length: 200 * s }, () => ({ tag: `${name}: equal`, a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro, ...v })),
+      ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
+        both(`${name}: without ${piece} (${square})`, bot, bot, 100 * s, { fa: without(f, square), fb: f, ...ro, ...v })),
+    ]);
+  },
+  // b. Deep 2k on v0.3: White's edge from the default formation and from random ones, and the
+  //    handicap test for every piece of Wind 3 held back and by element and size from random formations.
+  v03recheck: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000, ...V03 };
+    seed = 2000000;
+    const sameRandom = (tag, n, piece = null) => Array.from({ length: n }, (_, i) => ({
+      tag, a: i % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, whiteFormation: 'random', blackFormation: 'same', ...ro,
+      ...(piece ? { remove: { side: i % 2 ? 'b' : 'w', piece } } : {}),
+    }));
+    return [
+      ...Array.from({ length: 400 * s }, () => ({ tag: 'colours: default formation', a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro })),
+      ...sameRandom('colours: same random formation', 400 * s),
+      ...Object.entries(f).filter(([, v]) => v !== 'wizard').flatMap(([square, [e, size]]) =>
+        both(`handicap: without ${e}${size} (${square})`, bot, bot, 100 * s, { fa: without(f, square), fb: f, ...ro })),
+      ...['fire', 'wind', 'water', 'earth'].flatMap(e => [3, 2, 1].flatMap(size =>
+        sameRandom(`handicap random: without ${e}${size}`, 100 * s, [e, size]))),
+    ];
+  },
+  // c. The style players (Careful with one habit) on v0.3: is there a dominant strategy now?
+  v03styles: s => {
+    const f = PRESETS.windHeldBack, x = { fa: f, fb: f, ...V03 };
+    seed = 2100000;
+    return [
+      ...both('turtle v careful', { type: 'turtle' }, careful, 100 * s, x),
+      ...both('rusher v careful', { type: 'rusher' }, careful, 100 * s, x),
+      ...both('combiner v careful', { type: 'combiner' }, careful, 100 * s, x),
+      ...both('never-combiner v careful', { type: 'neverCombiner' }, careful, 100 * s, x),
+      ...both('hunter v careful', { type: 'hunter' }, careful, 100 * s, x),
+    ];
+  },
+  // d. The seven presets' round robin on v0.3 (Deep 2k), as presets2k on v0.2.
+  presetsV03: s => presetRoundRobin({ type: 'deep', nodes: 2000, weights: 'tuned' }, 60 * s, 2200000, V03),
+  // e. The new search's best (Fire forward) against the default, Wind 3 held back, head to head.
+  v03topTwo: s => {
+    const ff = JSON.parse(fs.readFileSync(new URL('./results/formation-search-v03.json', import.meta.url))).roundRobin.formations[1];
+    seed = 2300000;
+    return [['deep 2k', 2000, 200], ['deep 20k', 20000, 100]].flatMap(([name, nodes, n]) => {
+      const bot = { type: 'deep', nodes, weights: 'tuned' };
+      return both(`${name}: fire forward v wind 3 held back`, bot, bot, n * s, { fa: ff, fb: PRESETS.windHeldBack, randomOpening: 2, maxPlies: 1000, ...V03 });
+    });
   },
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.
   // a. Deep 2k with naive values (every piece worth 1) against itself, to learn values from.

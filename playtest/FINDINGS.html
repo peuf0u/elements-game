@@ -123,7 +123,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
 <div class="wrap">
 
 <header class="stack">
-  <span class="eyebrow">Elements · computer playtest · 28 Oct 2026 · about 90,000 games</span>
+  <span class="eyebrow">Elements · computer playtest · 28 Oct 2026 · about 120,000 games</span>
   <h1>What the computer learned playing Elements</h1>
   <p class="lede">The core game is healthy: fair, decisive, with real depth and no unbeatable defence. <strong>Water is the strongest element.</strong> The first, weak bots made it look overwhelming and Fire useless, but a much stronger bot shows every attacking piece matters. If you want the elements even, one small rule change does it: <strong>Water captures only straight</strong>.</p>
 </header>
@@ -158,6 +158,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     <div class="verdict"><span class="q">What makes a formation strong?</span><span class="a">Water next to your own Earth, pieces close together, Earth in front, Wind 3 held back. That's only part of it: moving one piece of a preset costs about 8 points.</span><span class="pill ok">presets help</span></div>
     <div class="verdict"><span class="q">Can a formation tame Water?</span><span class="a">No. Moving Fire forward changes nothing, and Earth beside the Wizard makes Water far more dangerous.</span><span class="pill warn">not by formation</span></div>
     <div class="verdict"><span class="q">Can a rule change tame Water?</span><span class="a">Yes. With "Water captures only straight", Water, Wind and Fire pull about equal weight and the game stays fair. Games get about a quarter longer, with a few more draws.</span><span class="pill ok">worth trying</span></div>
+    <div class="verdict"><span class="q">Does the new Water rule work?</span><span class="a">Yes. Since rules v0.3 Water bends diagonally and goes one way per move. Water 3 is no longer the piece you can't lose, and the game stays fair, with about as many draws.</span><span class="pill ok">adopted</span></div>
     <div class="verdict"><span class="q">Can these results be trusted?</span><span class="a">Checked on chess, where the answers are known: piece rankings come out right, exact sizes are understated, and White's edge can't be read off directly.</span><span class="pill ok">rankings: yes</span></div>
     <div class="verdict"><span class="q">A stronger bot?</span><span class="a">Deep, built from chess-engine techniques with learned piece values, rates about 430 points above Thinker at a sixth of its time.</span><span class="pill ok">new standard</span></div>
   </div>
@@ -588,6 +589,50 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
   <p><strong>Stronger play draws less:</strong> 17% → 11%, with slightly shorter games. The draws come from weak play more than from the game itself.</p>
 </section>
 
+<section class="stack" aria-labelledby="s15">
+  <span class="eyebrow">15 · Rules v0.3</span>
+  <h2 id="s15">Water bends diagonally, one way per move</h2>
+  <p>Playing the prototype, you found Water's attacks hard to see and its reach too large. After comparing ten rules (the Water rules page), you chose <strong>diagonal bends with one way per move</strong>, keeping the edge slide. Water still flows along its column. Its steps around Earth must be diagonal, and within one move it goes only forward or only backward.</p>
+  <figure class="figure">
+    <div class="boards" id="v03rule"></div>
+    <figcaption>The spec's example, Water 3 on b2 with Earth on c3. <strong>Left: v0.2</strong>, 14 squares. <strong>Right: v0.3</strong>, 9 squares: up the b-file, diagonally around the Earth, or back to the edge and along it.</figcaption>
+  </figure>
+
+  <h3>With the strongest bot</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Deep 20k, Wind 3 held back</th><th>v0.2</th><th>v0.3</th></tr></thead>
+    <tbody>
+      <tr><td>White's score</td><td class="n">51%</td><td class="n">51%</td></tr>
+      <tr><td>Draws</td><td class="n">16%</td><td class="n">20%</td></tr>
+      <tr><td>Typical game (moves each)</td><td class="n">40</td><td class="n">49</td></tr>
+      <tr><td>Checkmates given by Water</td><td class="n">67%</td><td class="n">71%</td></tr>
+      <tr><td>Score without Water 3 / Fire 3 / Wind 3</td><td class="n">8 / 22 / 10%</td><td class="n hi">17 / 18 / 10%</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">200 equal games and 100 per handicap row, so each number is uncertain by about ±6 to ±8 points.</p>
+
+  <h3>Every piece's value</h3>
+  <figure class="figure">
+    <div class="boards" id="v03handicap"></div>
+    <figcaption>Score of a side starting without each piece of Wind 3 held back, v0.3, Deep 2k, 100 games each. Lower means the piece matters more. Wind 3 is now the piece you can least afford to lose.</figcaption>
+  </figure>
+  <p>From shared random formations, by size 3 / 2 / 1: Water 20 / 37 / 38%, Wind 31 / 38 / 38%, Fire 27 / 36 / 42%, Earth 43 / 54 / 54%. Water 3 still matters most there, so Water stays the strongest element, by a smaller margin.</p>
+
+  <h3>Fair, decisive, and combining matters more</h3>
+  <ul class="plain">
+    <li><strong>White's edge stays small:</strong> 52% from the default formation and from random ones.</li>
+    <li><strong>Draws:</strong> 22% from the default formation (24% with v0.2), 32% from random ones.</li>
+    <li><strong>Playing styles</strong> against a plain Careful bot: Turtle 31%, Rusher 28%, Hunter 43%, Never-combiner 13%, <strong>Combiner 65%</strong> (51% with v0.2). No habit wins outright, but combining now pays off more, probably because a single Water reaches less.</li>
+  </ul>
+
+  <h3>Formations under v0.3</h3>
+  <p>In the presets' round robin, <strong>Wind 3 held back comes first</strong>, about 35 rating points above Fire in front of the Wizard. A new formation search under v0.3 found one formation about as good: <strong>Fire forward</strong>, your original with Fire 2 in front of the Wizard and Fire 1 out on h2. It beat Wind 3 held back 57% with Deep 2k and 53% with Deep 20k: level, within luck.</p>
+  <figure class="figure">
+    <div class="boards" id="v03fireforward"></div>
+    <figcaption><strong>Fire forward</strong>, a candidate for a new preset under v0.3.</figcaption>
+  </figure>
+</section>
+
 <section class="next" aria-labelledby="mean">
   <h2 id="mean">What this means, and your questions</h2>
   <ol>
@@ -704,6 +749,17 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
       label: 'Wind 3 held back: Earth 3 in front of Water 2, Earth 2 in front of Water 3, Wind 3 on c1' },
     { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: '. W3 E1 . E3 . E2 W2 .', 2: '. . R1 W1 R2 F1 R3 . .', 1: '. . . F3 Z F2 . . .' }),
       label: 'Your original: an Earth in front of each Water, Wind 3 on b3' });
+  put('v03rule',
+    { files: 'ae', ranks: [5, 1], cell: small, pieces: { b2: 'R3', c3: 'E1' }, label: 'v0.2: 14 squares',
+      numbers: Object.fromEntries(['a1', 'a2', 'b1', 'b3', 'b4', 'b5', 'c1', 'c2', 'c4', 'c5', 'd1', 'd2', 'd3', 'd4'].map(q => [q, '•'])) },
+    { files: 'ae', ranks: [5, 1], cell: small, pieces: { b2: 'R3', c3: 'E1' }, label: 'v0.3: 9 squares',
+      numbers: Object.fromEntries(['a1', 'b1', 'b3', 'b4', 'b5', 'c1', 'c4', 'c5', 'd1'].map(q => [q, '•'])) });
+  put('v03handicap',
+    { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: '. . . . E3 . E2 F1 .', 2: '. . R1 W1 R2 W2 R3 . .', 1: '. E1 W3 F3 Z F2 . . .' }), label: 'Wind 3 held back' },
+    { files: 'ai', ranks: [3, 1], cell: small, pieces: { e1: 'Z' }, label: 'Score without each piece, v0.3',
+      numbers: { e3: '45', g3: '47', h3: '41', c2: '28', d2: '27', e2: '30', f2: '25', g2: '17', b1: '46', c1: '8', d1: '24', f1: '34' } });
+  put('v03fireforward', { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: '. W3 E1 . E3 . E2 W2 .', 2: '. . R1 R2 F2 . R3 F1 .', 1: '. . . F3 Z W1 . . .' }),
+    label: 'Fire forward' });
   put('fortress', { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: 'W3 W2 F2 R3 W1 R2 . R1 .', 2: 'E3 E2 E1 . . . . . .', 1: 'Z F3 F1 . . . . . .' }),
     label: 'The corner fortress: Wizard on a1 under three Earth' });
 })();

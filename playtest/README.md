@@ -37,6 +37,10 @@ check.mjs ──▶ spike-rules.mjs ──▶ spike/index.html    the spike's ru
 | `spike-rules.mjs` | Loads the spike's rules (without copying them), only for `check.mjs`. |
 | `analyze.mjs` | Looks inside recorded games: who gives checkmate and by which route, captures by element, comebacks, quickest wins. |
 
+## Rules versions
+
+The engine plays rules v0.3 by default: Water bends diagonally and goes one way per move (GAME_SPEC §3). The playtest keeps the v0.2 Water as its own default, so every earlier experiment replays exactly. Experiments of the v0.3 game pass `V03` from `engine.mjs` (FINDINGS §15).
+
 ## Running it
 
 Needs only Node (no installs).
@@ -57,6 +61,9 @@ node formation-study.mjs collect   # what makes a formation strong: the games (a
 node formation-study.mjs fit       # ...and the features that predict a formation's score
 node run.mjs mirrorCheck    # are the presets' mirror images as strong?
 node run.mjs presets20k     # the presets' round robin with the strongest bot (about 20 minutes)
+node run.mjs waterRules     # Water movement rules compared (also waterBends, waterOneWay; WATER-RULES.html)
+node run.mjs v03strong      # rules v0.3 against v0.2 with Deep 20k (also v03recheck, v03styles, presetsV03)
+node search.mjs 1 v03       # the formation search under rules v0.3
 ```
 
 The players don't play the placement phase: games start from finished formations.

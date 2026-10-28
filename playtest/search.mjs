@@ -1,6 +1,7 @@
 // Searches for a set of good starting formations. Many formations play many games; the best are
 // kept, varied a little, and tried again for a few rounds; then the finalists play each other.
-// Run: node search.mjs [scale]   (writes results/formation-search-deep.json)
+// Run: node search.mjs [scale]       (writes results/formation-search-deep.json)
+//      node search.mjs [scale] v03   (rules v0.3: writes results/formation-search-v03.json)
 //
 // Second version (2026-10-28), after the first found nothing better than the default with weak bots:
 //   - Played by Deep 2k with learned values, under the 75-move rule.
@@ -10,12 +11,19 @@
 //   - Diversity: the formations kept, and the finalists, differ from each other by at least
 //     MIN_APART pieces, so the result is a list of real choices, not ten copies of one idea.
 // The first version's results are in results/formation-search.json.
+//
+// v03 (2026-10-28): the same search under rules v0.3 (Water bends diagonally, one way per move).
+// The app's default, Wind 3 held back, takes the place of the designer's original formation, and
+// the presets and variations of them join the starting points.
 import fs from 'node:fs';
 import { runGames } from './pool.mjs';
-import { DEFAULT_FORMATION, randomFormation, FIRE_FORWARD, FIRE_FORWARD_2 } from './formations.mjs';
+import { DEFAULT_FORMATION as ORIGINAL, PRESETS, randomFormation, FIRE_FORWARD, FIRE_FORWARD_2 } from './formations.mjs';
+import { V03 } from './engine.mjs';
 import { rngFrom } from './game.mjs';
 
 const scale = Number(process.argv[2] ?? 1);
+const v03 = process.argv[3] === 'v03', RULES = v03 ? V03 : {};
+const DEFAULT_FORMATION = v03 ? PRESETS.windHeldBack : ORIGINAL; // the league's fixed member
 const BOT = { type: 'deep', nodes: 2000, weights: 'tuned' };
 const GAMES = Math.round(40 * scale);        // games per candidate per round
 const FINAL_GAMES = Math.round(200 * scale); // total games for each finalist
@@ -72,7 +80,7 @@ async function evaluate(list, n, opponents, label) {
     const aWhite = i % 2 === 0, opp = opps[Math.floor(i / 2) % opps.length]; // both colours against each opponent in turn
     return {
       tag: c.key, a: aWhite ? 'w' : 'b', seed: seed++, white: BOT, black: BOT, randomOpening: 2, maxPlies: 1000,
-      whiteFormation: aWhite ? c.formation : opp.formation, blackFormation: aWhite ? opp.formation : c.formation,
+      whiteFormation: aWhite ? c.formation : opp.formation, blackFormation: aWhite ? opp.formation : c.formation, ...RULES,
     };
     });
   });
@@ -99,8 +107,8 @@ function diverse(ranked, n) {
   return out;
 }
 
-const out = { scale, bot: BOT, rounds: [], finalists: [], roundRobin: null };
-const file = new URL('./results/formation-search-deep.json', import.meta.url);
+const out = { scale, bot: BOT, rules: v03 ? 'v0.3' : 'v0.2', rounds: [], finalists: [], roundRobin: null };
+const file = new URL(v03 ? './results/formation-search-v03.json' : './results/formation-search-deep.json', import.meta.url);
 const save = () => fs.writeFileSync(file, JSON.stringify(out, null, 1));
 const brief = c => ({
   name: c.name, score: Math.round(100 * score(c)), games: c.games, apartFromDefault: apart(DEFAULT_FORMATION, c.formation),
@@ -116,9 +124,11 @@ for (let i = 0; i < 16; i++) add('random', randomFormation(rng));
 for (const [name, f] of Object.entries(HAND)) { add(name, f); add(name + ', varied', mutate(f, 2)); }
 add('fire forward (first search)', FIRE_FORWARD);
 add('fire forward 2 (first search)', FIRE_FORWARD_2);
+if (v03) for (const [name, f] of Object.entries(PRESETS)) { add(name, f); for (let i = 0; i < 3; i++) add(name + ', varied', mutate(f, 1 + i)); }
 
 const DEFAULT = { key: key(DEFAULT_FORMATION), formation: DEFAULT_FORMATION };
-let league = [DEFAULT, { key: key(FIRE_FORWARD), formation: FIRE_FORWARD }, { key: key(FIRE_FORWARD_2), formation: FIRE_FORWARD_2 }];
+let league = v03 ? [DEFAULT, ...['mirrored', 'fireBeforeWizard'].map(n => ({ key: key(PRESETS[n]), formation: PRESETS[n] }))]
+  : [DEFAULT, { key: key(FIRE_FORWARD), formation: FIRE_FORWARD }, { key: key(FIRE_FORWARD_2), formation: FIRE_FORWARD_2 }];
 for (let round = 0; round < ROUNDS; round++) {
   const all = [...cands.values()];
   console.log(`Round ${round + 1}: ${all.filter(c => !c.games).length} new formations, ${all.filter(c => c.games).length} kept`);
@@ -147,7 +157,7 @@ for (let i = 0; i < set.length; i++) for (let j = i + 1; j < set.length; j++)
   for (let g = 0; g < RR_GAMES; g++) {
     const iWhite = g % 2 === 0, A = set[i], B = set[j];
     configs.push({ tag: `${i}:${j}`, a: iWhite ? 'w' : 'b', seed: seed++, white: BOT, black: BOT, randomOpening: 2, maxPlies: 1000,
-      whiteFormation: iWhite ? A.formation : B.formation, blackFormation: iWhite ? B.formation : A.formation });
+      whiteFormation: iWhite ? A.formation : B.formation, blackFormation: iWhite ? B.formation : A.formation, ...RULES });
   }
 const recs = await runGames(configs, { onProgress: (d, t) => { if (d % 500 === 0 || d === t) console.log(`  round robin: ${d}/${t}`); } });
 const table = set.map(() => set.map(() => ({ points: 0, games: 0 })));

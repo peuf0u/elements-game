@@ -2,7 +2,7 @@
 
 Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open in a browser), also online at https://claude.ai/artifact/V6KKL4vWUm7FLFiqehXhEJ (private until shared from the page's Share menu).
 
-*Run on 2026-10-28 (GAME_SPEC v0.2), about 90,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§14 were played on the real engine. How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
+*Run on 2026-10-28 (GAME_SPEC v0.2), about 120,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§15 were played on the real engine. §1–§14 use the v0.2 Water rule; §15 checks rules v0.3, with the new Water. How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
 
 **How to read the numbers.** A "score" counts a win as 1 and a draw as ½, so 50% means even. The range in brackets is the 95% uncertainty range: if it includes 50%, the games can't tell the two sides apart. One "move" means one player's turn. §1–§9 come from bots that look 2–3 moves ahead (Careful and Thinker). §11 repeats the key tests with Deep, a much stronger bot (§10), and **where the two disagree, §11 is the better guide**. Treat anything that looks like a problem as a hint to try on the real board, not a verdict.
 
@@ -29,6 +29,7 @@ Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open i
 | What makes a formation strong? | Water next to your own Earth, pieces close together, Earth in front, Wind 3 held back. But these rules explain only part of it: strong formations are narrow peaks, and moving one piece costs about 8 points (§14) | ℹ️ presets are worth offering |
 | Can a formation tame Water? | No. Moving Fire forward changes nothing, and Earth beside the Wizard makes Water far *more* dangerous | ❌ not by formation |
 | Can a rule change tame Water? | Yes: **"Water captures only straight"** makes Water, Wind and Fire about equal and keeps the game fair. Games get about a quarter longer and draws rise a little (33% → 37% with the strong bot) | ✅ worth playtesting |
+| Rules v0.3: does the new Water rule work? | Yes. Water bends diagonally and goes one way per move. Water 3 is no longer the piece you can't lose, the game stays fair, and draws stay about the same (§15) | ✅ adopted |
 | Can these results be trusted? | Checked on chess, where the answers are known (§12): piece rankings and ratios come out right, the sizes of effects are understated, and bots this weak can't measure White's edge reliably | ✅ rankings, ⚠️ exact numbers |
 | A stronger bot? | **Deep**, built from chess-engine techniques with piece values learned from 8,000 games, rates about 430 points above Thinker at a sixth of its time (§10) | ✅ new standard bot |
 
@@ -572,6 +573,67 @@ Each score is uncertain by about ±5 points.
 **Wizard forward loses ground with stronger play** (47% → 41%). A Wizard on the front row is easier to attack for a bot that looks further ahead. It is still a fair choice for players who like it, but it is the weakest preset against strong opponents.
 
 **Stronger play draws less.** Draws fall from 17% to 11%, and games get a little shorter. That's a good sign: the draws come from weak play more than from the game itself.
+
+
+## 15. Rules v0.3: Water bends diagonally, one way per move
+
+Playing the prototype, the designer found Water's attacks hard to see and its reach too large. Ten Water rules were compared in strong-bot games ([WATER-RULES.html](WATER-RULES.html), GAME_SPEC open question 10). The designer chose **diagonal bends with one way per move**, keeping the edge slide. Since rules v0.3 that is the default ✅ *(designer, 2026-10-28; GAME_SPEC §3)*. Water still flows along its column. Its steps around Earth must be diagonal, and within one move it goes only forward or only backward.
+
+```
+ 5  ·  ○  ○  ·  ·      Water 3 on b2, Earth on c3 (the spec's example):
+ 4  ·  ○  ○  ·  ·      up the b-file, diagonally around the Earth to c4 and on,
+ 3  ·  ○  E  ·  ·      or back to the edge and along it.
+ 2  ·  R  ·  ·  ·      Gone: c2, d2, d3 and d4 (sideways steps) and a2
+ 1  ○  ○  ○  ○  ·      (back to the edge, then up again). 14 squares → 9.
+    a  b  c  d  e
+```
+
+All results below start from Wind 3 held back unless stated, under the 75-move rule.
+
+**With the strongest bot** (Deep 20k, 200 equal games and 100 per handicap row; `node run.mjs v03strong`):
+
+| Deep 20k | v0.2 | v0.3 |
+|---|---|---|
+| White's score | 51% | 51% |
+| Draws | 16% | 20% |
+| Typical game (moves each) | 40 | 49 |
+| Checkmates given by Water | 67% | 71% |
+| Score without Water 3 / Fire 3 / Wind 3 | 8 / 22 / 10% | 17 / 18 / 10% |
+
+**The key tests with Deep 2k** (`node run.mjs v03recheck`):
+- **White's edge stays small:** 52% from the default formation and 52% from shared random formations.
+- **Draws:** 22% from the default formation and 32% from random ones. With v0.2 Water it was 24% from the default.
+- **Every piece's value** from Wind 3 held back (score of a side starting without it, 100 games each):
+
+```
+ 3  ·  ·  ·  ·  E3 ·  E2 F1 ·      ·  ·  ·  ·  45 ·  47 41 ·
+ 2  ·  ·  R1 W1 R2 W2 R3 ·  ·      ·  ·  28 27 30 25 17 ·  ·
+ 1  ·  E1 W3 F3 Z  F2 ·  ·  ·      ·  46  8 24 Z  34 ·  ·  ·
+    a  b  c  d  e  f  g  h  i      a  b  c  d  e  f  g  h  i
+```
+- From shared random formations (sizes 3 / 2 / 1): Water 20 / 37 / 38, Wind 31 / 38 / 38, Fire 27 / 36 / 42, Earth 43 / 54 / 54. With v0.2 (§11) it was Water 21 / 34 / 35, Wind 24 / 30 / 37, Fire 30 / 40 / 51.
+
+**Playing styles** (Careful with one habit against Careful, 100 games each; `node run.mjs v03styles`): Turtle 31%, Rusher 28%, Hunter 43%, Never-combiner 13%, **Combiner 65%** (v0.2: 26 / 32 / 40 / 23 / 51%). No habit wins outright. But combining matters more than before: a bot that likes to combine now beats a plain one.
+
+**Formations under v0.3:**
+- The presets' round robin (Deep 2k, `node run.mjs presetsV03`): Wind 3 held back comes first, about 35 rating points above Fire in front of the Wizard. The other presets follow, 60–95 points behind.
+- A new formation search under v0.3 (`node search.mjs 1 v03`) found one formation about as good: "Fire forward", your original with Fire 2 in front of the Wizard and Fire 1 out on h2.
+  - Head to head it beat Wind 3 held back 57% (50–64) with Deep 2k, and 53% (43–62) with Deep 20k. That is level.
+  - The other finalists were weaker than both.
+
+```
+ 3  ·  W3 E1 ·  E3 ·  E2 W2 ·      Fire forward
+ 2  ·  ·  R1 R2 F2 ·  R3 F1 ·
+ 1  ·  ·  ·  F3 Z  W1 ·  ·  ·
+    a  b  c  d  e  f  g  h  i
+```
+
+**What changes with v0.3:**
+- **Water is no longer the piece you can't lose.** With the strongest bot, losing Water 3 now costs about as much as losing Fire 3 (17% and 18%); before, it was 8%. From the default formation, Wind 3 is now the most valuable piece. From random formations Water 3 still matters most, so Water stays the strongest element, by a smaller margin.
+- **Water still gives most checkmates** (about 70%). It's still the piece that finishes games, but it captures less (2.8 instead of 3.4 per game, §14's comparison).
+- **The game stays fair and decisive:** White 51–52%. Draws are about the same with Deep 2k and a little higher with Deep 20k (16% → 20%). Games are 5–10 moves longer.
+- **Combining matters more**, probably because a single Water now reaches less, so Water stacks pay off.
+- **Wind 3 held back stays a good default.** Fire forward is a candidate for a new preset.
 
 ---
 
