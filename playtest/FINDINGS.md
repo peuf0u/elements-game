@@ -15,7 +15,7 @@ Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open i
 | Question | Answer | Verdict |
 |---|---|---|
 | Does White win too often? | White scores 52–56% between equal players. The same bots give chess 48% (§12), so Elements' first-move edge is a little larger than chess's, but still small | ✅ healthy |
-| How often are games drawn? | About 1 in 4 to 1 in 3 games, mostly by the 50-move rule. That's more than chess at the same level of play (10%, §12) | ⚠️ keep an eye on it |
+| How often are games drawn? | About 1 in 4 to 1 in 3 games with the chess 50-move rule, more than chess at the same level (10%, §12). Stalled endgames, where Earth walls stop the last attackers. **Now 75 moves each** (§13), which cuts those draws by a third | ⚠️ better, keep an eye on it |
 | Do games end? How long are they? | Always. Typical game: 45–55 moves each | ✅ healthy |
 | How do games end? | Weak bots: ~70% checkmate, 5–18% elimination. **Strong bot: 40–50% checkmate, 25–30% elimination**, the rest drawn (§11) | ✅ both ways to win matter |
 | Does skill matter? | Each step up the ladder wins 92–99%, and the weaker player never won | ✅ very good |
@@ -455,6 +455,26 @@ The chess ranking is right. But the sizes are smaller than among strong humans: 
 - **White's edge: compare, don't read off.** With the same bots, Elements shows 53–56% and chess 48%. So Elements' first-move edge is probably a little larger than chess's, but these bots can't say how big it is among strong players.
 - **Draws: Elements is more drawish than chess at the same level** (24–33% against 10%), mostly from the 50-move rule.
 
+## 13. The move limit: 50 or more?
+
+Most draws between strong bots came from the 50-move rule: 50 moves by each player with no capture and no combine. At those draws:
+- A median of **3 capturing pieces** are left in total, just 1 on the weaker side.
+- The material gap is under one piece.
+- More than half of the last 100 moves are **Wizards and plain Earth shuffling**.
+
+Earth never leaves the board, so a few remaining attackers can't break its walls. In chess the blockers can be captured, and the same bots draw only 6% this way.
+
+Deep 2k with learned values, 400 games per row, your default formation (`node run.mjs drawLimit`):
+
+| Moves each before a draw | Decided | Drawn by the limit | Typical game (moves each) | Longest 10% |
+|---|---|---|---|---|
+| 50 | 67% | 28% | 52 | 97+ |
+| **75** | **77%** | **19%** | **50** | **117+** |
+| 100 | 78% | 17% | 59 | 148+ |
+| no limit | 89% | (4% reach the 500-move cap) | 50 | 259+ |
+
+With random formations it's 16% → 12% → 11%. **Decision: 75 moves each** ✅ *(designer, 2026-10-28)*. It turns a third of these draws into wins, and the typical game stays the same length; going further buys little. Games in §1–§12 were played with 50.
+
 ---
 
 ## What this means for the game
@@ -476,7 +496,7 @@ The questions these raise are recorded in [GAME_SPEC.md](../GAME_SPEC.md) (open 
 
 ## Next steps worth doing
 
-- Look at what makes Elements more drawish than chess at the same level: mostly the 50-move rule (open question 2).
+- If draws still bother at the table, look at the endgame: Earth walls that a few attackers can't break (§13).
 - Recheck the exact-range variant and the cheat hunt (§6, §7) with the strong bot.
 - Try straight captures at the table, and if it stays, rerun the formation search under it: the best formations may change once Water strikes straight.
 - A formation-builder player for the alternating placement phase.

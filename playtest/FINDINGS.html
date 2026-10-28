@@ -144,7 +144,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
   <h2 id="sum">The answers</h2>
   <div class="verdicts">
     <div class="verdict"><span class="q">Does White win too often?</span><span class="a">White scores 52–56% between equal players. The same bots give chess 48%, so the edge is a little larger than chess's, but small.</span><span class="pill ok">healthy</span></div>
-    <div class="verdict"><span class="q">How many draws?</span><span class="a">1 game in 4 to 1 in 3, mostly by the 50-move rule. More than chess at the same level (10%).</span><span class="pill warn">keep an eye on it</span></div>
+    <div class="verdict"><span class="q">How many draws?</span><span class="a">1 in 4 to 1 in 3 with the chess 50-move rule, more than chess. Now 75 moves each, which cuts those draws by a third.</span><span class="pill warn">better, watch it</span></div>
     <div class="verdict"><span class="q">Do games end?</span><span class="a">Every one did, typically after 45–55 moves each.</span><span class="pill ok">healthy</span></div>
     <div class="verdict"><span class="q">How do they end?</span><span class="a">Between strong bots, 40–50% checkmate and 25–30% elimination; the rest drawn.</span><span class="pill ok">both matter</span></div>
     <div class="verdict"><span class="q">Does skill matter?</span><span class="a">Each step up the ladder wins 92–99%, and the weaker player never won.</span><span class="pill ok">very good</span></div>
@@ -485,6 +485,23 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     <li>White's edge can't be read off directly: the same bots give chess 48%, against 54–56% among masters. With the same bots, Elements shows 53–56%, so its first-move edge is probably a little larger than chess's.</li>
     <li>Elements is more drawish than chess at the same level: 24–33% draws against 10%.</li>
   </ul>
+</section>
+
+<section class="stack" aria-labelledby="s13">
+  <span class="eyebrow">13 · Move limit</span>
+  <h2 id="s13">75 moves each instead of 50</h2>
+  <p>Most draws between strong bots came from the 50-move rule. At those draws only about 3 capturing pieces are left in total, and more than half of the last 100 moves are Wizards and plain Earth shuffling. Earth never leaves the board, so a few remaining attackers can't break its walls.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Moves each before a draw</th><th>Decided</th><th>Drawn by the limit</th><th>Typical game</th><th>Longest 10%</th></tr></thead>
+    <tbody>
+      <tr><td>50</td><td class="n">67%</td><td class="n">28%</td><td class="n">52</td><td class="n">97+</td></tr>
+      <tr><td><strong>75</strong></td><td class="n hi">77%</td><td class="n hi">19%</td><td class="n hi">50</td><td class="n hi">117+</td></tr>
+      <tr><td>100</td><td class="n">78%</td><td class="n">17%</td><td class="n">59</td><td class="n">148+</td></tr>
+      <tr><td>no limit</td><td class="n">89%</td><td class="n">—</td><td class="n">50</td><td class="n">259+</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Deep 2k with learned values, your default formation, 400 games per row. Moves are per player.</p>
+  <p><strong>Decision: 75 moves each.</strong> It turns a third of these draws into wins, and the typical game stays the same length. Going further buys little and makes the longest games much longer.</p>
 </section>
 
 <section class="next" aria-labelledby="mean">

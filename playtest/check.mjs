@@ -1,6 +1,7 @@
 // Checks that the engine (packages/engine) plays exactly the same game as the spike's rules: on
 // every move of many random games, under each variant, the same legal moves in the same order and
-// the same result. Run: node check.mjs
+// the same result. The spike still has the chess 50-move rule, so the engine is set to 50 here.
+// Run: node check.mjs
 import { Spike, setSpikeVariant } from './spike-rules.mjs';
 import * as E from '../packages/engine/src/index.ts';
 import { randomFormation, DEFAULT_FORMATION } from './formations.mjs';
@@ -24,7 +25,7 @@ for (const v of VARIANTS) {
         board[s] = val === 'wizard' ? { o, wiz: true } : { o, els: [{ e: val[0], s: val[1] }] };
         pieces.push([s, toPiece(o === 'w' ? 'white' : 'black', val)]);
       }
-    let a = Spike.fromPosition(board, 'w'), b = E.startFromPosition(pieces, { config: v });
+    let a = Spike.fromPosition(board, 'w'), b = E.startFromPosition(pieces, { config: { ...v, quietMoveLimit: 50 } });
     while (a.phase === 'play') {
       positions++;
       const ma = Spike.legalMoves(a), mb = E.legalActions(b);
@@ -33,7 +34,7 @@ for (const v of VARIANTS) {
       const m = ma[Math.floor(rng() * ma.length)];
       a = Spike.makeMove(a, m);
       b = E.apply(b, { from: m.from, to: m.to }).state;
-      const ra = result(a.result), rb = result(b.result && { winner: b.result.winner?.[0], reason: b.result.reason === 'fiftyMove' ? 'fifty' : b.result.reason });
+      const ra = result(a.result), rb = result(b.result && { winner: b.result.winner?.[0], reason: b.result.reason === 'moveLimit' ? 'fifty' : b.result.reason });
       if (ra !== rb) { bad++; if (bad < 5) console.log('RESULT DIFFERS', JSON.stringify(v), 'game', g, { spike: ra, engine: rb }); break; }
     }
   }

@@ -10,8 +10,11 @@ export interface RulesConfig {
   exactRange: boolean;           // §3: pieces move exactly N squares
   noWaterEdge: boolean;          // §3: Water can't slide along the board edge
   waterStraightCapture: boolean; // §3: Water's capturing step must be a straight flow
+  quietMoveLimit: number;        // §6: moves each without a capture or combine before a draw (75); 0 = no limit
 }
-export const DEFAULT_CONFIG: Readonly<RulesConfig> = Object.freeze({ exactRange: false, noWaterEdge: false, waterStraightCapture: false });
+export const DEFAULT_CONFIG: Readonly<RulesConfig> = Object.freeze({
+  exactRange: false, noWaterEdge: false, waterStraightCapture: false, quietMoveLimit: 75,
+});
 
 // A move is (from, to), packed into one number: from + to * 256. The board decides whether it
 // moves, captures or combines (architecture research §2.1).

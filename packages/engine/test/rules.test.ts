@@ -110,13 +110,21 @@ test('§6 Threefold repetition is a draw', () => {
   assert.deepEqual(apply(st, parseAction('i8-i9')).state.result, { winner: null, reason: 'repetition' });
 });
 
-test('§6 The 50-move rule: 50 moves each without a capture or combine is a draw', () => {
-  const st = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w'), clock: 99 };
-  assert.deepEqual(apply(st, parseAction('a1-a2')).state.result, { winner: null, reason: 'fiftyMove' });
+test('§6 The 75-move rule: 75 moves each without a capture or combine is a draw', () => {
+  const st = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w'), clock: 148 };
+  assert.equal(apply(st, parseAction('a1-a2')).state.result, null, '74½ moves each');
+  assert.deepEqual(apply({ ...st, clock: 149 }, parseAction('a1-a2')).state.result, { winner: null, reason: 'moveLimit' });
 });
 
-test('§6 A capture or combine resets the 50-move count', () => {
-  const st = { ...at('8f1/4z4/9/9/9/9/9/f13Z4/F18 w'), clock: 99 };
+test('§6 The move limit is a rule setting: 50 (the chess rule), or off', () => {
+  const st = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w', { quietMoveLimit: 50 }), clock: 99 };
+  assert.deepEqual(apply(st, parseAction('a1-a2')).state.result, { winner: null, reason: 'moveLimit' });
+  const off = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w', { quietMoveLimit: 0 }), clock: 999 };
+  assert.equal(apply(off, parseAction('a1-a2')).state.result, null, '0 means no limit');
+});
+
+test('§6 A capture or combine resets the move count', () => {
+  const st = { ...at('8f1/4z4/9/9/9/9/9/f13Z4/F18 w'), clock: 149 };
   const next = apply(st, parseAction('a1-a2')).state;
   assert.equal(next.clock, 0);
   assert.equal(next.result, null);

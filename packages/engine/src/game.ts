@@ -12,7 +12,7 @@ export const RULES_VERSION = '0.2';
 
 export type Action = { from: number; to: number };
 export type MoveKind = 'move' | 'capture' | 'combine';
-export type EndReason = 'elimination' | 'checkmate' | 'stalemate' | 'repetition' | 'fiftyMove';
+export type EndReason = 'elimination' | 'checkmate' | 'stalemate' | 'repetition' | 'moveLimit';
 export type Result = { winner: Side | null; reason: EndReason };
 
 export interface GameState {
@@ -22,7 +22,7 @@ export interface GameState {
   readonly toMove: Side;
   readonly board: readonly number[];   // 81 piece codes, 0 = empty. Read with pieceAt.
   readonly ply: number;                // moves played so far (one move = one player's turn)
-  readonly clock: number;              // moves since the last capture or combine (50-move rule)
+  readonly clock: number;              // turns since the last capture or combine (for the 75-move rule)
   readonly history: readonly string[]; // position hashes since the last capture or combine, current last
   readonly result: Result | null;
 }
@@ -68,7 +68,7 @@ export function moveKind(state: GameState, { from, to }: Action): MoveKind {
 export const pieceAt = (state: GameState, s: number): Piece | null => decodePiece(state.board[s]);
 
 // Play a move and run the end checks in the spec's order (§6): the mover wins (elimination,
-// checkmate), then draws (stalemate, repetition, 50-move rule). Throws on an illegal move.
+// checkmate), then draws (stalemate, repetition, the 75-move rule). Throws on an illegal move.
 export function apply(state: GameState, action: Action): { state: GameState; events: GameEvent[] } {
   const pos = positionOf(state);
   const m = moveOf(action.from, action.to);
@@ -88,7 +88,7 @@ export function apply(state: GameState, action: Action): { state: GameState; eve
   if (pos.capturers[opp] === 0) result = { winner: win, reason: 'elimination' };
   else if (!hasLegalMove(pos)) result = inCheck(pos, opp) ? { winner: win, reason: 'checkmate' } : { winner: null, reason: 'stalemate' };
   else if (history.filter(h => h === key).length >= 3) result = { winner: null, reason: 'repetition' };
-  else if (clock >= 100) result = { winner: null, reason: 'fiftyMove' };
+  else if (state.config.quietMoveLimit && clock >= 2 * state.config.quietMoveLimit) result = { winner: null, reason: 'moveLimit' };
 
   const next: GameState = {
     ...state, board: Array.from(pos.board), toMove: sideName(opp), ply: state.ply + 1, clock, history, result,

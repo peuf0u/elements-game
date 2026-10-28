@@ -181,14 +181,14 @@ Either:
 ### Order of end checks ✅ *(designer, review)*
 After every move, check in this order; the first match ends the game:
 1. **The mover wins**: the opponent has no capturing pieces left, or is checkmated.
-2. **Draws** (below): stalemate, repetition, the 50-move rule.
+2. **Draws** (below): stalemate, repetition, the 75-move rule.
 
 Example: a move that removes the opponent's last capturing piece **and** leaves them with no legal move is a win, not a stalemate.
 
 ### Draws 🟡 (provisional chess-like defaults, the designer hasn't decided yet)
 - **Stalemate** (not in check but no legal move) → draw.
 - **Threefold repetition** of the same position with the same player to move → draw.
-- **50-move rule:** 50 moves by each player with no capture and no combining → draw.
+- **75-move rule:** 75 moves by each player with no capture and no combining → draw. ✅ *(designer, playtest 2026-10-28)* Chess uses 50; Elements' endgames stall more often because Earth never leaves the board, and computer playtests showed 75 turns about a third of those draws into wins while typical games stay the same length (open question 2).
 - Draw by agreement.
 
 ## 7. Proposed / future mechanics 🧪
@@ -230,6 +230,10 @@ Example: a move that removes the opponent's last capturing piece **and** leaves 
 2. Draw rules are provisional chess defaults. Revisit after playtesting.
    - Computer playtesting (2026-10-28): about 1 in 4 games between equal players is drawn, roughly half by repetition and half by the 50-move rule. With `exactRange` on, the 50-move rule alone ends 44% of games. [playtest/FINDINGS.md](playtest/FINDINGS.md) §2, §7.
    - With the strong bot, 24–33% of games are drawn, mostly by the 50-move rule. The same bot draws only 10% of chess games, so Elements is more drawish than chess at the same level of play (§11, §12).
+   - The 50-move rule means 50 moves by **each** player (100 turns) with no capture and no combine. The designer doesn't want a shorter limit (it could only add draws) and asked for longer ones to be tested ✅ *(designer, playtest 2026-10-28)*. The limit is a rule setting in the engine (`quietMoveLimit`, default 50).
+   - Why games stall: at a 50-move draw a median of 3 capturing pieces are left in total, 1 on the weaker side, and more than half of the last 100 moves are Wizards and plain Earth shuffling. Earth never leaves the board, so a few remaining attackers can't break its walls.
+   - Tested (2026-10-28, Deep 2k with learned values, 400 games per row, default formation): limit 50 → 28% drawn by the rule, the longest 10% of games past 97 moves each; 75 → 19%, past 117; 100 → 17%, past 148; no limit → 89% of games decided, but the longest 10% past 259 moves each. The typical game stays about 50 moves each throughout. With random formations: 16% → 12% → 11%. Chess with the same bots: 6%. So 75 turns a third of these draws into wins for a modest cost in length; going further buys little.
+   - Decided: the limit is **75 moves each** ✅ *(designer, playtest 2026-10-28)*. Stalemate and threefold repetition stay provisional.
 3. Same-element combining is provisionally disallowed. Revisit if a use for it shows up.
 4. Wizard's own restricted starting area: shape and size (ties into the Castle idea).
 5. Names and look of the two sides (currently White/Black from chess), and the visual form of element pieces (currently pyramids). Neither affects the rules.

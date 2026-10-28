@@ -152,6 +152,22 @@ export const EXPERIMENTS = {
       ]),
     ];
   },
+  // 10b. The 50-move rule (GAME_SPEC open question 2): most strong-bot draws come from it. Does a
+  // longer limit turn them into wins, or only make games longer? 0 = no limit (capped at 500 moves each).
+  drawLimit: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' };
+    seed = 800000;
+    return [50, 75, 100, 0].flatMap(limit => {
+      const name = limit ? `limit ${limit}` : 'no limit';
+      return [
+        ...mirror(`${name}: default formation`, bot, 400 * s, { quietMoveLimit: limit, randomOpening: 2, maxPlies: 1000 }),
+        ...Array.from({ length: 400 * s }, () => ({
+          tag: `${name}: same random formation`, a: 'w', seed: seed++, white: bot, black: bot, whiteFormation: 'random', blackFormation: 'same',
+          quietMoveLimit: limit, randomOpening: 2, maxPlies: 1000,
+        })),
+      ];
+    });
+  },
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.
   // a. Deep 2k with naive values (every piece worth 1) against itself, to learn values from.
   chessSelfplay: s => Array.from({ length: 4000 * s }, (_, i) => ({

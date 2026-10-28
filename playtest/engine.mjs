@@ -20,8 +20,10 @@ export const hasCapturers = (board, o) => board.some(p => p && p.o === o && isCa
 
 // Variant toggles (GAME_SPEC.md "v1 scope"), applied to the games started after this call.
 let config = E.DEFAULT_CONFIG;
-export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false } = {}) {
-  config = { exactRange, noWaterEdge, waterStraightCapture };
+// quietMoveLimit: moves each without a capture or combine before a draw (0 = no limit). 75 since
+// 2026-10-28; games recorded before that were played with 50, the chess rule.
+export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, quietMoveLimit = 75 } = {}) {
+  config = { exactRange, noWaterEdge, waterStraightCapture, quietMoveLimit };
 }
 
 // A formation is { square: [element, size] | 'wizard' } as White sees it (rows 1–3).
@@ -32,7 +34,7 @@ const toEngine = f => Object.fromEntries(Object.entries(f).map(([s, v]) => [s, v
 
 const readable = p => (!p ? null : p.kind === 'wizard' ? { o: p.owner[0], wiz: true }
   : { o: p.owner[0], els: p.units.map(u => ({ e: u.element, s: u.size })) });
-const REASON = { fiftyMove: 'fifty' };
+const REASON = { moveLimit: 'fifty' }; // the playtest's name for the move-limit draw, kept from the 50-move days
 function wrap(game) {
   return {
     game,
