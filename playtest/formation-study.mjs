@@ -8,7 +8,7 @@
 // of them with 1 to 6 pieces moved, and fully random formations.
 import fs from 'node:fs';
 import { runGames } from './pool.mjs';
-import { PRESETS, randomFormation, mutate } from './formations.mjs';
+import { FIRST_PRESETS as PRESETS, randomFormation, mutate } from './formations.mjs';
 import { rngFrom } from './game.mjs';
 import { startGame, legalMoves } from './engine.mjs';
 

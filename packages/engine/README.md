@@ -29,7 +29,7 @@ It is written in TypeScript. Node 24 runs the `.ts` files directly, so there's n
 | `movegen.ts` | Which moves are possible (GAME_SPEC §3–§6), including Water's routes around Earth and along the edge, and whether a Wizard is attacked. |
 | `zobrist.ts` | A 64-bit fingerprint of each position, updated cheaply on every move. Used for threefold repetition, and later for the bots' memory. |
 | `game.ts` | The immutable API and the end-of-game checks, in the spec's order. |
-| `formation.ts` | Starting formations: the default ("Wind 3 held back"), five more presets and your original one, all named in `PRESETS`. |
+| `formation.ts` | Starting formations: the default ("Wind 3 held back"), six more presets and your original one, all named in `PRESETS`. |
 | `notation.ts` | Text forms: squares (`e1`), moves (`c2-c5`) and whole positions on one line, like chess's FEN. |
 | `route.ts` | The squares a move passes through, for animation and for analysing games. |
 

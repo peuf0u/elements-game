@@ -1,6 +1,6 @@
 // The experiments from the plan. Each one is a list of games to play; run.mjs plays them.
 import fs from 'node:fs';
-import { DEFAULT_FORMATION, PRESETS, mirror as mirrorFiles, without } from './formations.mjs';
+import { DEFAULT_FORMATION, PRESETS, FIRST_PRESETS, mirror as mirrorFiles, without } from './formations.mjs';
 import { V03 } from './engine.mjs';
 
 let seed = 1;
@@ -37,14 +37,14 @@ function roundRobin(tag, players, n, extra = {}) {
 
 // Every pair of presets meets n times, half with each colour, both sides played by the same bot.
 function presetRoundRobin(bot, n, firstSeed, rules = {}) {
-  const names = Object.keys(PRESETS), out = [];
+  const names = Object.keys(FIRST_PRESETS), out = [];
   seed = firstSeed;
   for (let i = 0; i < names.length; i++)
     for (let j = i + 1; j < names.length; j++)
       for (let k = 0; k < n; k++) {
         const [w, b] = k % 2 ? [names[j], names[i]] : [names[i], names[j]];
         out.push({ tag: `${names[i]} v ${names[j]}`, a: k % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, randomOpening: 2, maxPlies: 1000,
-          whiteFormation: PRESETS[w], blackFormation: PRESETS[b], labels: { w, b }, ...rules });
+          whiteFormation: FIRST_PRESETS[w], blackFormation: FIRST_PRESETS[b], labels: { w, b }, ...rules });
       }
   return out;
 }
@@ -220,9 +220,9 @@ export const EXPERIMENTS = {
   mirrorCheck: s => {
     const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, out = [];
     seed = 1200000;
-    for (const [name, f] of Object.entries(PRESETS))
+    for (const [name, f] of Object.entries(FIRST_PRESETS))
       for (const [tag, fa] of [[name, f], [`${name} mirrored`, mirrorFiles(f)]])
-        for (const [opp, fb] of Object.entries(PRESETS))
+        for (const [opp, fb] of Object.entries(FIRST_PRESETS))
           for (let k = 0; k < 40 * s; k++)
             out.push({ tag, opp, a: k % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, randomOpening: 2, maxPlies: 1000,
               whiteFormation: k % 2 ? fb : fa, blackFormation: k % 2 ? fa : fb });

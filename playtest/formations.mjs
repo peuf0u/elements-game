@@ -1,7 +1,7 @@
 // Starting formations, each written from White's side (rows 1–3). See engine.mjs startGame.
-import { DEFAULT_FORMATION, PRESETS } from './engine.mjs';
+import { DEFAULT_FORMATION, PRESETS, FIRST_PRESETS } from './engine.mjs';
 
-export { DEFAULT_FORMATION, PRESETS };
+export { DEFAULT_FORMATION, PRESETS, FIRST_PRESETS };
 
 const ELEMENTS = ['fire', 'wind', 'water', 'earth'];
 const ZONE = [];

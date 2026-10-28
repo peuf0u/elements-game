@@ -167,7 +167,7 @@ Example: Water size 3 (R) at b2, Earth (E) at c3, in the corner of the board. �
   - **Default formation:** the designer's own formation `[12:44]`–`[13:10]` is the default preset in the spike. ✅ *(designer, spike 2026-10-27)* The squares and sizes were read off the video. 🟡 Shown for White; Black uses the same formation from their side of the table (rotated 180°: White's b3 is Black's h7).
   - The designer's formation isn't a thought-through one, just one that was nice to play with; it may be replaced by better formations ✅ *(designer, playtest 2026-10-28)*. In computer play with strong bots it came last of nine strong formations (43% against the others), and drew most often. See [playtest/FORMATIONS.html](playtest/FORMATIONS.html). 
   - **New default and presets** ✅ *(designer, playtest 2026-10-28)*. The default is **"Wind 3 held back"**, the strongest formation the search found. It moves only four of the designer's pieces: Wind 3 to c1 with Earth 1 beside it, Wind 2 to f2, Fire 1 to h3. Five presets go with it: "Mirrored and reshaped", "Fire in front of the Wizard", "Fire 1 in front", "Low Winds, Earth forward" and "Wizard forward". The designer's own formation stays available as "Original". Boards and results: [playtest/FORMATIONS.html](playtest/FORMATIONS.html); squares: `PRESETS` in `packages/engine/src/formation.ts`.
-    - Under rules v0.3 (new Water), Wind 3 held back still comes first among the presets. A new search found "Fire forward" about as strong: the designer's formation with Fire 2 on e2, Fire 1 on h2 and Wind 1 on f1. It's a candidate for a seventh preset, not decided ([playtest/FINDINGS.md](playtest/FINDINGS.md) §15).
+    - Under rules v0.3 (new Water), Wind 3 held back still comes first among the presets. A new search found "Fire forward" about as strong: the designer's formation with Fire 2 on e2, Fire 1 on h2 and Wind 1 on f1 (third board below). It became the seventh preset, "Fire forward" ✅ *(designer, playtest 2026-10-29)*. Head to head against Wind 3 held back it scored 57% with Deep 2k and 53% with Deep 20k, so they're level ([playtest/FINDINGS.md](playtest/FINDINGS.md) §15).
     ```
      3  ·  ·  ·  ·  E3 ·  E2 F1 ·
      2  ·  ·  R1 W1 R2 W2 R3 ·  ·
@@ -178,6 +178,12 @@ Example: Water size 3 (R) at b2, Earth (E) at c3, in the corner of the board. �
      3  ·  W3 E1 ·  E3 ·  E2 W2 ·       W = Wind  E = Earth  R = Water  F = Fire
      2  ·  ·  R1 W1 R2 F1 R3 ·  ·       Z = Wizard, number = size
      1  ·  ·  ·  F3 Z  F2 ·  ·  ·
+        a  b  c  d  e  f  g  h  i
+    ```
+    ```
+     3  ·  W3 E1 ·  E3 ·  E2 W2 ·       Fire forward
+     2  ·  ·  R1 R2 F2 ·  R3 F1 ·
+     1  ·  ·  ·  F3 Z  W1 ·  ·  ·
         a  b  c  d  e  f  g  h  i
     ```
 

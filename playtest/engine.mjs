@@ -37,6 +37,9 @@ export const DEFAULT_FORMATION = Object.fromEntries(Object.entries(E.PRESETS.ori
 // The engine's presets (the app's default "Wind 3 held back" and the others) in the same form.
 export const PRESETS = Object.fromEntries(Object.entries(E.PRESETS).map(([k, f]) => [k,
   Object.fromEntries(Object.entries(f).map(([s, v]) => [s, v === 'wizard' ? v : [v.element, v.size]]))]));
+// The seven presets the formation experiments played (Fire forward joined later, 2026-10-29),
+// so those experiments replay exactly.
+export const FIRST_PRESETS = Object.fromEntries(Object.entries(PRESETS).filter(([k]) => k !== 'fireForward'));
 const toEngine = f => Object.fromEntries(Object.entries(f).map(([s, v]) => [s, v === 'wizard' ? v : { element: v[0], size: v[1] }]));
 
 const readable = p => (!p ? null : p.kind === 'wizard' ? { o: p.owner[0], wiz: true }

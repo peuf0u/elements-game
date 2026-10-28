@@ -17,7 +17,7 @@
 // the presets and variations of them join the starting points.
 import fs from 'node:fs';
 import { runGames } from './pool.mjs';
-import { DEFAULT_FORMATION as ORIGINAL, PRESETS, randomFormation, FIRE_FORWARD, FIRE_FORWARD_2 } from './formations.mjs';
+import { DEFAULT_FORMATION as ORIGINAL, FIRST_PRESETS as PRESETS, randomFormation, FIRE_FORWARD, FIRE_FORWARD_2 } from './formations.mjs';
 import { V03 } from './engine.mjs';
 import { rngFrom } from './game.mjs';
 

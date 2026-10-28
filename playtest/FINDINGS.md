@@ -633,7 +633,7 @@ All results below start from Wind 3 held back unless stated, under the 75-move r
 - **Water still gives most checkmates** (about 70%). It's still the piece that finishes games, but it captures less (2.8 instead of 3.4 per game, §14's comparison).
 - **The game stays fair and decisive:** White 51–52%. Draws are about the same with Deep 2k and a little higher with Deep 20k (16% → 20%). Games are 5–10 moves longer.
 - **Combining matters more**, probably because a single Water now reaches less, so Water stacks pay off.
-- **Wind 3 held back stays a good default.** Fire forward is a candidate for a new preset.
+- **Wind 3 held back stays a good default.** Fire forward became the seventh preset (designer, 2026-10-29).
 
 ---
 
