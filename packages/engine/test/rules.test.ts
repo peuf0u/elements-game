@@ -1,0 +1,127 @@
+// One test per rule in GAME_SPEC.md, using the spec's own examples where it gives one.
+// Positions are in the one-line text form (src/notation.ts): ranks 9 down to 1, upper case White.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  fromPositionText, legalActions, apply, status, pieceAt, parseSquare, squareName, parseAction, positionText,
+  type GameState, type RulesConfig,
+} from '../src/index.ts';
+
+const at = (text: string, config: Partial<RulesConfig> = {}) => fromPositionText(text, config);
+const dests = (st: GameState, from: string) =>
+  legalActions(st).filter(a => a.from === parseSquare(from)).map(a => squareName(a.to)).sort();
+const play = (st: GameState, ...moves: string[]) => moves.reduce((s, m) => apply(s, parseAction(m)).state, st);
+
+// §3 Water movement rule: Water 3 on b2, Earth on c3 (the spec's example).
+const WATER_EXAMPLE = '4z4/9/9/9/8Z/9/2E16/1R37/9 w';
+
+test('§3 Water flows, banks around Earth, and comes back (spec example)', () => {
+  const d = dests(at(WATER_EXAMPLE), 'b2');
+  for (const s of ['b5', 'd2', 'd3', 'c4', 'd1']) assert.ok(d.includes(s), `b2 should reach ${s}`);
+});
+
+test('§3 Water slides along the edge: b2 → b1 → a1 → a2 (spec example)', () => {
+  assert.ok(dests(at(WATER_EXAMPLE), 'b2').includes('a2'));
+  const noEdge = dests(at(WATER_EXAMPLE, { noWaterEdge: true }), 'b2');
+  assert.ok(!noEdge.includes('a2') && !noEdge.includes('a1'), 'no edge slide: a1 and a2 are out of reach');
+  assert.ok(noEdge.includes('b1'), 'flowing down to b1 is still fine');
+});
+
+test('§3 Straight captures: Water may bend to move, but must capture with a straight flow', () => {
+  // White Water 2 on b2, Earth on c3; Black Fire on d3 (reachable only by banking) and on b4 (straight).
+  const text = '4z4/9/9/9/1f16Z/9/2E1f15/1R27/9 w';
+  assert.deepEqual(['b4', 'd3'].filter(s => dests(at(text), 'b2').includes(s)), ['b4', 'd3']);
+  assert.deepEqual(['b4', 'd3'].filter(s => dests(at(text, { waterStraightCapture: true }), 'b2').includes(s)), ['b4']);
+});
+
+test('§3 Exact range: pieces move exactly N squares', () => {
+  const d = dests(at('4z4/9/9/9/4F34/9/9/9/Z8 w', { exactRange: true }), 'e5');
+  assert.deepEqual(d, ['b5', 'e2', 'e8', 'h5']);
+});
+
+test('§3/§4 Earth blocks, can\'t capture and can\'t be captured', () => {
+  // White Earth on d4; Black Fire on d5 and Black Earth on e4 right next to it.
+  const st = at('4z4/9/9/9/3f15/3E1e14/9/9/Z8 w');
+  const d = dests(st, 'd4');
+  assert.ok(!d.includes('d5') && !d.includes('e4'), 'Earth captures nothing');
+  assert.ok(!dests({ ...st, toMove: 'black' }, 'd5').includes('d4'), 'Fire can\'t take Earth');
+});
+
+test('§5 Combining: Wind 3 onto Water 1 makes one piece that moves 3 as either element', () => {
+  const st = play(at('4z3f1/9/9/9/9/9/1W37/2R16/Z8 w'), 'b3-c2', 'e9-e8');
+  assert.deepEqual(pieceAt(st, parseSquare('c2')), {
+    owner: 'white', kind: 'element', units: [{ element: 'wind', size: 3 }, { element: 'water', size: 1 }],
+  });
+  const d = dests(st, 'c2');
+  assert.ok(d.includes('c5'), 'flows 3 as Water');
+  assert.ok(d.includes('f5'), 'slides 3 diagonally as Wind');
+  assert.ok(!d.includes('c6'), 'not 4');
+});
+
+test('§5 A stack never combines again, and the same element can\'t combine', () => {
+  // White stack (R1W3) on c2, own Earth on c5 (a Water flow away) and on d3 (a Wind step away).
+  const st = at('4z4/9/9/9/2E16/9/3E15/2(R1W3)6/Z8 w');
+  const d = dests(st, 'c2');
+  assert.ok(!d.includes('c5') && !d.includes('d3'), 'a stack can\'t move onto its own pieces');
+  assert.ok(!dests(st, 'd3').includes('c2'), 'nothing can move onto a stack');
+  assert.ok(!dests(at('4z4/9/9/9/9/9/1W37/2W16/Z8 w'), 'b3').includes('c2'), 'Wind can\'t combine with Wind');
+});
+
+test('§5 Earth + Fire moves only as Fire, can be captured, and is no longer a bank for Water', () => {
+  const st = play(at('4z3f1/9/9/9/4E24/3R1F14/9/9/Z8 w'), 'e4-e5', 'e9-e8');
+  const d = dests(st, 'e5');
+  assert.ok(d.includes('e7') && d.includes('c5'), 'moves orthogonally, range 2');
+  assert.ok(!d.includes('f6'), 'not diagonally like Earth');
+  assert.deepEqual(dests(st, 'd4'), ['d3', 'd5'], 'Water 1 next to the stack can only flow: the stack is no bank');
+});
+
+test('§6 You may not leave your Wizard attacked', () => {
+  // White Wind on e2 shields the Wizard on e1 from Black Fire 3 on e4; every Wind move opens the line.
+  assert.deepEqual(dests(at('4z4/9/9/9/9/4f34/9/4W14/4Z4 w'), 'e2'), []);
+});
+
+test('§6 Water gives check along the edge and around Earth', () => {
+  assert.equal(status(at('4z4/9/9/9/9/9/9/9/4Z1r22 w')).inCheck, true, 'r2 on g1 → f1 → e1 along the edge');
+  const around = '4z4/9/9/9/9/9/5r23/4E14/4Z4 w'; // r2 on f3 → f2 → e1, banking around the Earth on e2
+  assert.equal(status(at(around)).inCheck, true);
+  assert.equal(status(at(around, { waterStraightCapture: true })).inCheck, false, 'not with straight captures');
+});
+
+test('§6 Elimination: taking the last capturing piece wins', () => {
+  const { state } = apply(at('z8/e18/9/9/4f14/4F14/9/9/8Z w'), parseAction('e4-e5'));
+  assert.deepEqual(state.result, { winner: 'white', reason: 'elimination' });
+});
+
+test('§6 Checkmate', () => {
+  // Black Wizard on a9. Fire 3 from a5 to a6 checks along the a-file; Fire 3 on b6 covers b8 and b9.
+  const { state } = apply(at('z8/9/9/1F37/F33f14/9/9/9/8Z w'), parseAction('a5-a6'));
+  assert.deepEqual(state.result, { winner: 'white', reason: 'checkmate' });
+});
+
+test('§6 Stalemate is a draw', () => {
+  // Black's Fire on i9 is walled in by White Earth; every Wizard square is covered, but a9 isn't attacked.
+  const { state } = apply(at('z1F14E1f1/3F14E1/F18/9/9/9/9/9/4Z4 w'), parseAction('d8-c8'));
+  assert.deepEqual(state.result, { winner: null, reason: 'stalemate' });
+});
+
+test('§6 Threefold repetition is a draw', () => {
+  const st = play(at('8f1/4z4/9/9/9/9/9/4Z4/F18 w'), 'a1-a2', 'i9-i8', 'a2-a1', 'i8-i9', 'a1-a2', 'i9-i8', 'a2-a1');
+  assert.equal(st.result, null);
+  assert.deepEqual(apply(st, parseAction('i8-i9')).state.result, { winner: null, reason: 'repetition' });
+});
+
+test('§6 The 50-move rule: 50 moves each without a capture or combine is a draw', () => {
+  const st = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w'), clock: 99 };
+  assert.deepEqual(apply(st, parseAction('a1-a2')).state.result, { winner: null, reason: 'fiftyMove' });
+});
+
+test('§6 A capture or combine resets the 50-move count', () => {
+  const st = { ...at('8f1/4z4/9/9/9/9/9/f13Z4/F18 w'), clock: 99 };
+  const next = apply(st, parseAction('a1-a2')).state;
+  assert.equal(next.clock, 0);
+  assert.equal(next.result, null);
+});
+
+test('Position text round-trips', () => {
+  for (const t of [WATER_EXAMPLE, '4z4/9/2E1R1(F3W2)4/9/9/9/2e16/1R37/4Z4 b']) assert.equal(positionText(at(t)), t);
+});
