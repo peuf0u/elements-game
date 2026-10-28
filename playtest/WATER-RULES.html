@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Water Movement Rules</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the methods page's reading column; findings as verdict rows, then sections with drawn boards. */
+:root {
+  --ground: #eef0ee; --plate: #fbfcfa; --ink: #1d2422; --muted: #5b6662; --rule: #d5dad6; --link: #24618a;
+  --fire: #c2412d; --wind: #b8860b; --water: #2f6f9f; --earth: #8a6a48; --mark: #e4ebe6;
+  --tile: #e6dccb; --tile-mid: #efe8dc; --route: #2f6f9f;
+  --ok: #2e7d4f; --ok-bg: #e2f1e7; --warn: #a15c00; --warn-bg: #fbecd6;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #151a19; --plate: #1d2422; --ink: #e5ebe7; --muted: #9aa6a1; --rule: #33403c; --link: #7fb6dc;
+    --fire: #e9735e; --wind: #e0b33f; --water: #6aa8d6; --earth: #c29b72; --mark: #26302d;
+    --tile: #3a342b; --tile-mid: #302b24; --route: #6aa8d6;
+    --ok: #7bd3a0; --ok-bg: #1d3328; --warn: #f0b35a; --warn-bg: #3a2c16; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #151a19; --plate: #1d2422; --ink: #e5ebe7; --muted: #9aa6a1; --rule: #33403c; --link: #7fb6dc;
+  --fire: #e9735e; --wind: #e0b33f; --water: #6aa8d6; --earth: #c29b72; --mark: #26302d;
+  --tile: #3a342b; --tile-mid: #302b24; --route: #6aa8d6;
+  --ok: #7bd3a0; --ok-bg: #1d3328; --warn: #f0b35a; --warn-bg: #3a2c16; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 72px; margin: 0;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 6vw, 2.9rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 500; }
+p { margin: 0; }
+a { color: var(--link); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+code { font-family: var(--mono); font-size: 0.82em; background: var(--mark); padding: 0.1em 0.35em; border-radius: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.lede { font-size: 1.15rem; }
+.muted { color: var(--muted); font-size: 0.92rem; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; }
+
+.howto { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 22px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem; }
+
+/* Verdicts */
+.verdicts { display: flex; flex-direction: column; border: 1px solid var(--rule); border-radius: 10px; background: var(--plate); overflow: hidden; }
+.verdict { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--rule); align-items: start; }
+.verdict:last-child { border-bottom: 0; }
+.verdict .q { font-family: var(--display); font-weight: 500; }
+.verdict .a { min-width: 0; font-size: 0.95rem; }
+.pill { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { color: var(--ok); background: var(--ok-bg); }
+.pill.warn { color: var(--warn); background: var(--warn-bg); }
+@media (max-width: 600px) { .verdict { grid-template-columns: 1fr auto; } .verdict .a { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Tables */
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--plate); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 13px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--display); font-weight: 500; color: var(--muted); font-size: 0.84rem; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.hi { font-weight: 600; }
+
+/* Bars */
+.bars { display: flex; flex-direction: column; gap: 9px; }
+.bar-row { display: grid; grid-template-columns: 10.5rem 1fr 3.4rem; gap: 12px; align-items: center; font-family: var(--display); font-size: 0.95rem; }
+.bar-row .track { height: 14px; background: var(--mark); border-radius: 3px; position: relative; overflow: hidden; }
+.bar-row .track i { position: absolute; inset: 0 auto 0 0; background: var(--c, var(--water)); border-radius: 3px; }
+.bar-row .track .mid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+.bar-row b { text-align: right; font-variant-numeric: tabular-nums; }
+.bar-row small { display: block; font-family: var(--body); color: var(--muted); font-size: 0.78rem; font-weight: 400; }
+@media (max-width: 480px) { .bar-row { grid-template-columns: 7.5rem 1fr 3rem; } }
+
+/* Boards */
+.figure { display: flex; flex-direction: column; gap: 10px; background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.figure figcaption { font-size: 0.93rem; }
+.boards { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+.bd { display: grid; gap: 2px; font-family: var(--display); }
+.bd .lbl { font-size: 0.68rem; color: var(--muted); display: grid; place-items: center; font-family: var(--mono); }
+.bd .sq { width: var(--cell, 34px); height: var(--cell, 34px); background: var(--tile); border-radius: 3px; display: grid; place-items: center; position: relative; }
+.bd .sq.midz { background: var(--tile-mid); }
+.bd .sq.route { box-shadow: inset 0 0 0 2px var(--route); }
+.bd .sq .step { position: absolute; top: 1px; right: 3px; font-family: var(--mono); font-size: 0.6rem; color: var(--route); font-weight: 500; }
+.bd .sq.num { font-family: var(--mono); font-size: 0.82rem; font-weight: 500; }
+.pc { width: 78%; height: 78%; display: grid; place-items: center; font-size: 0.66rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1; border: 2px solid transparent; }
+.pc.w { color: #1d2422; } .pc.b { color: #fbfcfa; }
+.pc.fire { border-radius: 3px; } .pc.wind { border-radius: 3px; transform: rotate(45deg) scale(0.82); }
+.pc.wind span { transform: rotate(-45deg); }
+.pc.water { border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; } .pc.earth { clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); }
+.pc.wiz { clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); width: 92%; height: 92%; }
+.pc.w.fire { background: #f08a74; } .pc.b.fire { background: #a3301f; }
+.pc.w.wind { background: #f2cf62; } .pc.b.wind { background: #8f6a06; }
+.pc.w.water { background: #8fc0e6; } .pc.b.water { background: #1f5680; }
+.pc.w.earth { background: #d2b28e; } .pc.b.earth { background: #6b4f33; }
+.pc.w.wiz { background: #f4f1e8; border: 0; outline: 1px solid #1d2422; } .pc.b.wiz { background: #1d2422; }
+.pc.w { box-shadow: 0 0 0 1.5px #fbfcfa inset; } .pc.b { box-shadow: 0 0 0 1.5px #1d2422 inset; }
+.pc.stack { outline: 2px dashed var(--ink); outline-offset: 1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.82rem; color: var(--muted); font-family: var(--display); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .swatch { width: 14px; height: 14px; display: inline-block; }
+
+.next { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.next ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; }
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Rule cards in a grid, then one panel per statistic with a bar per rule; today's value is a tick on every bar. */
+.wrap { max-width: 1080px; }
+.narrow { max-width: 760px; display: flex; flex-direction: column; gap: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; }
+.card { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card.ref { border-style: dashed; }
+.card p { font-size: 0.93rem; }
+.boardwrap { overflow-x: auto; }
+.panels { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
+.panel { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.panel h3 { margin: 0; }
+.panel .bar-row { grid-template-columns: 9.5rem 1fr 3.2rem; font-size: 0.88rem; }
+.bar-row.ref span, .group.ref .gname { font-weight: 700; }
+.bar-row .track .tick { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--ink); opacity: 0.55; }
+.groups { display: flex; flex-direction: column; gap: 10px; }
+.group { display: grid; grid-template-columns: 9.5rem 1fr; gap: 12px; align-items: center; font-family: var(--display); font-size: 0.88rem; }
+.gbars { display: flex; flex-direction: column; gap: 3px; }
+.gbar { display: grid; grid-template-columns: 2.8rem 1fr 2.6rem; gap: 8px; align-items: center; font-size: 0.78rem; }
+.gbar .gl { color: var(--muted); }
+.gbar .track { height: 8px; background: var(--mark); border-radius: 2px; position: relative; overflow: hidden; }
+.gbar .track i { position: absolute; inset: 0 auto 0 0; background: var(--c); border-radius: 2px; }
+.gbar b { text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 480px) { .panel .bar-row, .group { grid-template-columns: 7rem 1fr 2.8rem; } .group { grid-template-columns: 1fr; gap: 4px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="stack narrow">
+  <span class="eyebrow">Elements · Water rules · 28 Oct 2026 · Deep 2k with learned values · 75-move rule</span>
+  <h1>Ten ways for Water to move</h1>
+  <p class="lede">Today's Water rule and nine alternatives, each played by the strong bot from the default formation, Wind 3 held back. The edge slide stays in every version. Each rule had 400 equal games, plus 150 games each with one side missing Water 3, Fire 3 or Wind 3.</p>
+</header>
+
+<section class="stack" aria-labelledby="rules">
+  <h2 id="rules">The rules</h2>
+  <p class="muted narrow">Each board shows where a Water 3 on d3 can go, with an Earth right in front of it on d4 and another Earth nearby on f3. Dots mark the squares it reaches.</p>
+  <div class="grid">
+  <article class="card ref">
+    <div class="boardwrap"><div class="boards" id="b0"></div></div>
+    <h3>Today</h3>
+    <p>Bends around any Earth it touches, with straight or diagonal steps.</p>
+    <p class="muted">23 squares here · 9.3 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b1"></div></div>
+    <h3>River</h3>
+    <p>Bends only around an Earth right in front of it or right behind it in its column.</p>
+    <p class="muted">16 squares here · 6 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b2"></div></div>
+    <h3>Straight steps</h3>
+    <p>Never steps diagonally, also when going around Earth.</p>
+    <p class="muted">14 squares here · 5.8 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b3"></div></div>
+    <h3>River + straight steps</h3>
+    <p>Both rules together.</p>
+    <p class="muted">12 squares here · 4.4 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b4"></div></div>
+    <h3>Diagonal bends</h3>
+    <p>Flows straight, but its steps around Earth must be diagonal.</p>
+    <p class="muted">18 squares here · 7.5 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b5"></div></div>
+    <h3>River + diagonal bends</h3>
+    <p>Bends only around an Earth in its column, and only diagonally.</p>
+    <p class="muted">16 squares here · 5.4 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b6"></div></div>
+    <h3>One way</h3>
+    <p>As today, but in one move it goes only forward or only backward.</p>
+    <p class="muted">22 squares here · 8.8 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b7"></div></div>
+    <h3>Diagonal bends, one way</h3>
+    <p>Diagonal bends, and only forward or only backward in one move.</p>
+    <p class="muted">12 squares here · 6.2 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b8"></div></div>
+    <h3>River + diagonal, one way</h3>
+    <p>River and diagonal bends, only forward or only backward.</p>
+    <p class="muted">12 squares here · 4.8 moves per Water in real games</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="b9"></div></div>
+    <h3>Straight steps, one way</h3>
+    <p>Straight steps, and only forward or only backward in one move.</p>
+    <p class="muted">14 squares here · 5.7 moves per Water in real games</p>
+  </article>
+  </div>
+</section>
+
+<section class="stack" aria-labelledby="stats">
+  <h2 id="stats">How the games went</h2>
+  <p class="muted narrow">The dark tick on each bar marks today's value. Percentages from 400 games are uncertain by about ±4 points, and the games without a piece by about ±7.</p>
+  <div class="panels">
+<section class="panel" aria-labelledby="draws"><h3 id="draws">Draws</h3><p class="muted">Fewer is more decisive.</p><div class="bars"><div class="bar-row ref"><span>Today</span><div class="track"><i style="width:48.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>24%</b></div>
+<div class="bar-row"><span>River</span><div class="track"><i style="width:46.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>23%</b></div>
+<div class="bar-row"><span>Straight steps</span><div class="track"><i style="width:58.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>29%</b></div>
+<div class="bar-row"><span>River + straight steps</span><div class="track"><i style="width:94.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>47%</b></div>
+<div class="bar-row"><span>Diagonal bends</span><div class="track"><i style="width:32.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>16%</b></div>
+<div class="bar-row"><span>River + diagonal bends</span><div class="track"><i style="width:56.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>28%</b></div>
+<div class="bar-row"><span>One way</span><div class="track"><i style="width:48.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>24%</b></div>
+<div class="bar-row"><span>Diagonal bends, one way</span><div class="track"><i style="width:42.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>21%</b></div>
+<div class="bar-row"><span>River + diagonal, one way</span><div class="track"><i style="width:84.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>42%</b></div>
+<div class="bar-row"><span>Straight steps, one way</span><div class="track"><i style="width:58.0%;--c:var(--water)"></i><span class="tick" style="left:48.0%"></span></div><b>29%</b></div></div></section>
+<section class="panel" aria-labelledby="moves"><h3 id="moves">Typical game length</h3><p class="muted">Moves each, median.</p><div class="bars"><div class="bar-row ref"><span>Today</span><div class="track"><i style="width:46.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>46</b></div>
+<div class="bar-row"><span>River</span><div class="track"><i style="width:55.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>55</b></div>
+<div class="bar-row"><span>Straight steps</span><div class="track"><i style="width:59.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>59</b></div>
+<div class="bar-row"><span>River + straight steps</span><div class="track"><i style="width:100.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>100</b></div>
+<div class="bar-row"><span>Diagonal bends</span><div class="track"><i style="width:45.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>45</b></div>
+<div class="bar-row"><span>River + diagonal bends</span><div class="track"><i style="width:64.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>64</b></div>
+<div class="bar-row"><span>One way</span><div class="track"><i style="width:45.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>45</b></div>
+<div class="bar-row"><span>Diagonal bends, one way</span><div class="track"><i style="width:51.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>51</b></div>
+<div class="bar-row"><span>River + diagonal, one way</span><div class="track"><i style="width:74.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>74</b></div>
+<div class="bar-row"><span>Straight steps, one way</span><div class="track"><i style="width:65.0%;--c:var(--water)"></i><span class="tick" style="left:46.0%"></span></div><b>65</b></div></div></section>
+<section class="panel" aria-labelledby="mates"><h3 id="mates">Checkmates given by Water</h3><p class="muted">Share of all checkmates.</p><div class="bars"><div class="bar-row ref"><span>Today</span><div class="track"><i style="width:78.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>78%</b></div>
+<div class="bar-row"><span>River</span><div class="track"><i style="width:76.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>76%</b></div>
+<div class="bar-row"><span>Straight steps</span><div class="track"><i style="width:67.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>67%</b></div>
+<div class="bar-row"><span>River + straight steps</span><div class="track"><i style="width:54.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>54%</b></div>
+<div class="bar-row"><span>Diagonal bends</span><div class="track"><i style="width:68.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>68%</b></div>
+<div class="bar-row"><span>River + diagonal bends</span><div class="track"><i style="width:65.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>65%</b></div>
+<div class="bar-row"><span>One way</span><div class="track"><i style="width:69.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>69%</b></div>
+<div class="bar-row"><span>Diagonal bends, one way</span><div class="track"><i style="width:69.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>69%</b></div>
+<div class="bar-row"><span>River + diagonal, one way</span><div class="track"><i style="width:69.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>69%</b></div>
+<div class="bar-row"><span>Straight steps, one way</span><div class="track"><i style="width:54.0%;--c:var(--water)"></i><span class="tick" style="left:78.0%"></span></div><b>54%</b></div></div></section>
+<section class="panel" aria-labelledby="white"><h3 id="white">White's score</h3><p class="muted">50% is even.</p><div class="bars"><div class="bar-row ref"><span>Today</span><div class="track"><i style="width:50.0%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>50%</b></div>
+<div class="bar-row"><span>River</span><div class="track"><i style="width:53.5%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>53.5%</b></div>
+<div class="bar-row"><span>Straight steps</span><div class="track"><i style="width:54.5%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>54.5%</b></div>
+<div class="bar-row"><span>River + straight steps</span><div class="track"><i style="width:53.5%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>53.5%</b></div>
+<div class="bar-row"><span>Diagonal bends</span><div class="track"><i style="width:53.0%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>53%</b></div>
+<div class="bar-row"><span>River + diagonal bends</span><div class="track"><i style="width:54.0%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>54%</b></div>
+<div class="bar-row"><span>One way</span><div class="track"><i style="width:54.0%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>54%</b></div>
+<div class="bar-row"><span>Diagonal bends, one way</span><div class="track"><i style="width:50.5%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>50.5%</b></div>
+<div class="bar-row"><span>River + diagonal, one way</span><div class="track"><i style="width:49.0%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>49%</b></div>
+<div class="bar-row"><span>Straight steps, one way</span><div class="track"><i style="width:55.5%;--c:var(--water)"></i><span class="tick" style="left:50.0%"></span></div><b>55.5%</b></div></div></section>
+<section class="panel" aria-labelledby="caps"><h3 id="caps">Captures per game, by element</h3><p class="muted">When the bars are about equal, the elements pull equal weight.</p><div class="groups"><div class="group ref"><span class="gname">Today</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:97.1%;--c:var(--water)"></i></div><b>3.4</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:51.4%;--c:var(--fire)"></i></div><b>1.8</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:65.7%;--c:var(--wind)"></i></div><b>2.3</b></div></div></div>
+<div class="group"><span class="gname">River</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:88.6%;--c:var(--water)"></i></div><b>3.1</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:54.3%;--c:var(--fire)"></i></div><b>1.9</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:71.4%;--c:var(--wind)"></i></div><b>2.5</b></div></div></div>
+<div class="group"><span class="gname">Straight steps</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:62.9%;--c:var(--water)"></i></div><b>2.2</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:57.1%;--c:var(--fire)"></i></div><b>2.0</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:71.4%;--c:var(--wind)"></i></div><b>2.5</b></div></div></div>
+<div class="group"><span class="gname">River + straight steps</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:60.0%;--c:var(--water)"></i></div><b>2.1</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:57.1%;--c:var(--fire)"></i></div><b>2.0</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:71.4%;--c:var(--wind)"></i></div><b>2.5</b></div></div></div>
+<div class="group"><span class="gname">Diagonal bends</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:91.4%;--c:var(--water)"></i></div><b>3.2</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:51.4%;--c:var(--fire)"></i></div><b>1.8</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:68.6%;--c:var(--wind)"></i></div><b>2.4</b></div></div></div>
+<div class="group"><span class="gname">River + diagonal bends</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:80.0%;--c:var(--water)"></i></div><b>2.8</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:54.3%;--c:var(--fire)"></i></div><b>1.9</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:71.4%;--c:var(--wind)"></i></div><b>2.5</b></div></div></div>
+<div class="group"><span class="gname">One way</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:100.0%;--c:var(--water)"></i></div><b>3.5</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:51.4%;--c:var(--fire)"></i></div><b>1.8</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:65.7%;--c:var(--wind)"></i></div><b>2.3</b></div></div></div>
+<div class="group"><span class="gname">Diagonal bends, one way</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:80.0%;--c:var(--water)"></i></div><b>2.8</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:51.4%;--c:var(--fire)"></i></div><b>1.8</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:68.6%;--c:var(--wind)"></i></div><b>2.4</b></div></div></div>
+<div class="group"><span class="gname">River + diagonal, one way</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:74.3%;--c:var(--water)"></i></div><b>2.6</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:57.1%;--c:var(--fire)"></i></div><b>2.0</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:71.4%;--c:var(--wind)"></i></div><b>2.5</b></div></div></div>
+<div class="group"><span class="gname">Straight steps, one way</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:65.7%;--c:var(--water)"></i></div><b>2.3</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:57.1%;--c:var(--fire)"></i></div><b>2.0</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:71.4%;--c:var(--wind)"></i></div><b>2.5</b></div></div></div></div></section>
+<section class="panel" aria-labelledby="without"><h3 id="without">Score without Water 3, Fire 3 or Wind 3</h3><p class="muted">A side starting without that piece. Lower means the piece matters more; 50% would mean it doesn't matter.</p><div class="groups"><div class="group ref"><span class="gname">Today</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:26.0%;--c:var(--water)"></i></div><b>13%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:30.0%;--c:var(--fire)"></i></div><b>15%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:28.0%;--c:var(--wind)"></i></div><b>14%</b></div></div></div>
+<div class="group"><span class="gname">River</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:32.0%;--c:var(--water)"></i></div><b>16%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:46.0%;--c:var(--fire)"></i></div><b>23%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:24.0%;--c:var(--wind)"></i></div><b>12%</b></div></div></div>
+<div class="group"><span class="gname">Straight steps</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:38.0%;--c:var(--water)"></i></div><b>19%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:38.0%;--c:var(--fire)"></i></div><b>19%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:28.0%;--c:var(--wind)"></i></div><b>14%</b></div></div></div>
+<div class="group"><span class="gname">River + straight steps</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:46.0%;--c:var(--water)"></i></div><b>23%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:52.0%;--c:var(--fire)"></i></div><b>26%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:42.0%;--c:var(--wind)"></i></div><b>21%</b></div></div></div>
+<div class="group"><span class="gname">Diagonal bends</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:22.0%;--c:var(--water)"></i></div><b>11%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:36.0%;--c:var(--fire)"></i></div><b>18%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:26.0%;--c:var(--wind)"></i></div><b>13%</b></div></div></div>
+<div class="group"><span class="gname">River + diagonal bends</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:48.0%;--c:var(--water)"></i></div><b>24%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:62.0%;--c:var(--fire)"></i></div><b>31%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:30.0%;--c:var(--wind)"></i></div><b>15%</b></div></div></div>
+<div class="group"><span class="gname">One way</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:22.0%;--c:var(--water)"></i></div><b>11%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:32.0%;--c:var(--fire)"></i></div><b>16%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:24.0%;--c:var(--wind)"></i></div><b>12%</b></div></div></div>
+<div class="group"><span class="gname">Diagonal bends, one way</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:34.0%;--c:var(--water)"></i></div><b>17%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:48.0%;--c:var(--fire)"></i></div><b>24%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:28.0%;--c:var(--wind)"></i></div><b>14%</b></div></div></div>
+<div class="group"><span class="gname">River + diagonal, one way</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:44.0%;--c:var(--water)"></i></div><b>22%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:50.0%;--c:var(--fire)"></i></div><b>25%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:30.0%;--c:var(--wind)"></i></div><b>15%</b></div></div></div>
+<div class="group"><span class="gname">Straight steps, one way</span><div class="gbars"><div class="gbar"><span class="gl">Water</span><div class="track"><i style="width:44.0%;--c:var(--water)"></i></div><b>22%</b></div><div class="gbar"><span class="gl">Fire</span><div class="track"><i style="width:42.0%;--c:var(--fire)"></i></div><b>21%</b></div><div class="gbar"><span class="gl">Wind</span><div class="track"><i style="width:28.0%;--c:var(--wind)"></i></div><b>14%</b></div></div></div></div></section>
+  </div>
+</section>
+
+<section class="stack narrow" aria-labelledby="pick">
+  <h2 id="pick">Which rule for what</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>If you want…</th><th>Rule</th><th>What it costs</th></tr></thead>
+    <tbody>
+      <tr><td>Water easier to read, same strength</td><td><strong>River</strong></td><td>Games about 10 moves longer</td></tr>
+      <tr><td>The elements even</td><td><strong>Straight steps</strong></td><td>A few more draws, games about 13 moves longer</td></tr>
+      <tr><td>Fewer draws, Water a bit less dominant</td><td><strong>Diagonal bends</strong></td><td>Water is still the strongest piece, and its zigzag routes (up, then back down) stay hard to see</td></tr>
+      <tr><td>Water less dominant, no zigzags, the game still decisive</td><td><strong>Diagonal bends, one way</strong></td><td>Games about 5 moves longer</td></tr>
+      <tr><td>The elements even, Water no longer the main mating piece</td><td><strong>Straight steps, one way</strong></td><td>A few more draws, games about 19 moves longer</td></tr>
+      <tr><td>Water clearly weaker, still a playable game</td><td><strong>River + diagonal bends</strong></td><td>A few more draws, games about 18 moves longer</td></tr>
+      <tr><td>Not recommended</td><td>River + straight steps, and River + diagonal bends with one way</td><td>40–47% of games drawn and much longer: Earth walls can't be broken</td></tr>
+    </tbody>
+  </table></div>
+  <p>The bots read every Water route perfectly, so these numbers show strength, not how easy a rule is to see. That part only shows at the table: every rule is in the prototype's menu under <strong>Water movement (trial)</strong>.</p>
+  <p class="muted">"Moves per Water in real games" counts every move a single Water could make, averaged over 5,751 Waters in positions from 400 games between the strongest bots. Experiments: <code>node run.mjs waterRules</code> and <code>node run.mjs waterBends</code>. Rule details: GAME_SPEC.md, open question 10.</p>
+</section>
+</div>
+<script>
+(function () {
+  const ELEMENT = { F: 'fire', W: 'wind', R: 'water', E: 'earth', Z: 'wiz' };
+  function piece(code) {
+    const white = code === code.toUpperCase();
+    const letters = code.replace(/\d/g, '').toUpperCase();
+    const size = code.replace(/\D/g, '');
+    const el = document.createElement('div');
+    el.className = 'pc ' + (white ? 'w ' : 'b ') + ELEMENT[letters[0]] + (letters.length > 1 ? ' stack' : '');
+    const t = document.createElement('span');
+    t.textContent = letters === 'Z' ? '' : letters + size;
+    el.appendChild(t);
+    return el;
+  }
+  // opts: files 'a'..'i' range, ranks [top, bottom], pieces {sq: code}, route [sq...], numbers {sq: text}, cell px
+  function board(opts) {
+    const files = 'abcdefghi'.slice('abcdefghi'.indexOf(opts.files[0]), 'abcdefghi'.indexOf(opts.files[1]) + 1);
+    const [top, bottom] = opts.ranks;
+    const g = document.createElement('div');
+    g.className = 'bd';
+    g.style.gridTemplateColumns = `14px repeat(${files.length}, var(--cell, 34px))`;
+    if (opts.cell) g.style.setProperty('--cell', opts.cell + 'px');
+    g.setAttribute('role', 'img');
+    g.setAttribute('aria-label', opts.label);
+    for (let r = top; r >= bottom; r--) {
+      const l = document.createElement('div'); l.className = 'lbl'; l.textContent = r; g.appendChild(l);
+      for (const f of files) {
+        const s = f + r, cell = document.createElement('div');
+        cell.className = 'sq' + (r >= 4 && r <= 6 ? ' midz' : '');
+        const ri = (opts.route || []).indexOf(s);
+        if (ri > 0) { cell.classList.add('route'); const st = document.createElement('span'); st.className = 'step'; st.textContent = ri; cell.appendChild(st); }
+        if (opts.numbers && opts.numbers[s]) { cell.classList.add('num'); cell.appendChild(document.createTextNode(opts.numbers[s])); }
+        else if (opts.pieces[s]) cell.appendChild(piece(opts.pieces[s]));
+        g.appendChild(cell);
+      }
+    }
+    g.appendChild(document.createElement('div'));
+    for (const f of files) { const l = document.createElement('div'); l.className = 'lbl'; l.textContent = f; g.appendChild(l); }
+    return g;
+  }
+  const put = (id, ...boards) => { const host = document.getElementById(id); boards.forEach(b => host.appendChild(board(b))); };
+  const parse = rows => { // rows: { rank: 'a b c ... i' tokens, '.' = empty }
+    const out = {};
+    for (const [rank, line] of Object.entries(rows)) line.trim().split(/\s+/).forEach((t, i) => { if (t !== '.') out['abcdefghi'[i] + rank] = t; });
+    return out;
+  };
+  const small = window.matchMedia('(max-width: 480px)').matches ? 28 : 34;
+
+
+  const cell = window.matchMedia('(max-width: 480px)').matches ? 26 : 30;
+  const RULES = [["c1","c2","c3","c4","c5","c6","d1","d2","d5","d6","e1","e2","e3","e4","e5","e6","f1","f2","f4","f5","g2","g3","g4"],["c1","c2","c3","c4","c5","c6","d1","d2","d5","d6","e1","e2","e3","e4","e5","e6"],["c1","c2","c3","c4","c5","d1","d2","e1","e2","e3","e4","e5","f2","f4"],["c1","c2","c3","c4","c5","d1","d2","e1","e2","e3","e4","e5"],["c1","c2","c3","c4","c5","c6","d1","d2","d5","d6","e1","e2","e3","e4","e5","e6","f2","f4"],["c1","c2","c3","c4","c5","c6","d1","d2","d5","d6","e1","e2","e3","e4","e5","e6"],["c1","c2","c3","c4","c5","c6","d1","d2","d5","d6","e1","e2","e3","e4","e5","e6","f1","f2","f4","f5","g2","g4"],["c1","c4","c5","c6","d1","d2","d5","d6","e1","e4","e5","e6"],["c1","c4","c5","c6","d1","d2","d5","d6","e1","e4","e5","e6"],["c1","c2","c3","c4","c5","d1","d2","e1","e2","e3","e4","e5","f2","f4"]];
+  RULES.forEach((sqs, i) => put('b' + i, { files: 'bg', ranks: [6, 1], cell, pieces: { d3: 'R3', d4: 'E1', f3: 'E1' },
+    numbers: Object.fromEntries(sqs.map(s => [s, '•'])), label: 'Squares a Water 3 on d3 reaches: ' + sqs.join(' ') }));
+})();
+</script>
+</body>
+</html>

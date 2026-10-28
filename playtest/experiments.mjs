@@ -1,6 +1,6 @@
 // The experiments from the plan. Each one is a list of games to play; run.mjs plays them.
 import fs from 'node:fs';
-import { DEFAULT_FORMATION, without } from './formations.mjs';
+import { DEFAULT_FORMATION, PRESETS, mirror as mirrorFiles, without } from './formations.mjs';
 
 let seed = 1;
 // n games of A against B, alternating colours: A is White in even games, Black in odd ones.
@@ -30,6 +30,20 @@ function roundRobin(tag, players, n, extra = {}) {
         const [w, b] = k % 2 ? [names[j], names[i]] : [names[i], names[j]];
         out.push({ tag: `${tag}: ${names[i]} v ${names[j]}`, a: k % 2 ? 'b' : 'w', seed: seed++, randomOpening: 2,
           white: players[w], black: players[b], whiteFormation: 'default', blackFormation: 'default', labels: { w, b }, ...extra });
+      }
+  return out;
+}
+
+// Every pair of presets meets n times, half with each colour, both sides played by the same bot.
+function presetRoundRobin(bot, n, firstSeed) {
+  const names = Object.keys(PRESETS), out = [];
+  seed = firstSeed;
+  for (let i = 0; i < names.length; i++)
+    for (let j = i + 1; j < names.length; j++)
+      for (let k = 0; k < n; k++) {
+        const [w, b] = k % 2 ? [names[j], names[i]] : [names[i], names[j]];
+        out.push({ tag: `${names[i]} v ${names[j]}`, a: k % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, randomOpening: 2, maxPlies: 1000,
+          whiteFormation: PRESETS[w], blackFormation: PRESETS[b], labels: { w, b } });
       }
   return out;
 }
@@ -198,6 +212,72 @@ export const EXPERIMENTS = {
           whiteFormation: set[w], blackFormation: set[b], randomOpening: 2, maxPlies: 1000, labels: { w, b } });
       }
     return out;
+  },
+  // 10e. Is a preset's mirror image as strong as the preset? Each preset, and its mirror image, plays
+  // all seven presets, 40 games each (20 with each colour). A formation against its own mirror image
+  // would prove nothing: the board is the same seen in a mirror, so that's a fair fight by symmetry.
+  mirrorCheck: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, out = [];
+    seed = 1200000;
+    for (const [name, f] of Object.entries(PRESETS))
+      for (const [tag, fa] of [[name, f], [`${name} mirrored`, mirrorFiles(f)]])
+        for (const [opp, fb] of Object.entries(PRESETS))
+          for (let k = 0; k < 40 * s; k++)
+            out.push({ tag, opp, a: k % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, randomOpening: 2, maxPlies: 1000,
+              whiteFormation: k % 2 ? fb : fa, blackFormation: k % 2 ? fa : fb });
+    return out;
+  },
+  // 10f. The seven presets in a round robin, 60 games per pair, played by the strongest bot (Deep 20k)
+  // and, for comparison, by the search's bot (Deep 2k): does the ranking hold with stronger play?
+  presets20k: s => presetRoundRobin({ type: 'deep', nodes: 20000, weights: 'tuned' }, 60 * s, 1300000),
+  presets2k: s => presetRoundRobin({ type: 'deep', nodes: 2000, weights: 'tuned' }, 60 * s, 1400000),
+  // 10g. Is neglecting Water early worse than neglecting another element? One side may not move any
+  // piece holding the element during its first 10 moves; both sides are Deep 2k with learned values.
+  neglect: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' };
+    seed = 1500000;
+    return ['original', 'windHeldBack'].flatMap(f => ['water', 'fire', 'wind', 'earth'].flatMap(element =>
+      both(`${f}: no ${element} moves for the first 10 moves`, { ...bot, avoid: { element, moves: 10 } }, bot, 200 * s,
+        { fa: PRESETS[f], fb: PRESETS[f], randomOpening: 2, maxPlies: 1000 })));
+  },
+  // 10h. The designer's Water movement candidates (GAME_SPEC open question 10), edge slide kept:
+  // equal games from the default formation (Wind 3 held back), and the handicap test, one side
+  // without Water 3, Fire 3 or Wind 3.
+  waterRules: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000 };
+    seed = 1600000;
+    return [['today', {}], ['river', { waterRiver: true }], ['straight steps', { waterStraightSteps: true }],
+      ['river + straight steps', { waterRiver: true, waterStraightSteps: true }]].flatMap(([name, v]) => [
+      ...Array.from({ length: 400 * s }, () => ({ tag: `${name}: equal`, a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro, ...v })),
+      ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
+        both(`${name}: without ${piece} (${square})`, bot, bot, 150 * s, { fa: without(f, square), fb: f, ...ro, ...v })),
+    ]);
+  },
+  // 10i. The same for "when it bends, it bends diagonally", alone and with the river rule.
+  waterBends: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000 };
+    seed = 1700000;
+    return [['diagonal bends', { waterDiagonalBends: true }], ['river + diagonal bends', { waterRiver: true, waterDiagonalBends: true }]].flatMap(([name, v]) => [
+      ...Array.from({ length: 400 * s }, () => ({ tag: `${name}: equal`, a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro, ...v })),
+      ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
+        both(`${name}: without ${piece} (${square})`, bot, bot, 150 * s, { fa: without(f, square), fb: f, ...ro, ...v })),
+    ]);
+  },
+  // 10j. One way per move (the designer: "the river should only flow forward or backwards in one
+  // turn"), alone and with the other candidates.
+  waterOneWay: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000 };
+    seed = 1800000;
+    return [['one way', { waterOneWay: true }], ['diagonal bends, one way', { waterDiagonalBends: true, waterOneWay: true }],
+      ['river + diagonal bends, one way', { waterRiver: true, waterDiagonalBends: true, waterOneWay: true }],
+      ['straight steps, one way', { waterStraightSteps: true, waterOneWay: true }]].flatMap(([name, v]) => [
+      ...Array.from({ length: 400 * s }, () => ({ tag: `${name}: equal`, a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro, ...v })),
+      ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
+        both(`${name}: without ${piece} (${square})`, bot, bot, 150 * s, { fa: without(f, square), fb: f, ...ro, ...v })),
+    ]);
   },
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.
   // a. Deep 2k with naive values (every piece worth 1) against itself, to learn values from.

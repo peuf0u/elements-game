@@ -1,0 +1,458 @@
+{
+ "experiment": "neglect",
+ "scale": 1,
+ "seconds": 140,
+ "matchups": {
+  "original: no water moves for the first 10 moves": {
+   "games": 200,
+   "aScore": 43,
+   "aScoreRange": [
+    36,
+    49
+   ],
+   "aWins": 33,
+   "bWins": 48,
+   "draws": 20,
+   "whiteWins": 40,
+   "blackWins": 41,
+   "whiteOfDecisive": 49,
+   "whiteOfDecisiveRange": [
+    42,
+    57
+   ],
+   "endings": {
+    "checkmate": 46,
+    "elimination": 35,
+    "draw:fifty": 15,
+    "draw:repetition": 6
+   },
+   "movesPerPlayer": {
+    "median": 35,
+    "shortest": 10,
+    "longest": 190.5
+   },
+   "combinesPerGame": 8.1,
+   "capturesPerGame": 8.1
+  },
+  "original: no fire moves for the first 10 moves": {
+   "games": 200,
+   "aScore": 39,
+   "aScoreRange": [
+    33,
+    46
+   ],
+   "aWins": 28,
+   "bWins": 49,
+   "draws": 24,
+   "whiteWins": 38,
+   "blackWins": 39,
+   "whiteOfDecisive": 50,
+   "whiteOfDecisiveRange": [
+    42,
+    58
+   ],
+   "endings": {
+    "checkmate": 44,
+    "elimination": 33,
+    "draw:fifty": 20,
+    "draw:repetition": 4
+   },
+   "movesPerPlayer": {
+    "median": 58,
+    "shortest": 7.5,
+    "longest": 229.5
+   },
+   "combinesPerGame": 8.3,
+   "capturesPerGame": 8.8
+  },
+  "original: no wind moves for the first 10 moves": {
+   "games": 200,
+   "aScore": 33,
+   "aScoreRange": [
+    27,
+    40
+   ],
+   "aWins": 25,
+   "bWins": 59,
+   "draws": 17,
+   "whiteWins": 40,
+   "blackWins": 43,
+   "whiteOfDecisive": 48,
+   "whiteOfDecisiveRange": [
+    41,
+    56
+   ],
+   "endings": {
+    "checkmate": 52,
+    "elimination": 32,
+    "draw:fifty": 13,
+    "draw:repetition": 5
+   },
+   "movesPerPlayer": {
+    "median": 40,
+    "shortest": 8,
+    "longest": 174
+   },
+   "combinesPerGame": 8,
+   "capturesPerGame": 8
+  },
+  "original: no earth moves for the first 10 moves": {
+   "games": 200,
+   "aScore": 47,
+   "aScoreRange": [
+    40,
+    54
+   ],
+   "aWins": 35,
+   "bWins": 41,
+   "draws": 25,
+   "whiteWins": 37,
+   "blackWins": 39,
+   "whiteOfDecisive": 49,
+   "whiteOfDecisiveRange": [
+    41,
+    57
+   ],
+   "endings": {
+    "checkmate": 40,
+    "elimination": 35,
+    "draw:fifty": 18,
+    "draw:repetition": 7
+   },
+   "movesPerPlayer": {
+    "median": 51.5,
+    "shortest": 7.5,
+    "longest": 196
+   },
+   "combinesPerGame": 8.2,
+   "capturesPerGame": 8.8
+  },
+  "windHeldBack: no water moves for the first 10 moves": {
+   "games": 200,
+   "aScore": 26,
+   "aScoreRange": [
+    21,
+    33
+   ],
+   "aWins": 21,
+   "bWins": 69,
+   "draws": 11,
+   "whiteWins": 47,
+   "blackWins": 43,
+   "whiteOfDecisive": 53,
+   "whiteOfDecisiveRange": [
+    45,
+    60
+   ],
+   "endings": {
+    "checkmate": 54,
+    "elimination": 36,
+    "draw:fifty": 9,
+    "draw:repetition": 2
+   },
+   "movesPerPlayer": {
+    "median": 34,
+    "shortest": 7.5,
+    "longest": 238
+   },
+   "combinesPerGame": 8,
+   "capturesPerGame": 8.4
+  },
+  "windHeldBack: no fire moves for the first 10 moves": {
+   "games": 200,
+   "aScore": 23,
+   "aScoreRange": [
+    17,
+    29
+   ],
+   "aWins": 17,
+   "bWins": 72,
+   "draws": 12,
+   "whiteWins": 44,
+   "blackWins": 45,
+   "whiteOfDecisive": 50,
+   "whiteOfDecisiveRange": [
+    42,
+    57
+   ],
+   "endings": {
+    "checkmate": 58,
+    "elimination": 31,
+    "draw:fifty": 9,
+    "draw:repetition": 3
+   },
+   "movesPerPlayer": {
+    "median": 36,
+    "shortest": 9,
+    "longest": 155.5
+   },
+   "combinesPerGame": 8.4,
+   "capturesPerGame": 8.3
+  },
+  "windHeldBack: no wind moves for the first 10 moves": {
+   "games": 200,
+   "aScore": 45,
+   "aScoreRange": [
+    39,
+    52
+   ],
+   "aWins": 39,
+   "bWins": 48,
+   "draws": 14,
+   "whiteWins": 42,
+   "blackWins": 45,
+   "whiteOfDecisive": 49,
+   "whiteOfDecisiveRange": [
+    41,
+    56
+   ],
+   "endings": {
+    "checkmate": 47,
+    "elimination": 40,
+    "draw:fifty": 10,
+    "draw:repetition": 4
+   },
+   "movesPerPlayer": {
+    "median": 33.5,
+    "shortest": 10,
+    "longest": 134.5
+   },
+   "combinesPerGame": 8.5,
+   "capturesPerGame": 8
+  },
+  "windHeldBack: no earth moves for the first 10 moves": {
+   "games": 200,
+   "aScore": 49,
+   "aScoreRange": [
+    42,
+    56
+   ],
+   "aWins": 39,
+   "bWins": 41,
+   "draws": 20,
+   "whiteWins": 45,
+   "blackWins": 35,
+   "whiteOfDecisive": 56,
+   "whiteOfDecisiveRange": [
+    49,
+    64
+   ],
+   "endings": {
+    "checkmate": 49,
+    "elimination": 32,
+    "draw:fifty": 14,
+    "draw:repetition": 7
+   },
+   "movesPerPlayer": {
+    "median": 40,
+    "shortest": 13,
+    "longest": 171.5
+   },
+   "combinesPerGame": 8.6,
+   "capturesPerGame": 8.2
+  }
+ },
+ "pieces": {
+  "takenPerGame": {
+   "fire3+wind1": 1.22,
+   "water1+wind3": 1.15,
+   "water3": 0.78,
+   "water2": 0.61,
+   "fire2+wind2": 0.39,
+   "wind2": 0.37,
+   "water3+fire1": 0.35,
+   "fire1+water2": 0.28,
+   "fire2": 0.25,
+   "wind3+water1": 0.21,
+   "fire1": 0.18,
+   "water3+wind2": 0.15,
+   "fire1+water3": 0.14,
+   "wind3": 0.14,
+   "water2+wind1": 0.12,
+   "wind2+fire2": 0.11,
+   "water2+wind2": 0.11,
+   "earth2+fire1": 0.11,
+   "fire3": 0.1,
+   "earth1+water1": 0.1,
+   "earth3+water2": 0.08,
+   "water2+fire1": 0.08,
+   "water2+earth3": 0.07,
+   "water1": 0.07,
+   "wind1+earth1": 0.06,
+   "wind2+water3": 0.05,
+   "fire2+earth2": 0.05,
+   "fire1+earth2": 0.05,
+   "wind1+earth3": 0.05,
+   "wind2+earth3": 0.05,
+   "water3+fire2": 0.05,
+   "earth1+wind3": 0.04,
+   "earth3+fire1": 0.04,
+   "wind2+earth2": 0.04,
+   "fire3+earth1": 0.04,
+   "water2+fire2": 0.04,
+   "earth1+fire3": 0.03,
+   "fire3+wind3": 0.03,
+   "earth2+fire2": 0.03,
+   "earth2+wind2": 0.03,
+   "water3+earth2": 0.03,
+   "water3+earth3": 0.03,
+   "earth1+fire2": 0.02,
+   "earth3+wind1": 0.02,
+   "earth3+wind2": 0.02,
+   "water1+earth1": 0.02,
+   "earth2+water3": 0.02,
+   "wind1": 0.02,
+   "water2+fire3": 0.02,
+   "fire2+earth1": 0.02,
+   "water3+wind1": 0.02,
+   "water2+wind3": 0.01,
+   "earth3+fire2": 0.01,
+   "water1+wind1": 0.01,
+   "water2+earth1": 0.01,
+   "fire2+earth3": 0.01,
+   "wind2+water2": 0.01,
+   "earth1+wind2": 0.01,
+   "wind3+fire3": 0.01,
+   "earth1+wind1": 0.01,
+   "wind3+earth3": 0.01,
+   "earth3+water1": 0.01,
+   "wind1+fire3": 0.01,
+   "earth1+water2": 0.01,
+   "earth2+fire3": 0.01,
+   "fire2+water2": 0.01,
+   "wind1+water1": 0.01,
+   "wind3+water2": 0.01,
+   "fire3+water1": 0.01,
+   "fire3+wind2": 0,
+   "earth1+fire1": 0,
+   "wind2+earth1": 0,
+   "wind2+fire3": 0,
+   "fire2+water3": 0,
+   "wind2+water1": 0,
+   "fire1+earth3": 0,
+   "earth2+wind1": 0,
+   "wind1+water2": 0,
+   "fire3+water2": 0,
+   "wind3+earth2": 0,
+   "fire3+earth3": 0,
+   "wind3+fire2": 0,
+   "water3+wind3": 0,
+   "water1+fire3": 0,
+   "fire3+earth2": 0,
+   "fire1+wind2": 0,
+   "wind3+earth1": 0,
+   "earth3+wind3": 0,
+   "water1+earth3": 0,
+   "wind1+earth2": 0,
+   "water2+earth2": 0,
+   "wind2+fire1": 0,
+   "fire3+water3": 0,
+   "water3+earth1": 0,
+   "wind3+fire1": 0,
+   "earth2+water1": 0,
+   "earth2+water2": 0,
+   "fire2+wind1": 0,
+   "wind1+fire2": 0,
+   "water3+fire3": 0
+  },
+  "capturesMadePerGame": {
+   "fire3+wind1": 1.4,
+   "water1+wind3": 1.31,
+   "water2": 0.79,
+   "water3": 0.69,
+   "wizard": 0.46,
+   "fire2+wind2": 0.45,
+   "wind2": 0.35,
+   "water3+fire1": 0.29,
+   "fire1+water2": 0.27,
+   "wind3+water1": 0.21,
+   "fire2": 0.17,
+   "water3+wind2": 0.16,
+   "wind2+fire2": 0.14,
+   "fire1+water3": 0.13,
+   "water2+wind1": 0.11,
+   "earth3+water2": 0.1,
+   "water2+wind2": 0.09,
+   "fire3": 0.09,
+   "water2+earth3": 0.08,
+   "wind3": 0.08,
+   "fire1": 0.07,
+   "wind2+water3": 0.06,
+   "earth2+fire1": 0.06,
+   "water2+fire1": 0.05,
+   "water3+fire2": 0.04,
+   "earth3+fire1": 0.04,
+   "wind1+earth3": 0.04,
+   "fire3+wind3": 0.03,
+   "wind2+earth3": 0.03,
+   "fire3+earth1": 0.03,
+   "earth1+fire3": 0.03,
+   "water3+earth3": 0.02,
+   "water2+fire2": 0.02,
+   "fire1+earth2": 0.02,
+   "fire2+earth2": 0.02,
+   "water3+wind1": 0.02,
+   "water3+earth2": 0.02,
+   "earth1+wind3": 0.02,
+   "water2+wind3": 0.02,
+   "earth3+wind1": 0.02,
+   "earth3+water1": 0.02,
+   "water1": 0.02,
+   "earth2+water3": 0.01,
+   "water2+fire3": 0.01,
+   "earth2+wind2": 0.01,
+   "wind2+water2": 0.01,
+   "wind2+earth2": 0.01,
+   "fire3+water1": 0.01,
+   "earth1+water2": 0.01,
+   "earth2+fire2": 0.01,
+   "fire2+earth3": 0.01,
+   "earth3+wind2": 0.01,
+   "wind1+fire3": 0.01,
+   "wind2+water1": 0.01,
+   "earth1+fire2": 0.01,
+   "wind3+water2": 0.01,
+   "wind3+fire2": 0.01,
+   "earth1+water1": 0.01,
+   "wind3+fire3": 0.01,
+   "wind1+earth1": 0.01,
+   "wind1": 0.01,
+   "earth3+fire2": 0.01,
+   "fire3+wind2": 0.01,
+   "water1+wind1": 0.01,
+   "water1+earth1": 0.01,
+   "water2+earth1": 0.01,
+   "fire2+water3": 0,
+   "earth2+fire3": 0,
+   "wind1+water2": 0,
+   "wind3+earth3": 0,
+   "fire2+water2": 0,
+   "fire3+water2": 0,
+   "fire1+earth3": 0,
+   "earth3+fire3": 0,
+   "water1+fire3": 0,
+   "wind1+water1": 0,
+   "fire2+earth1": 0,
+   "earth1+wind2": 0,
+   "wind2+earth1": 0,
+   "wind3+earth2": 0,
+   "fire1+wind2": 0,
+   "water2+earth2": 0,
+   "earth2+wind1": 0,
+   "water3+earth1": 0,
+   "fire3+earth2": 0,
+   "wind3+fire1": 0,
+   "fire3+earth3": 0,
+   "water3+wind3": 0,
+   "wind3+earth1": 0,
+   "wind2+fire3": 0,
+   "wind2+fire1": 0,
+   "water1+fire2": 0,
+   "earth1+water3": 0,
+   "earth1+wind1": 0,
+   "earth3+wind3": 0,
+   "wind1+fire2": 0,
+   "fire2+wind1": 0
+  }
+ }
+}

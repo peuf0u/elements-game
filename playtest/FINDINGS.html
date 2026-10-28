@@ -123,7 +123,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
 <div class="wrap">
 
 <header class="stack">
-  <span class="eyebrow">Elements · computer playtest · 28 Oct 2026 · about 50,000 games</span>
+  <span class="eyebrow">Elements · computer playtest · 28 Oct 2026 · about 90,000 games</span>
   <h1>What the computer learned playing Elements</h1>
   <p class="lede">The core game is healthy: fair, decisive, with real depth and no unbeatable defence. <strong>Water is the strongest element.</strong> The first, weak bots made it look overwhelming and Fire useless, but a much stronger bot shows every attacking piece matters. If you want the elements even, one small rule change does it: <strong>Water captures only straight</strong>.</p>
 </header>
@@ -154,7 +154,8 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     <div class="verdict"><span class="q">Pieces too strong or useless?</span><span class="a">Water leads and gives two thirds of checkmates. With strong play, losing Fire 3 clearly hurts too.</span><span class="pill warn">Water leads</span></div>
     <div class="verdict"><span class="q">Does combining matter?</span><span class="a">Very much. A player who never combines scores 23%.</span><span class="pill ok">healthy</span></div>
     <div class="verdict"><span class="q">Exact range?</span><span class="a">Just as fair, but games run twice as long and draws rise to 43–59%.</span><span class="pill warn">plays worse</span></div>
-    <div class="verdict"><span class="q">Default formation?</span><span class="a">It beats random setups and both fortresses. A search through about 100 formations found none better, but several just as good.</span><span class="pill ok">good</span></div>
+    <div class="verdict"><span class="q">Default formation?</span><span class="a">With weak bots nothing beat it. With strong bots it came last of nine strong formations, so "Wind 3 held back" is the new default, with five presets. Mirror images play just as well.</span><span class="pill ok">new presets</span></div>
+    <div class="verdict"><span class="q">What makes a formation strong?</span><span class="a">Water next to your own Earth, pieces close together, Earth in front, Wind 3 held back. That's only part of it: moving one piece of a preset costs about 8 points.</span><span class="pill ok">presets help</span></div>
     <div class="verdict"><span class="q">Can a formation tame Water?</span><span class="a">No. Moving Fire forward changes nothing, and Earth beside the Wizard makes Water far more dangerous.</span><span class="pill warn">not by formation</span></div>
     <div class="verdict"><span class="q">Can a rule change tame Water?</span><span class="a">Yes. With "Water captures only straight", Water, Wind and Fire pull about equal weight and the game stays fair. Games get about a quarter longer, with a few more draws.</span><span class="pill ok">worth trying</span></div>
     <div class="verdict"><span class="q">Can these results be trusted?</span><span class="a">Checked on chess, where the answers are known: piece rankings come out right, exact sizes are understated, and White's edge can't be read off directly.</span><span class="pill ok">rankings: yes</span></div>
@@ -504,6 +505,89 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
   <p><strong>Decision: 75 moves each.</strong> It turns a third of these draws into wins, and the typical game stays the same length. Going further buys little and makes the longest games much longer.</p>
 </section>
 
+<section class="stack" aria-labelledby="s14">
+  <span class="eyebrow">14 · Formations with strong play</span>
+  <h2 id="s14">What makes a formation strong</h2>
+  <p>A second formation search with Deep 2k found eight strong, varied formations. Your default came last of nine, and <strong>Wind 3 held back</strong> came first, so it is the app's new default, with five presets beside it. The boards are on the formations page (<code>playtest/FORMATIONS.html</code>).</p>
+  <p>To learn <em>why</em> some formations are strong, 554 formations each played 28 games against the seven presets, about 15,500 games. They were the presets themselves, variations of them with 1 to 6 pieces moved, and fully random setups.</p>
+
+  <h3>Good formations are narrow peaks</h3>
+  <div class="bars" role="img" aria-label="Score against the presets: presets 52%, one piece moved 44%, two 41%, three 33%, four to six 31%, random 25%">
+    <div class="bar-row"><span>The presets<small>7 formations</small></span><div class="track"><i style="width:52%"></i><span class="mid"></span></div><b>52%</b></div>
+    <div class="bar-row"><span>1 piece moved<small>60 formations</small></span><div class="track"><i style="width:44%"></i><span class="mid"></span></div><b>44%</b></div>
+    <div class="bar-row"><span>2 pieces moved<small>63 formations</small></span><div class="track"><i style="width:41%"></i><span class="mid"></span></div><b>41%</b></div>
+    <div class="bar-row"><span>3 pieces moved<small>56 formations</small></span><div class="track"><i style="width:33%"></i><span class="mid"></span></div><b>33%</b></div>
+    <div class="bar-row"><span>4 to 6 moved<small>168 formations</small></span><div class="track"><i style="width:31%"></i><span class="mid"></span></div><b>31%</b></div>
+    <div class="bar-row"><span>Random setups<small>200 formations</small></span><div class="track"><i style="width:25%"></i><span class="mid"></span></div><b>25%</b></div>
+  </div>
+  <p>Moving <strong>one</strong> piece of a preset to a random square costs about 8 points on average. After three or more moves, little is left of the preset's strength.</p>
+
+  <h3>Rules of thumb</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>Feature</th><th>Near the presets</th><th>Random setups</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Waters touching your own Earth</strong> (of 3)</td><td class="n">0: 28% · 3: <b>39%</b></td><td class="n">0: 18% · 3: <b>30%</b></td></tr>
+      <tr><td>…with the Earth right in front of the Water</td><td class="n">0: 35% · 2: <b>40%</b></td><td class="n">0: 24% · 1: 26%</td></tr>
+      <tr><td><strong>Combines possible on move one</strong></td><td class="n">≤20: 33% · 26+: <b>40%</b></td><td class="n">≤20: 23% · 26+: 29%</td></tr>
+      <tr><td><strong>Water on the front row</strong></td><td class="n">none: <b>37%</b> · some: 33%</td><td class="n">no difference</td></tr>
+      <tr><td><strong>Earths on the front row</strong></td><td class="n">1: 34% · 2: <b>38%</b></td><td class="n">no difference</td></tr>
+      <tr><td><strong>Earth right in front of the Wizard</strong></td><td class="n">no: <b>36%</b> · yes: 30%</td><td class="n">no difference</td></tr>
+      <tr><td><strong>Wind 3</strong> on row 1 or row 3</td><td class="n"><b>37%</b> · 33%</td><td class="n">no difference</td></tr>
+    </tbody>
+  </table></div>
+  <ol>
+    <li><strong>Give each Water an Earth to lean on.</strong> This is the strongest rule, and it holds everywhere. Water bends around Earth, so an Earth just ahead gives it routes to both sides, and it blocks attacks aimed at the Water.</li>
+    <li><strong>Keep the pieces close together</strong>, so they can combine early.</li>
+    <li><strong>Water on the middle row, Earth on the front row:</strong> the Earth walls the front, and the Water waits behind it.</li>
+    <li><strong>No Earth directly in front of your Wizard.</strong> It probably takes the Wizard's escape square and gives enemy Water a post to bend around next to it, as with the Earth shield in section 8. This one rests on only 26 formations.</li>
+    <li><strong>Keep Wind 3 back</strong>: the main change from your default to Wind 3 held back.</li>
+  </ol>
+  <figure class="figure">
+    <div class="boards" id="rules"></div>
+    <figcaption><strong>Left: Wind 3 held back</strong> follows the rules: all three Waters lean on Earth, two with the Earth right in front, Wind 3 waits on the back row. <strong>Right: your original</strong> follows rules 1–4 even better, yet it is the weakest preset, probably because Wind 3 stands exposed on b3.</figcaption>
+  </figure>
+  <p><strong>What didn't matter:</strong> the Wizard on row 1 or further forward, on the e-file or not, the Winds' square colours, and where Fire, Fire 3 or Water 3 stand.</p>
+  <p><strong>These rules are only part of the story.</strong> Together, the 23 features measured explain about a quarter of the real differences between formations, and among formations near the presets only about a tenth. A formation's strength comes mostly from how its pieces work together: which covers which, and where the Water can go. That can't be read off a checklist and has to be found by playing. A player who builds a formation from scratch will rarely find one as strong as the presets, so presets are worth offering, and the placement phase rewards experience.</p>
+
+  <h3>Mirror images are just as strong</h3>
+  <p>A formation against its own mirror image proves nothing, because that game is the same board seen in a mirror. So each preset and its mirror image played all seven presets, 280 games each.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Preset</th><th>As designed</th><th>Mirrored</th></tr></thead>
+    <tbody>
+      <tr><td>Wind 3 held back</td><td class="n">59%</td><td class="n">57%</td></tr>
+      <tr><td>Mirrored and reshaped</td><td class="n">50%</td><td class="n">51%</td></tr>
+      <tr><td>Fire in front of the Wizard</td><td class="n">54%</td><td class="n">47%</td></tr>
+      <tr><td>Fire 1 in front</td><td class="n">47%</td><td class="n">46%</td></tr>
+      <tr><td>Low Winds, Earth forward</td><td class="n">46%</td><td class="n">52%</td></tr>
+      <tr><td>Wizard forward</td><td class="n">53%</td><td class="n">46%</td></tr>
+      <tr><td>Original</td><td class="n">42%</td><td class="n">46%</td></tr>
+      <tr><td><strong>Average</strong></td><td class="n hi">50%</td><td class="n hi">49%</td></tr>
+    </tbody>
+  </table></div>
+  <p>The gaps are within luck (about ±8 points) and go both ways, so the app can offer every preset in both orientations.</p>
+
+  <h3>With the strongest bot</h3>
+  <p>The seven presets played a round robin, 360 games each, with Deep 2k and with Deep 20k, which searches ten times as many positions.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Preset</th><th>Deep 2k</th><th>Deep 20k</th></tr></thead>
+    <tbody>
+      <tr><td>Mirrored and reshaped</td><td class="n">51%</td><td class="n hi">60%</td></tr>
+      <tr><td>Fire in front of the Wizard</td><td class="n hi">56%</td><td class="n hi">57%</td></tr>
+      <tr><td>Wind 3 held back</td><td class="n hi">54%</td><td class="n hi">55%</td></tr>
+      <tr><td>Low Winds, Earth forward</td><td class="n">48%</td><td class="n">50%</td></tr>
+      <tr><td>Fire 1 in front</td><td class="n">50%</td><td class="n">44%</td></tr>
+      <tr><td>Original</td><td class="n">44%</td><td class="n">43%</td></tr>
+      <tr><td>Wizard forward</td><td class="n">47%</td><td class="n">41%</td></tr>
+      <tr><td>Draws</td><td class="n">17%</td><td class="n">11%</td></tr>
+      <tr><td>Typical game (moves each)</td><td class="n">40</td><td class="n">37</td></tr>
+    </tbody>
+  </table></div>
+  <p class="muted">Each score is uncertain by about ±5 points.</p>
+  <p><strong>The ranking holds in broad terms.</strong> The same three lead with both bots, and your original stays near the bottom. Within the top three the order shuffles, so they are about equally strong. Wind 3 held back is in the top three in every test and first in the most of them, so it stays a sound default.</p>
+  <p><strong>Wizard forward loses ground with stronger play</strong> (47% → 41%): a Wizard on the front row is easier to attack for a bot that looks further ahead.</p>
+  <p><strong>Stronger play draws less:</strong> 17% → 11%, with slightly shorter games. The draws come from weak play more than from the game itself.</p>
+</section>
+
 <section class="next" aria-labelledby="mean">
   <h2 id="mean">What this means, and your questions</h2>
   <ol>
@@ -511,6 +595,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     <li><strong>Water leads, but every attacking piece matters</strong> with strong play. Formations can't change Water's lead. Straight captures even the elements out, at the cost of longer games and a few more draws, so it's a matter of taste.</li>
     <li><strong>Both ways to win matter:</strong> checkmate decides about half the games between strong bots, and elimination a quarter to a third.</li>
     <li><strong>Exact range makes the game slower and more drawish.</strong> It stays off by default.</li>
+    <li><strong>Formations matter a little and are hard to build well.</strong> Your default came last with strong play, and the new default and presets are clearly better. No formation wins by itself, and mirror images are just as good. Presets are worth offering, and the placement phase rewards experience.</li>
   </ol>
   <p>These are recorded as open questions 6–9 in <code>GAME_SPEC.md</code>, plus setup safety and bot difficulty in <code>PRODUCT_BRIEF.md</code>. The biggest one is a rule to decide: whether Water may capture at the end of a bent route. The computer's answer is to try "straight captures" at the table.</p>
 </section>
@@ -614,6 +699,11 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     { files: 'be', ranks: [3, 1], pieces: { c3: 'E1', d3: 'z', c2: 'R2' }, route: ['c2', 'd3'], label: 'Normal rules: Water on c2 bends around Earth on c3 onto the Wizard on d3' },
     { files: 'be', ranks: [3, 1], pieces: { c3: 'E1', d3: 'z', d1: 'R2' }, route: ['d1', 'd2', 'd3'], label: 'Straight captures: Water on d1 captures straight up the d column' });
 
+  put('rules',
+    { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: '. . . . E3 . E2 F1 .', 2: '. . R1 W1 R2 W2 R3 . .', 1: '. E1 W3 F3 Z F2 . . .' }),
+      label: 'Wind 3 held back: Earth 3 in front of Water 2, Earth 2 in front of Water 3, Wind 3 on c1' },
+    { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: '. W3 E1 . E3 . E2 W2 .', 2: '. . R1 W1 R2 F1 R3 . .', 1: '. . . F3 Z F2 . . .' }),
+      label: 'Your original: an Earth in front of each Water, Wind 3 on b3' });
   put('fortress', { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: 'W3 W2 F2 R3 W1 R2 . R1 .', 2: 'E3 E2 E1 . . . . . .', 1: 'Z F3 F1 . . . . . .' }),
     label: 'The corner fortress: Wizard on a1 under three Earth' });
 })();

@@ -18,8 +18,19 @@ export function rngFrom(seed) { // mulberry32: small, seedable, good enough for 
 const label = p => (p.wiz ? 'wizard' : p.els.map(x => x.e + x.s).join('+'));
 const formation = (f, rng) => (f === 'random' ? randomFormation(rng) : typeof f === 'string' ? FORMATIONS[f] : f);
 // A player config: { type, ...options }. values names a table in VALUES, weights a set in WEIGHTS.
-const makePlayer = ({ type, values, weights, ...o }) =>
-  PLAYERS[type]({ ...(weights ? WEIGHTS[weights] : {}), ...o, ...(values ? { values: VALUES[values] } : {}) });
+// avoid: { element, moves } keeps the player from moving any piece holding that element during its
+// first `moves` moves, unless nothing else is legal (restricted play: "what if you neglect Water?").
+const makePlayer = ({ type, values, weights, avoid, ...o }) => {
+  const p = PLAYERS[type]({ ...(weights ? WEIGHTS[weights] : {}), ...o, ...(values ? { values: VALUES[values] } : {}) });
+  if (!avoid) return p;
+  return { ...p, choose(st, moves, rng) {
+    if (st.ply < 2 * avoid.moves) {
+      const f = moves.filter(m => !st.board[m.from].els?.some(x => x.e === avoid.element));
+      if (f.length) moves = f;
+    }
+    return p.choose(st, moves, rng);
+  } };
+};
 
 // config: { white: {type, ...options}, black: {...}, whiteFormation, blackFormation, seed, maxPlies,
 //           and the variant toggles from engine.mjs setVariant: exactRange, noWaterEdge, waterStraightCapture }

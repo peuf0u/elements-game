@@ -18,7 +18,9 @@ const toPiece = (owner, v) => (v === 'wizard' ? { owner, kind: 'wizard' } : { ow
 const result = r => (r ? `${r.winner ?? 'draw'} ${r.reason}` : '');
 
 let positions = 0, bad = 0;
-for (const v of VARIANTS) {
+// Each variant is written against the v0.2 Water rule; the engine's own default is v0.3.
+for (const v0 of VARIANTS) {
+  const v = { waterDiagonalBends: false, waterOneWay: false, ...v0 };
   setSpikeVariant(v);
   for (let g = 0; g < 40; g++) {
     const rng = rngFrom(7000 + g);

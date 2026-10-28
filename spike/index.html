@@ -153,13 +153,14 @@ button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-c
   </fieldset>
   <fieldset class="choice">
     <legend class="menu-label">Water movement (trial)</legend>
-    <label class="toggle"><input type="radio" name="water" value="normal"><span>As now</span><small>Water bends around any Earth it touches, diagonal steps allowed.</small></label>
+    <label class="toggle"><input type="radio" name="water" value="normal"><span>Before v0.3</span><small>Water bends around any Earth it touches, with straight or diagonal steps.</small></label>
     <label class="toggle"><input type="radio" name="water" value="river"><span>River</span><small>Water bends only around an Earth right in front of it or right behind it in its own column.</small></label>
     <label class="toggle"><input type="radio" name="water" value="straight"><span>Straight steps</span><small>Water never steps diagonally, also when going around Earth.</small></label>
     <label class="toggle"><input type="radio" name="water" value="both"><span>River + straight steps</span><small>Both rules together.</small></label>
-    <label class="toggle"><input type="radio" name="water" value="diagonal"><span>Diagonal bends</span><small>Water flows straight, but its steps around Earth must be diagonal.</small></label>
+    <label class="toggle"><input type="radio" name="water" value="diagonal"><span>Diagonal bends (v0.3)</span><small>Water flows straight, but its steps around Earth must be diagonal. With "One way per move", the v0.3 rule.</small></label>
     <label class="toggle"><input type="radio" name="water" value="riverDiagonal"><span>River + diagonal bends</span><small>Bends only around an Earth in its column, and diagonally. The edge slide stays in every version.</small></label>
   </fieldset>
+  <label class="toggle"><input id="optOneWay" type="checkbox"><span>One way per move (Water, v0.3)</span><small>In one move Water goes only forward or only backward, never both. Sideways steps are fine. Works with any of the rules above.</small></label>
   <div class="menu-row">
     <button id="drawBtn" type="button">Agree to a draw</button>
     <button id="editBtn" type="button">Set up a position (debug)</button>
@@ -446,10 +447,10 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ----- app state -----
 let history = [R.newGame()];
-let settings = { orient: 'fixed', opponent: 'medium', side: 'w', water: 'normal' };
+let settings = { orient: 'fixed', opponent: 'medium', side: 'w', water: 'diagonal', oneWay: true };
 // orient: 'fixed' | 'turn' | 'face' (two players only); opponent: 'easy' | 'medium' | 'hard' | 'human';
 // side: the colour you play against the computer;
-// water: 'normal' | 'river' | 'straight' | 'both' | 'diagonal' | 'riverDiagonal'
+// water: 'normal' | 'river' | 'straight' | 'both' | 'diagonal' | 'riverDiagonal'; diagonal + oneWay is the v0.3 rule
 let sel = null;          // {type:'board', sq} | {type:'tray', idx} | {type:'palette', piece} | {type:'remove'}
 let targets = new Map(); // square -> move (board) or true (placement)
 let peek = null;         // {sq, moves} opponent piece being inspected
@@ -462,18 +463,24 @@ const view = () => (editing ? { ...cur(), board: editing.board, phase: 'edit', t
 
 try { Object.assign(settings, JSON.parse(localStorage.getItem('elements-spike-settings') || '{}')); } catch (e) {}
 // older versions stored a rotate on/off switch
-const migrate = s => { if (!s.orient) s.orient = s.rotate ? 'turn' : 'fixed'; delete s.rotate; if (!s.water) s.water = 'normal'; };
+const migrate = s => {
+  if (!s.orient) s.orient = s.rotate ? 'turn' : 'fixed'; delete s.rotate;
+  if (s.rules !== '0.3') { s.water = 'diagonal'; s.oneWay = true; s.rules = '0.3'; } // v0.3 became the rule (GAME_SPEC §3)
+};
 // The Water movement trial (GAME_SPEC open question 10): sets the rules' two Water switches.
 const applyWater = () => {
   R.variant.waterRiver = ['river', 'both', 'riverDiagonal'].includes(settings.water);
   R.variant.waterStraightSteps = settings.water === 'straight' || settings.water === 'both';
   R.variant.waterDiagonalBends = settings.water === 'diagonal' || settings.water === 'riverDiagonal';
+  R.variant.waterOneWay = !!settings.oneWay;
 };
 migrate(settings);
-// a link can pick the Water rule: ?water=normal | river | straight | both | diagonal | riverDiagonal
+// a link can pick the Water rule: ?water=normal | river | straight | both | diagonal | riverDiagonal,
+// and &oneWay=0 or 1 (v0.3 is ?water=diagonal&oneWay=1, v0.2 is ?water=normal&oneWay=0)
 try {
-  const w = new URLSearchParams(location.search).get('water');
+  const q = new URLSearchParams(location.search), w = q.get('water'), one = q.get('oneWay');
   if (['normal', 'river', 'straight', 'both', 'diagonal', 'riverDiagonal'].includes(w)) settings.water = w;
+  if (one === '0' || one === '1') settings.oneWay = one === '1';
 } catch (e) {}
 const saveSettings = () => { try { localStorage.setItem('elements-spike-settings', JSON.stringify(settings)); } catch (e) {} };
 
@@ -1126,6 +1133,7 @@ function updateUi(st) {
   $('sideChoice').hidden = !vsBot();
   $('orientChoice').hidden = vsBot();
   for (const r of document.querySelectorAll('input[name="water"]')) r.checked = r.value === settings.water;
+  $('optOneWay').checked = !!settings.oneWay;
   if (editing) {
     $('eTurnW').setAttribute('aria-pressed', String(editing.turn === 'w'));
     $('eTurnB').setAttribute('aria-pressed', String(editing.turn === 'b'));
@@ -1178,6 +1186,9 @@ function bindUi() {
   });
   for (const r of document.querySelectorAll('input[name="water"]')) r.addEventListener('change', e => {
     settings.water = e.target.value; applyWater(); settingsChanged();
+  });
+  $('optOneWay').addEventListener('change', e => {
+    settings.oneWay = e.target.checked; applyWater(); settingsChanged();
   });
   $('drawBtn').addEventListener('click', () => {
     const st = cur();

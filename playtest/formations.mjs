@@ -1,7 +1,7 @@
 // Starting formations, each written from White's side (rows 1–3). See engine.mjs startGame.
-import { DEFAULT_FORMATION } from './engine.mjs';
+import { DEFAULT_FORMATION, PRESETS } from './engine.mjs';
 
-export { DEFAULT_FORMATION };
+export { DEFAULT_FORMATION, PRESETS };
 
 const ELEMENTS = ['fire', 'wind', 'water', 'earth'];
 const ZONE = [];
@@ -18,6 +18,22 @@ export function randomFormation(rng) {
   let k = 1;
   for (const e of ELEMENTS) for (const s of [3, 2, 1]) f[squares[k++]] = [e, s];
   return f;
+}
+
+// The formation seen in a mirror: files a↔i swapped, rows kept.
+export const mirror = f => Object.fromEntries(Object.entries(f).map(([s, v]) => ['ihgfedcba'['abcdefghi'.indexOf(s[0])] + s[1], v]));
+
+// Small changes: move a piece to another square of the zone, swapping if that square is taken.
+export function mutate(f, changes, rng) {
+  const g = { ...f };
+  for (let i = 0; i < changes; i++) {
+    const keys = Object.keys(g), from = keys[Math.floor(rng() * keys.length)];
+    const others = ZONE.filter(s => s !== from), to = others[Math.floor(rng() * others.length)];
+    const moving = g[from];
+    if (g[to]) g[from] = g[to]; else delete g[from];
+    g[to] = moving;
+  }
+  return g;
 }
 
 // The default formation with one piece taken away (the handicap test).

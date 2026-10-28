@@ -5,7 +5,8 @@ import { SQUARES, NEIGHBOR } from './squares.ts';
 import { OWNER, IS_WIZARD, CAPTURER, PLAIN_EARTH, combineCodes } from './pieces.ts';
 import { keyLo, keyHi, SIDE_LO, SIDE_HI } from './zobrist.ts';
 
-// Variant toggles (GAME_SPEC "v1 scope"). All off by default.
+// Rule toggles (GAME_SPEC "v1 scope"). Off by default, except the v0.3 Water rule: diagonal bends
+// and one way per move (§3). Turning both off gives the v0.2 Water rule.
 export interface RulesConfig {
   exactRange: boolean;           // §3: pieces move exactly N squares
   noWaterEdge: boolean;          // §3: Water can't slide along the board edge
@@ -18,7 +19,7 @@ export interface RulesConfig {
 }
 export const DEFAULT_CONFIG: Readonly<RulesConfig> = Object.freeze({
   exactRange: false, noWaterEdge: false, waterStraightCapture: false, waterRiver: false, waterStraightSteps: false,
-  waterDiagonalBends: false, waterOneWay: false, quietMoveLimit: 75,
+  waterDiagonalBends: true, waterOneWay: true, quietMoveLimit: 75,
 });
 
 // A move is (from, to), packed into one number: from + to * 256. The board decides whether it

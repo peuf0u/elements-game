@@ -14,15 +14,27 @@ const play = (st: GameState, ...moves: string[]) => moves.reduce((s, m) => apply
 
 // §3 Water movement rule: Water 3 on b2, Earth on c3 (the spec's example).
 const WATER_EXAMPLE = '4z4/9/9/9/8Z/9/2E16/1R37/9 w';
+// The v0.2 Water rule, kept as a playtest switch: bends with any step, forward and back in one move.
+const V02: Partial<RulesConfig> = { waterDiagonalBends: false, waterOneWay: false };
 
-test('§3 Water flows, banks around Earth, and comes back (spec example)', () => {
+test('§3 v0.3 Water: flows, bends diagonally around Earth, slides along the edge, one way per move (spec example)', () => {
+  assert.deepEqual(dests(at(WATER_EXAMPLE), 'b2'), ['a1', 'b1', 'b3', 'b4', 'b5', 'c1', 'c4', 'c5', 'd1']);
+});
+
+test('§3 v0.3 Water: no sideways bend, and no turning back within a move', () => {
   const d = dests(at(WATER_EXAMPLE), 'b2');
+  assert.ok(!d.includes('c2'), 'b2 → c2 is a sideways step around the Earth');
+  assert.ok(!d.includes('c2') && !d.includes('a2'), 'b2 → b1 → c1 → c2 and b2 → b1 → a1 → a2 turn back up');
+});
+
+test('§3 v0.2 Water flows, banks around Earth, and comes back (spec example)', () => {
+  const d = dests(at(WATER_EXAMPLE, V02), 'b2');
   for (const s of ['b5', 'd2', 'd3', 'c4', 'd1']) assert.ok(d.includes(s), `b2 should reach ${s}`);
 });
 
-test('§3 Water slides along the edge: b2 → b1 → a1 → a2 (spec example)', () => {
-  assert.ok(dests(at(WATER_EXAMPLE), 'b2').includes('a2'));
-  const noEdge = dests(at(WATER_EXAMPLE, { noWaterEdge: true }), 'b2');
+test('§3 v0.2 Water slides along the edge: b2 → b1 → a1 → a2 (spec example)', () => {
+  assert.ok(dests(at(WATER_EXAMPLE, V02), 'b2').includes('a2'));
+  const noEdge = dests(at(WATER_EXAMPLE, { ...V02, noWaterEdge: true }), 'b2');
   assert.ok(!noEdge.includes('a2') && !noEdge.includes('a1'), 'no edge slide: a1 and a2 are out of reach');
   assert.ok(noEdge.includes('b1'), 'flowing down to b1 is still fine');
 });
@@ -30,14 +42,14 @@ test('§3 Water slides along the edge: b2 → b1 → a1 → a2 (spec example)', 
 test('§3 Straight captures: Water may bend to move, but must capture with a straight flow', () => {
   // White Water 2 on b2, Earth on c3; Black Fire on d3 (reachable only by banking) and on b4 (straight).
   const text = '4z4/9/9/9/1f16Z/9/2E1f15/1R27/9 w';
-  assert.deepEqual(['b4', 'd3'].filter(s => dests(at(text), 'b2').includes(s)), ['b4', 'd3']);
-  assert.deepEqual(['b4', 'd3'].filter(s => dests(at(text, { waterStraightCapture: true }), 'b2').includes(s)), ['b4']);
+  assert.deepEqual(['b4', 'd3'].filter(s => dests(at(text, V02), 'b2').includes(s)), ['b4', 'd3']);
+  assert.deepEqual(['b4', 'd3'].filter(s => dests(at(text, { ...V02, waterStraightCapture: true }), 'b2').includes(s)), ['b4']);
 });
 
 test('Open question 10: the river rule and straight steps', () => {
   // Water 3 on d3 with an Earth right in front on d4, and Water 3 on d2 with an Earth diagonal on e3.
   const inFront = '4z4/9/9/9/8Z/3E15/3R35/9/9 w', diagonal = '4z4/9/9/9/8Z/9/4E14/3R35/9 w';
-  const reach = (text: string, from: string, config: Partial<RulesConfig>) => dests(at(text, config), from);
+  const reach = (text: string, from: string, config: Partial<RulesConfig>) => dests(at(text, { ...V02, ...config }), from);
   // River: the Earth in its column still lets it past (d3 → c4 → d5); the diagonal Earth gives no turn.
   assert.ok(reach(inFront, 'd3', { waterRiver: true }).includes('d5'));
   assert.ok(reach(diagonal, 'd2', {}).includes('f3'));
