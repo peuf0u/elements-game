@@ -4,6 +4,7 @@
 import { positionOf } from './engine.mjs';
 import { legalMoves as coreLegal, hasLegalMove, inCheck, OWNER } from '../packages/engine/src/core.ts';
 import { VALUES, pieceValue, codeValues, evaluate, forward, SCORE_DEFAULTS } from './evaluate.mjs';
+import { deep } from './deep.mjs';
 
 export { VALUES, pieceValue };
 
@@ -141,4 +142,6 @@ export const neverCombiner = (o = {}) => searcher('never-combiner', { depth: 2, 
   (side, from, to, kind) => kind !== 'combine');
 export const hunter = (o = {}) => searcher('hunter', { depth: 2, materialWeight: 0.3, wizardPressure: 0.6, hunt: 0.8, ...o });
 
-export const PLAYERS = { random, greedy, careful, thinker, turtle, rusher, combiner, neverCombiner, hunter };
+export { deep };
+
+export const PLAYERS = { random, greedy, careful, thinker, turtle, rusher, combiner, neverCombiner, hunter, deep };

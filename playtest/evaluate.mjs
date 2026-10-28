@@ -8,12 +8,25 @@ export const VALUES = {
   standard: { element: { fire: 3, wind: 2.5, water: 3, earth: 1 }, size: { 1: 1, 2: 1.6, 3: 2.1 } },
   // Every capturing element worth the same; only size matters.
   flat: { element: { fire: 3, wind: 3, water: 3, earth: 1 }, size: { 1: 1, 2: 1.5, 3: 2 } },
+  // Learned from 4,000 games of Deep 2k against itself (tune.mjs selfplay, 2026-10-28), one value per
+  // element and size, scaled so the average attacking piece is worth what it is in `standard`.
+  // Earth's value can't really be measured (it's never captured on its own): the negative numbers
+  // only say that a stack holding Earth is worth less than a stack of two attackers.
+  tuned: { unit: {
+    fire1: 1.654, fire2: 2.824, fire3: 5.09, wind1: 0.929, wind2: 1.817, wind3: 6.182,
+    water1: 3.22, water2: 6.421, water3: 11.813, earth1: -2.949, earth2: -3.617, earth3: -2.941,
+  } },
+};
+
+// Whole sets of evaluate weights. `tuned` is the rest of the tune.mjs result that goes with VALUES.tuned.
+export const WEIGHTS = {
+  tuned: { values: VALUES.tuned, mobility: 0.278, wizardPressure: 0.408, stackBonus: 4.29 },
 };
 
 // For readable pieces ({ o, wiz } or { o, els }), as game.mjs and Greedy use them.
 export function pieceValue(p, table = VALUES.standard) {
   if (!p || p.wiz) return 0;
-  return p.els.reduce((v, x) => v + table.element[x.e] * table.size[x.s], 0);
+  return p.els.reduce((v, x) => v + (table.unit ? table.unit[x.e + x.s] : table.element[x.e] * table.size[x.s]), 0);
 }
 
 // The same per piece code, for the search: one table lookup instead of a sum.
@@ -27,7 +40,7 @@ export function codeValues(table) {
     if (!VALID[c] || IS_WIZARD[c]) continue;
     const units = [[(c >> 2) & 3, (c >> 4) & 3]];
     if (c & 64) units.push([(c >> 7) & 3, (c >> 9) & 3]);
-    v[c] = units.reduce((s, [e, size]) => s + table.element[ELEMENTS[e]] * table.size[size], 0);
+    v[c] = units.reduce((s, [e, size]) => s + (table.unit ? table.unit[ELEMENTS[e] + size] : table.element[ELEMENTS[e]] * table.size[size]), 0);
   }
   codeTables.set(table, v);
   return v;

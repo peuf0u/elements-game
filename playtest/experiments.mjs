@@ -18,6 +18,21 @@ function both(tag, A, B, n, { fa = 'default', fb = 'default', ...extra } = {}) {
 const mirror = (tag, P, n, extra = {}) =>
   Array.from({ length: n }, () => ({ tag, a: 'w', seed: seed++, white: P, black: P, whiteFormation: 'default', blackFormation: 'default', ...extra }));
 
+// Every pair of players meets n times, half with each colour. The first move of each side is
+// random, so players that pick the same move every time still get varied games. labels names the
+// players for the ratings (rating.mjs).
+function roundRobin(tag, players, n, extra = {}) {
+  const names = Object.keys(players), out = [];
+  for (let i = 0; i < names.length; i++)
+    for (let j = i + 1; j < names.length; j++)
+      for (let k = 0; k < n; k++) {
+        const [w, b] = k % 2 ? [names[j], names[i]] : [names[i], names[j]];
+        out.push({ tag: `${tag}: ${names[i]} v ${names[j]}`, a: k % 2 ? 'b' : 'w', seed: seed++, randomOpening: 2,
+          white: players[w], black: players[b], whiteFormation: 'default', blackFormation: 'default', labels: { w, b }, ...extra });
+      }
+  return out;
+}
+
 const random = { type: 'random' }, greedy = { type: 'greedy' }, careful = { type: 'careful' }, thinker = { type: 'thinker' };
 
 // The 12 element pieces of the default formation, by square.
@@ -90,6 +105,53 @@ export const EXPERIMENTS = {
     mirror(`${name}: thinker v thinker, random opening`, thinker, 60 * s, { ...v, randomOpening: 2 })),
   // 6d. More of the above for straight captures, where White looked weak. Fresh seeds, so no game repeats.
   straightThinker: s => { seed = 100000; return mirror('straight captures: thinker v thinker, random opening', thinker, 200 * s, { waterStraightCapture: true, randomOpening: 2 }); },
+  // 8. Rating ladder: the old and new look-ahead players, every pair against each other.
+  // Deep 80k was dropped after the first ladder (2026-10-28): no stronger than 20k (44% head to head).
+  rating: s => roundRobin('rating', {
+    careful, thinker,
+    'deep 2k': { type: 'deep', nodes: 2000 }, 'deep 5k': { type: 'deep', nodes: 5000 }, 'deep 20k': { type: 'deep', nodes: 20000 },
+    'deep 2k tuned': { type: 'deep', nodes: 2000, weights: 'tuned' }, 'deep 5k tuned': { type: 'deep', nodes: 5000, weights: 'tuned' },
+    'deep 20k tuned': { type: 'deep', nodes: 20000, weights: 'tuned' },
+  }, 100 * s),
+  // 9. Material for tune.mjs: Deep against itself, half from the default formation and half from
+  // a random formation shared by both sides, so every piece shows up in many situations.
+  selfplay: s => Array.from({ length: 4000 * s }, (_, i) => ({
+    tag: i % 2 ? 'deep 2k, same random formation' : 'deep 2k, default formation', a: 'w', seed: 200000 + i, randomOpening: 2,
+    white: { type: 'deep', nodes: 2000 }, black: { type: 'deep', nodes: 2000 },
+    whiteFormation: i % 2 ? 'random' : 'default', blackFormation: i % 2 ? 'same' : 'default',
+  })),
+  // 9b. The same with the tuned values, for a second round of tuning.
+  selfplayTuned: s => Array.from({ length: 4000 * s }, (_, i) => ({
+    tag: i % 2 ? 'deep 2k tuned, same random formation' : 'deep 2k tuned, default formation', a: 'w', seed: 300000 + i, randomOpening: 2,
+    white: { type: 'deep', nodes: 2000, weights: 'tuned' }, black: { type: 'deep', nodes: 2000, weights: 'tuned' },
+    whiteFormation: i % 2 ? 'random' : 'default', blackFormation: i % 2 ? 'same' : 'default',
+  })),
+  // 10. The key experiments again with the strongest fast player, Deep 2k with tuned values
+  // (2026-10-28): colours (1), the handicap tests (4, 4b) and the Water variants (6b). Every game
+  // starts with one random move per side, because Deep repeats itself more than Careful.
+  recheck: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, ro = { randomOpening: 2 };
+    seed = 400000;
+    // Both sides get the same random formation; with `piece`, side A is missing that piece.
+    const sameRandom = (tag, n, piece = null) => Array.from({ length: n }, (_, i) => ({
+      tag, a: i % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, whiteFormation: 'random', blackFormation: 'same', ...ro,
+      ...(piece ? { remove: { side: i % 2 ? 'b' : 'w', piece } } : {}),
+    }));
+    return [
+      ...mirror('colours: default formation', bot, 400 * s, ro),
+      ...sameRandom('colours: same random formation', 400 * s),
+      ...DEFAULT_PIECES.flatMap(([square, [e, size]]) =>
+        both(`handicap: without ${e}${size} (${square})`, bot, bot, 100 * s, { fa: without(DEFAULT_FORMATION, square), ...ro })),
+      ...['fire', 'wind', 'water', 'earth'].flatMap(e => [3, 2, 1].flatMap(size =>
+        sameRandom(`handicap random: without ${e}${size}`, 100 * s, [e, size]))),
+      ...[['normal rules', {}], ['no edge slide', { noWaterEdge: true }], ['straight captures', { waterStraightCapture: true }],
+        ['both', { noWaterEdge: true, waterStraightCapture: true }]].flatMap(([name, v]) => [
+        ...mirror(`water, ${name}: equal`, bot, 400 * s, { ...v, ...ro }),
+        ...[['g2', 'water3'], ['d1', 'fire3'], ['b3', 'wind3']].flatMap(([square, piece]) =>
+          both(`water, ${name}: without ${piece} (${square})`, bot, bot, 100 * s, { fa: without(DEFAULT_FORMATION, square), ...v, ...ro })),
+      ]),
+    ];
+  },
   // 7. Formations against the default one.
   formations: s => [
     ...both('random formation v default', careful, careful, 200 * s, { fa: 'random' }),

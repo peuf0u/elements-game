@@ -1,6 +1,7 @@
 // Plays one game between two players and records what happened.
 import { setVariant, startGame, legalMoves, play, name } from './engine.mjs';
 import { PLAYERS, VALUES, pieceValue } from './players.mjs';
+import { WEIGHTS } from './evaluate.mjs';
 import { FORMATIONS, randomFormation, without } from './formations.mjs';
 
 export function rngFrom(seed) { // mulberry32: small, seedable, good enough for games
@@ -16,7 +17,9 @@ export function rngFrom(seed) { // mulberry32: small, seedable, good enough for 
 
 const label = p => (p.wiz ? 'wizard' : p.els.map(x => x.e + x.s).join('+'));
 const formation = (f, rng) => (f === 'random' ? randomFormation(rng) : typeof f === 'string' ? FORMATIONS[f] : f);
-const makePlayer = ({ type, values, ...o }) => PLAYERS[type]({ ...o, ...(values ? { values: VALUES[values] } : {}) });
+// A player config: { type, ...options }. values names a table in VALUES, weights a set in WEIGHTS.
+const makePlayer = ({ type, values, weights, ...o }) =>
+  PLAYERS[type]({ ...(weights ? WEIGHTS[weights] : {}), ...o, ...(values ? { values: VALUES[values] } : {}) });
 
 // config: { white: {type, ...options}, black: {...}, whiteFormation, blackFormation, seed, maxPlies,
 //           and the variant toggles from engine.mjs setVariant: exactRange, noWaterEdge, waterStraightCapture }

@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import { EXPERIMENTS } from './experiments.mjs';
 import { runGames } from './pool.mjs';
 import { summarize, pieceActivity } from './stats.mjs';
+import { ratings } from './rating.mjs';
 
 const [name, scaleArg] = process.argv.slice(2);
 if (!EXPERIMENTS[name]) {
@@ -23,6 +24,7 @@ const records = await runGames(configs, {
   },
 });
 const summary = { experiment: name, scale: Number(scaleArg ?? 1), seconds: Math.round((Date.now() - t0) / 1000), matchups: summarize(records), pieces: pieceActivity(records) };
+if (records.some(r => r.config.labels)) summary.ratings = ratings(records, { anchor: records[0].config.labels.w });
 const dir = new URL('./results/', import.meta.url);
 fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(new URL(`${name}.json`, dir), JSON.stringify(records));
