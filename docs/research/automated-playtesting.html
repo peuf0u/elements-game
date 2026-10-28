@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How the Computer Playtests Elements</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column on a slate-grey "board" ground; each method is a numbered-free plate with three labelled rows (in game terms / in playtest / sources). */
+:root {
+  --ground: #eef0ee;
+  --plate: #fbfcfa;
+  --ink: #1d2422;
+  --muted: #5b6662;
+  --rule: #d5dad6;
+  --link: #24618a;
+  --fire: #c2412d;
+  --wind: #b8860b;
+  --water: #2f6f9f;
+  --earth: #8a6a48;
+  --mark: #e4ebe6;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #151a19; --plate: #1d2422; --ink: #e5ebe7; --muted: #9aa6a1; --rule: #33403c; --link: #7fb6dc;
+    --fire: #e9735e; --wind: #e0b33f; --water: #6aa8d6; --earth: #c29b72; --mark: #26302d; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #151a19; --plate: #1d2422; --ink: #e5ebe7; --muted: #9aa6a1; --rule: #33403c; --link: #7fb6dc;
+  --fire: #e9735e; --wind: #e0b33f; --water: #6aa8d6; --earth: #c29b72; --mark: #26302d; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 72px;
+}
+.wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 6vw, 2.9rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 500; }
+p { margin: 0; }
+a { color: var(--link); text-underline-offset: 2px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; border-radius: 2px; }
+code { font-family: var(--mono); font-size: 0.82em; background: var(--mark); padding: 0.1em 0.35em; border-radius: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.lede { font-size: 1.15rem; }
+.muted { color: var(--muted); }
+
+/* Header with the 9×9 board motif */
+header { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; }
+.board { display: grid; grid-template-columns: repeat(9, 10px); gap: 2px; }
+.board span { width: 10px; height: 10px; background: var(--rule); border-radius: 1px; }
+.board span.f { background: var(--fire); } .board span.w { background: var(--wind); }
+.board span.r { background: var(--water); } .board span.e { background: var(--earth); }
+.board span.z { background: var(--ink); }
+.board span.gap { margin-bottom: 4px; }
+@media (max-width: 480px) { header { grid-template-columns: 1fr; } .board { order: -1; } }
+
+/* Answer block */
+.answer { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+.answer ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; }
+
+nav ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 18px; font-family: var(--display); font-size: 0.95rem; }
+
+/* Method plates */
+.method { background: var(--plate); border: 1px solid var(--rule); border-left: 4px solid var(--dot, var(--rule)); border-radius: 8px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+.method dl { margin: 0; display: grid; grid-template-columns: 9.5rem 1fr; gap: 10px 16px; }
+.method dt { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); padding-top: 0.3em; }
+.method dd { margin: 0; min-width: 0; }
+@media (max-width: 560px) { .method dl { grid-template-columns: 1fr; gap: 2px; } .method dd { margin-bottom: 10px; } }
+.fire { --dot: var(--fire); } .wind { --dot: var(--wind); } .water { --dot: var(--water); } .earth { --dot: var(--earth); }
+
+/* Ladder */
+.ladder { display: flex; flex-direction: column; gap: 10px; }
+.rung { display: grid; grid-template-columns: 7.5rem 1fr 3.2rem; gap: 12px; align-items: center; font-family: var(--display); }
+.rung .bar { height: 14px; background: var(--mark); border-radius: 3px; overflow: hidden; }
+.rung .bar i { display: block; height: 100%; background: var(--water); }
+.rung b { font-variant-numeric: tabular-nums; text-align: right; font-weight: 700; }
+.rung small { display: block; font-family: var(--body); font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+
+/* Tables */
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--plate); }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 10px 14px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--display); font-weight: 500; color: var(--muted); font-size: 0.85rem; }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; }
+.judgment { border-left: 3px dashed var(--muted); padding-left: 16px; }
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+@media (prefers-reduced-motion: no-preference) { a { transition: text-decoration-thickness 0.1s; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="stack">
+    <span class="eyebrow">Elements · playtest research · 28 Oct 2026</span>
+    <h1>How the computer playtests Elements</h1>
+    <p class="lede">You asked whether the methods behind the computer players are well known or made up. They're well known. This page shows where each one comes from, what it means in board-game terms, and where it sits in the <code>playtest/</code> folder.</p>
+  </div>
+  <div class="board" aria-hidden="true" id="board"></div>
+</header>
+
+<section class="answer" aria-labelledby="short">
+  <h2 id="short">The short answer</h2>
+  <ol>
+    <li><strong>The players are textbook game programs.</strong> Looking ahead, skipping hopeless lines, scoring a position by piece values and trying captures first all go back to <a href="https://doi.org/10.1080/14786445008521796">Shannon (1950)</a> and <a href="https://doi.org/10.1016/0004-3702(75)90019-3">Knuth &amp; Moore (1975)</a>. Every chess engine still does this.</li>
+    <li><strong>The experiments come from a small research field</strong> that uses simulated players to balance games before people test them. Our style players are "restricted play", our ladder is a "strategy ladder", and our exact-range test copies how DeepMind tested chess rule changes with AlphaZero.</li>
+    <li><strong>The theory underneath:</strong> a game like Elements, with no dice and nothing hidden, has a fixed answer under perfect play (White wins, Black wins, or a draw). It's far too big to compute, so we estimate it from many games.</li>
+    <li><strong>Our own judgment calls:</strong> the piece values, the style players' habits, the fortress formations and the warning thresholds. Every result holds only for bots of the strength we used.</li>
+  </ol>
+</section>
+
+<nav aria-label="Sections">
+  <ul>
+    <li><a href="#theory">The theory</a></li>
+    <li><a href="#players">The players</a></li>
+    <li><a href="#measuring">The measuring</a></li>
+    <li><a href="#ours">Our own judgment</a></li>
+    <li><a href="#limits">Limits</a></li>
+    <li><a href="#reading">Further reading</a></li>
+  </ul>
+</nav>
+
+<section class="stack" id="theory">
+  <span class="eyebrow">1 · The theory</span>
+  <h2>Elements has an answer, we just can't compute it</h2>
+  <p><strong>Zermelo's theorem.</strong> In 1913 Ernst Zermelo asked what it means for a chess player to be in a winning position. His result is usually summed up like this: in such a game, either White can force a win, or Black can, or both can force a draw. A historical study notes that this modern version "bears only a partial relationship to what Zermelo really did", and that König and Kalmár finished the proof (<a href="https://doi.org/10.1006/game.2000.0794">Schwalbe &amp; Walker 2001</a>, with an <a href="https://www.math.harvard.edu/~elkies/FS23j.03/zermelo.pdf">English translation</a>).</p>
+  <p>For Elements this means your default formation already is, in principle, a White win, a Black win or a draw. The draw rules (repetition and the 50-move rule) guarantee every game ends, so "is it balanced?" has a true answer.</p>
+  <p><strong>Why we can't compute it.</strong> Shannon estimated chess has about 10<sup>120</sup> possible games. A machine checking one per microsecond "would require over 10<sup>90</sup> years to calculate the first move" (<a href="https://www.pi.infn.it/~carosi/chess/shannon.txt">Shannon 1950, full text</a>).</p>
+  <p><strong>A solved game for comparison.</strong> Checkers has about 5 × 10<sup>20</sup> positions. Computers worked on it almost non-stop from 1989 to 2007, when Schaeffer's team proved perfect play is a draw (<a href="https://doi.org/10.1126/science.1144079">Science, 2007</a>, <a href="https://www.cse.sc.edu/~mgv/csce580sp17/gradPres/schaeffer_CheckersIsSolved_Science2007.pdf">PDF</a>). Checkers has 32 squares and two kinds of piece. Elements has 81 squares, twelve kinds of element piece, stacks and a Wizard, so solving it is out of reach. Measuring it is the practical route.</p>
+</section>
+
+<section class="stack" id="players">
+  <span class="eyebrow">2 · The players</span>
+  <h2>Four ways to choose a move</h2>
+  <p>The players climb a ladder: Random, then Greedy (grabs the biggest piece it can), then Careful (looks 2 moves ahead) and Thinker (3 moves ahead). Careful and Thinker use the four methods below.</p>
+
+  <article class="method fire">
+    <h3>Looking ahead: minimax</h3>
+    <dl>
+      <dt>In game terms</dt>
+      <dd>"If I play this, what's your best answer, and what's my best answer to that?" Assume the opponent always picks the reply that's worst for you, and choose the move whose worst case is best.</dd>
+      <dt>In playtest/</dt>
+      <dd><code>search()</code> in <code>players.mjs</code>. Careful looks 2 turns deep, Thinker 3.</dd>
+      <dt>Sources</dt>
+      <dd>Shannon proposed cutting this reasoning off after a few moves and scoring the position there (<a href="https://doi.org/10.1080/14786445008521796">1950</a>), which programmers call his "<a href="https://chessprogramming.org/Type_A_Strategy">Type A</a>" strategy. The name and the maths come from von Neumann's minimax theorem (<a href="https://doi.org/10.1007/BF01448847">1928</a>). We use the compact form, <a href="https://www.chessprogramming.org/Negamax">negamax</a>: your score is minus mine.</dd>
+    </dl>
+  </article>
+
+  <article class="method wind">
+    <h3>Skipping hopeless lines: alpha-beta pruning</h3>
+    <dl>
+      <dt>In game terms</dt>
+      <dd>Once one of your opponent's replies already refutes your move, stop checking their other replies to it. The answer is the same as checking everything, only faster.</dd>
+      <dt>In playtest/</dt>
+      <dd>The <code>alpha</code> and <code>beta</code> limits in <code>search()</code>.</dd>
+      <dt>Sources</dt>
+      <dd>It finds the same move "without any potential of overlooking a better move" (<a href="https://www.chessprogramming.org/Alpha-Beta">Chess Programming Wiki</a>). With good move order, a 4-turn search over 40 moves a turn checks about 3,199 end positions instead of 2,560,000. The standard analysis is <a href="https://doi.org/10.1016/0004-3702(75)90019-3">Knuth &amp; Moore (1975)</a>.</dd>
+    </dl>
+  </article>
+
+  <article class="method water">
+    <h3>Scoring a position: the evaluation function</h3>
+    <dl>
+      <dt>In game terms</dt>
+      <dd>When the bot stops looking ahead, it needs a rule of thumb for who's ahead. Ours adds up piece values (element × size), adds a little for how many moves your pieces have and for attackers near the enemy Wizard, and adds extra when a side is down to its last capturing pieces.</dd>
+      <dt>In playtest/</dt>
+      <dd><code>VALUES</code> and <code>evaluate()</code> in <code>players.mjs</code>. There are two value tables, <code>standard</code> and <code>flat</code>.</dd>
+      <dt>Sources</dt>
+      <dd>This is Shannon's own proposal: material with the 9-5-3-3-1 chess values, plus 0.1 per legal move (<a href="https://www.pi.infn.it/~carosi/chess/shannon.txt">full text</a>). He warned the values "only have a kind of statistical validity", which is why we test two tables. Modern engines still start there (<a href="https://www.chessprogramming.org/Evaluation">Evaluation</a>).</dd>
+    </dl>
+  </article>
+
+  <article class="method earth">
+    <h3>Trying captures first: move ordering</h3>
+    <dl>
+      <dt>In game terms</dt>
+      <dd>Look at "take their biggest piece" before quiet moves. Those are most likely to be best, so alpha-beta can skip more.</dd>
+      <dt>In playtest/</dt>
+      <dd><code>orderMoves()</code>: captures by value of the piece taken, then combines, then the rest.</dd>
+      <dt>Sources</dt>
+      <dd>The classic rule is <a href="https://www.chessprogramming.org/MVV-LVA">MVV-LVA</a>: "most valuable victim, least valuable attacker". We use the first half only (<a href="https://www.chessprogramming.org/Move_Ordering">Move Ordering</a>).</dd>
+    </dl>
+  </article>
+
+  <p><strong>Random and Greedy</strong> are the standard baselines. <a href="https://ojs.aaai.org/index.php/AIIDE/article/view/12513/12366">Jaffe et al. (2012)</a> use exactly these two. Browne warns that random games "don't give much insight into actual quality" (<a href="https://ludii.games/TalksWorkshop/Metrics.pdf">slides, 2022</a>), so we use them only to check that games end.</p>
+  <p><strong>Variety.</strong> A look-ahead bot would play the same game every time. Ours picks at random among moves within 0.1 points of the best. DeepMind solved the same problem by sampling AlphaZero's first 20 moves at random (<a href="https://arxiv.org/abs/2009.04374">Tomašev et al. 2020</a>).</p>
+</section>
+
+<section class="stack" id="measuring">
+  <span class="eyebrow">3 · The measuring</span>
+  <h2>Each experiment has a name in the literature</h2>
+  <p>Testing a game with simulated players before people play it is its own research topic. <a href="https://doi.org/10.1609/aiide.v7i3.12479">Nelson (2011)</a> calls it "hypothetical player-testing": "what happens when the game is played by a player who always attacks… If that player does very well, the game might be a bit too simple." <a href="https://doi.org/10.1609/aiide.v8i1.12513">Jaffe et al. (2012)</a> call bot win rates "an early warning system" that saves human playtesting time. That's the job D12 gives <code>playtest/</code>.</p>
+
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Our experiment</th><th>Established method</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Style players (Turtle, Never-combiner…) against Careful</td><td>Restricted play</td><td><a href="https://ojs.aaai.org/index.php/AIIDE/article/view/12513/12366">Jaffe 2012</a>, <a href="https://ojs.aaai.org/index.php/AIIDE/article/view/12479/12338">Nelson 2011</a></td></tr>
+        <tr><td>Skill ladder: each player against the next one up</td><td>Strategy ladder, "depth"</td><td><a href="https://cdn.aaai.org/ocs/ws/ws0340/15142-68464-1-PB.pdf">Lantz 2017</a>, <a href="https://eprints.qut.edu.au/17025/">Browne 2008</a></td></tr>
+        <tr><td>White against Black between equal players</td><td>First-player advantage</td><td>Jaffe 2012, Browne 2008, <a href="https://ludii.games/">Ludii</a></td></tr>
+        <tr><td>The exact-range variant re-run</td><td>Comparing rule variants by self-play</td><td><a href="https://arxiv.org/abs/2009.04374">Tomašev 2020</a></td></tr>
+        <tr><td>Endings, draws, game length, formations</td><td>Whole-game measures</td><td>Browne 2008, Ludii</td></tr>
+        <tr><td>Handicap: default formation minus one piece</td><td>Piece values from results, odds games</td><td><a href="https://www.danheisman.com/evaluation-of-material-imbalances.html">Kaufman 1999</a></td></tr>
+        <tr><td>The ± range next to every win rate</td><td>Wilson score interval</td><td><a href="https://doi.org/10.1080/01621459.1927.10502953">Wilson 1927</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Style players are "restricted play"</h3>
+  <p>Jaffe et al. play a bot that's forbidden one thing ("never do <i>a</i>") against a normal bot. If the restricted bot barely loses, that feature doesn't matter much. Our <strong>Never-combiner</strong> is "never combine" and <strong>Combiner</strong> is close to "always combine". If <strong>Turtle</strong> (never crosses the middle) holds off Careful, defence is too strong. One difference: in Jaffe's setup the normal bot knows about the restriction and exploits it, while our Careful doesn't. So our test is gentler than theirs.</p>
+
+  <h3>The skill ladder measures depth</h3>
+  <p>Lantz, Isaksen, Jaffe, Nealen and Togelius define a game's depth by a <em>strategy ladder</em>: a row of players, each thinking more and each beating the one below. The more rungs, the deeper the game (<a href="https://cdn.aaai.org/ocs/ws/ws0340/15142-68464-1-PB.pdf">2017</a>, <a href="http://julian.togelius.com/Lantz2017Depth.pdf">author copy</a>). Browne's test is the same idea: take one move of look-ahead away from one player, and if the deeper player doesn't win clearly, "the game is most certainly devoid of depth" (<a href="https://eprints.qut.edu.au/17025/1/Cameron_Browne_Thesis.pdf">thesis pp. 121–122</a>). Our Thinker against Careful is exactly that test. Here are our first results:</p>
+
+  <div class="ladder" role="img" aria-label="Skill ladder results: Greedy scores 99% against Random, Careful 99% against Greedy, Thinker 96% against Careful">
+    <div class="rung"><span>Greedy<small>vs Random · 400 games</small></span><div class="bar"><i style="width:99%"></i></div><b>99%</b></div>
+    <div class="rung"><span>Careful<small>vs Greedy · 200 games</small></span><div class="bar"><i style="width:99%"></i></div><b>99%</b></div>
+    <div class="rung"><span>Thinker<small>vs Careful · 100 games</small></span><div class="bar"><i style="width:96%"></i></div><b>96%</b></div>
+  </div>
+  <p class="muted">The stronger player's score (draws count as half). The weaker player never won a game. Each extra move of look-ahead pays off clearly, so Elements passes Browne's depth test at every rung we can measure.</p>
+
+  <h3>Rule variants, the AlphaZero way</h3>
+  <p>DeepMind and former world champion Vladimir Kramnik used AlphaZero to compare nine chess variants, each with one rule changed (no castling, pawns move only one square, and others). For each one they measured draw rate, White's advantage and piece values (<a href="https://arxiv.org/abs/2009.04374">Tomašev, Paquet, Hassabis, Kramnik 2020</a>; <a href="https://www.deepmind.com/publications/assessing-game-balance-with-alphazero-exploring-alternative-rule-sets-in-chess">DeepMind page</a>; <a href="https://www.chess.com/news/view/new-alphazero-paper-explores-chess-variants">chess.com summary</a>). Our exact-range test does the same: the same players and measurements, with one rule changed. Our bots are far weaker than AlphaZero, but the design of the experiment is the same.</p>
+
+  <h3>Whole-game measures, from the man who let a computer invent a game</h3>
+  <p>For his PhD, Cameron Browne built <strong>Ludi</strong>, a program that describes board games, plays them against itself, measures them and evolves new ones. Its scores matched how people ranked the games (<a href="https://eprints.qut.edu.au/17025/">thesis 2008</a>; <a href="https://doi.org/10.1109/TCIAIG.2010.2041928">Browne &amp; Maire 2010</a>). One of its games, <a href="https://www.cambolbro.com/games/yavalath/">Yavalath</a>, was published commercially. Several of its measures are ours:</p>
+  <ul class="plain">
+    <li><strong>Completion:</strong> how many games end in a win or a loss</li>
+    <li><strong>Balance and advantage:</strong> whether one colour or the first player wins more than its share</li>
+    <li><strong>Drawishness:</strong> the share of draws</li>
+    <li><strong>Duration:</strong> whether games are trivially short or endlessly long</li>
+    <li><strong>Drama:</strong> "the tendency for players to recover from seemingly bad positions"; our comeback count measures this</li>
+  </ul>
+  <p>His successor system, <a href="https://ludii.games/">Ludii</a>, plays hundreds of board games and publishes the same kind of table for each one (<a href="https://ludii.games/conceptsAB.php?gameId=200">example</a>; <a href="https://doi.org/10.3233/FAIA200120">Piette et al. 2020</a>). His <a href="https://ludii.games/TalksWorkshop/Metrics.pdf">2022 slides</a> sum up a good game's first test: fair, decisive, and a good length.</p>
+
+  <h3>The handicap test is an odds game</h3>
+  <p>Larry Kaufman worked out chess piece values from results. He took nearly 300,000 master games and compared results with ratings when material was unequal. That gave pawn 1, knight and bishop 3¼, rook 5, queen 9¾ (<a href="https://www.danheisman.com/evaluation-of-material-imbalances.html">Chess Life, 1999</a>). Our handicap test does the same from the other side. Careful plays with one piece removed, and the bigger the drop in its score, the more that piece is worth in practice.</p>
+
+  <h3>The ± ranges</h3>
+  <p>A win rate from 100 games is only an estimate. The range next to each number is a 95% <a href="https://doi.org/10.1080/01621459.1927.10502953">Wilson interval</a>, the standard formula for how far off a percentage could be. If the range includes 50%, the games can't tell the two sides apart yet.</p>
+
+  <h3>White's advantage: the chess yardstick</h3>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Where</th><th>White's score</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>2.2 million human games</td><td class="num">54.6%</td><td><a href="https://www.chessgames.com/chessstats.html">ChessGames.com</a> (37.6% White wins, 34.0% draws; score worked out from those)</td></tr>
+        <tr><td>Literature summary</td><td class="num">52–56%</td><td><a href="https://en.wikipedia.org/wiki/First-move_advantage_in_chess">Wikipedia</a></td></tr>
+        <tr><td>AlphaZero, 1 second a move</td><td class="num">51.8%</td><td><a href="https://arxiv.org/abs/2009.04374">Tomašev 2020</a></td></tr>
+        <tr><td>AlphaZero, 1 minute a move</td><td class="num">50.8%</td><td>same, with 98% draws</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>So our rule of thumb is that a White score of 50–56% between equal players looks healthy, and above about 60% is a problem. That's chess as a yardstick, not a law: Elements could be fine with a different number.</p>
+</section>
+
+<section class="stack judgment" id="ours">
+  <span class="eyebrow">4 · Our own judgment</span>
+  <h2>What isn't from any source</h2>
+  <ul class="plain">
+    <li><strong>Piece values.</strong> Both tables are guesses. The handicap test checks them.</li>
+    <li><strong>The other scoring weights:</strong> mobility, pressure on the Wizard, the bonus for the last capturing pieces.</li>
+    <li><strong>Look-ahead depths</strong> of 2 and 3, chosen so thousands of games run in minutes on a laptop.</li>
+    <li><strong>The style players' habits.</strong> The method is established, but which habits to test is our guess about where cheats might hide.</li>
+    <li><strong>The fortress formations,</strong> hand-built worst cases for defence.</li>
+    <li><strong>The warning thresholds</strong> and how many games each test gets.</li>
+  </ul>
+</section>
+
+<section class="stack" id="limits">
+  <span class="eyebrow">5 · Limits</span>
+  <h2>Results hold for bots of this strength</h2>
+  <p>Even in chess, results shift with strength: as AlphaZero thought longer, draws rose and White's edge shrank (<a href="https://arxiv.org/abs/2009.04374">Tomašev 2020</a>). Weak bots can <strong>hide</strong> an imbalance by never finding the attack a strong player would. They can also <strong>invent</strong> one by walking into a trap any person would see. So treat a "cheat" the bots find as a hint to check on the board, not a verdict.</p>
+  <ul class="plain">
+    <li><strong>The scoring steers the bots.</strong> A bot that thinks Earth is worth 1 plays as if it is.</li>
+    <li><strong>Bots don't adapt.</strong> A person who loses to a Turtle twice changes plans. Careful doesn't.</li>
+    <li><strong>No placement phase yet.</strong> Games start from finished formations.</li>
+    <li><strong>Stronger players are possible, at a cost.</strong> <a href="https://www.chessprogramming.org/Monte-Carlo_Tree_Search">Monte Carlo tree search</a> judges moves by playing many quick games and needs no piece values (<a href="https://doi.org/10.1007/978-3-540-75538-8_7">Coulom 2006</a>, <a href="https://doi.org/10.1007/11871842_29">Kocsis &amp; Szepesvári 2006</a>, <a href="https://doi.org/10.1109/TCIAIG.2012.2186810">survey 2012</a>). Self-taught play like <a href="https://doi.org/10.1126/science.aar6404">AlphaZero</a> is the strongest option, but its chess training used 5,000 of Google's AI chips (<a href="https://arxiv.org/abs/1712.01815">preprint</a>). A home-sized version for Elements would be a project of its own.</li>
+    <li><strong>People still decide.</strong> Bots measure fairness, length and dominant strategies, not fun or tension. Nelson presents his methods as a complement to human playtesting, not a replacement.</li>
+  </ul>
+</section>
+
+<section class="stack" id="reading">
+  <span class="eyebrow">6 · Further reading</span>
+  <h2>Friendly introductions</h2>
+  <ul class="plain">
+    <li>Cameron Browne, <a href="https://ludii.games/TalksWorkshop/Metrics.pdf"><i>Measuring Games</i></a>: short visual slides on fairness, decisiveness, length and the strategy ladder. The best single place to start.</li>
+    <li>DeepMind, <a href="https://deepmind.google/blog/alphazero-shedding-new-light-on-chess-shogi-and-go/">AlphaZero: shedding new light on chess, shogi and Go</a></li>
+    <li>Chess.com, <a href="https://www.chess.com/news/view/new-alphazero-paper-explores-chess-variants">New AlphaZero paper explores chess variants</a></li>
+    <li><a href="https://www.cambolbro.com/games/yavalath/">Yavalath</a>, the computer-designed game, with rules you can play on paper</li>
+    <li>Chess Programming Wiki, <a href="https://www.chessprogramming.org/Point_Value">Point Value</a>: piece-value tables from Shannon, Kaufman and others side by side</li>
+    <li>Wikipedia: <a href="https://en.wikipedia.org/wiki/Zermelo%27s_theorem_(game_theory)">Zermelo's theorem</a> · <a href="https://en.wikipedia.org/wiki/Solved_game">Solved game</a> · <a href="https://en.wikipedia.org/wiki/Minimax">Minimax</a> · <a href="https://en.wikipedia.org/wiki/Alpha%E2%80%93beta_pruning">Alpha–beta pruning</a> · <a href="https://en.wikipedia.org/wiki/Monte_Carlo_tree_search">Monte Carlo tree search</a> · <a href="https://en.wikipedia.org/wiki/Game_balance">Game balance</a> · <a href="https://en.wikipedia.org/wiki/First-move_advantage_in_chess">First-move advantage in chess</a></li>
+  </ul>
+</section>
+
+<footer>
+  <p>The same note, with every citation, is in <a href="automated-playtesting.md">automated-playtesting.md</a>. All links were checked on 28 October 2026.</p>
+  <p>Ladder results come from <code>playtest/results/ladder.summary.json</code>.</p>
+</footer>
+
+</div>
+
+<script>
+// The default formation on a 9×9 grid, as a small header motif.
+(function () {
+  const F = { b3:'w', c3:'e', e3:'e', g3:'e', h3:'w', c2:'r', d2:'w', e2:'r', f2:'f', g2:'r', d1:'f', e1:'z', f1:'f' };
+  const el = document.getElementById('board');
+  for (let y = 9; y >= 1; y--) for (let x = 0; x < 9; x++) {
+    const white = F['abcdefghi'[x] + y];
+    const black = F['abcdefghi'[8 - x] + (10 - y)];
+    const s = document.createElement('span');
+    const k = white || black;
+    if (k) s.className = k;
+    if (y === 7 || y === 4) s.classList.add('gap');
+    el.appendChild(s);
+  }
+})();
+</script>
+</body>
+</html>

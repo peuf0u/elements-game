@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elements Playtest Findings</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the methods page's reading column; findings as verdict rows, then sections with drawn boards. */
+:root {
+  --ground: #eef0ee; --plate: #fbfcfa; --ink: #1d2422; --muted: #5b6662; --rule: #d5dad6; --link: #24618a;
+  --fire: #c2412d; --wind: #b8860b; --water: #2f6f9f; --earth: #8a6a48; --mark: #e4ebe6;
+  --tile: #e6dccb; --tile-mid: #efe8dc; --route: #2f6f9f;
+  --ok: #2e7d4f; --ok-bg: #e2f1e7; --warn: #a15c00; --warn-bg: #fbecd6;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #151a19; --plate: #1d2422; --ink: #e5ebe7; --muted: #9aa6a1; --rule: #33403c; --link: #7fb6dc;
+    --fire: #e9735e; --wind: #e0b33f; --water: #6aa8d6; --earth: #c29b72; --mark: #26302d;
+    --tile: #3a342b; --tile-mid: #302b24; --route: #6aa8d6;
+    --ok: #7bd3a0; --ok-bg: #1d3328; --warn: #f0b35a; --warn-bg: #3a2c16; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #151a19; --plate: #1d2422; --ink: #e5ebe7; --muted: #9aa6a1; --rule: #33403c; --link: #7fb6dc;
+  --fire: #e9735e; --wind: #e0b33f; --water: #6aa8d6; --earth: #c29b72; --mark: #26302d;
+  --tile: #3a342b; --tile-mid: #302b24; --route: #6aa8d6;
+  --ok: #7bd3a0; --ok-bg: #1d3328; --warn: #f0b35a; --warn-bg: #3a2c16; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 72px; margin: 0;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 6vw, 2.9rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 500; }
+p { margin: 0; }
+a { color: var(--link); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+code { font-family: var(--mono); font-size: 0.82em; background: var(--mark); padding: 0.1em 0.35em; border-radius: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.lede { font-size: 1.15rem; }
+.muted { color: var(--muted); font-size: 0.92rem; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; }
+
+.howto { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 22px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem; }
+
+/* Verdicts */
+.verdicts { display: flex; flex-direction: column; border: 1px solid var(--rule); border-radius: 10px; background: var(--plate); overflow: hidden; }
+.verdict { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--rule); align-items: start; }
+.verdict:last-child { border-bottom: 0; }
+.verdict .q { font-family: var(--display); font-weight: 500; }
+.verdict .a { min-width: 0; font-size: 0.95rem; }
+.pill { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { color: var(--ok); background: var(--ok-bg); }
+.pill.warn { color: var(--warn); background: var(--warn-bg); }
+@media (max-width: 600px) { .verdict { grid-template-columns: 1fr auto; } .verdict .a { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Tables */
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--plate); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 13px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--display); font-weight: 500; color: var(--muted); font-size: 0.84rem; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.hi { font-weight: 600; }
+
+/* Bars */
+.bars { display: flex; flex-direction: column; gap: 9px; }
+.bar-row { display: grid; grid-template-columns: 10.5rem 1fr 3.4rem; gap: 12px; align-items: center; font-family: var(--display); font-size: 0.95rem; }
+.bar-row .track { height: 14px; background: var(--mark); border-radius: 3px; position: relative; overflow: hidden; }
+.bar-row .track i { position: absolute; inset: 0 auto 0 0; background: var(--c, var(--water)); border-radius: 3px; }
+.bar-row .track .mid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+.bar-row b { text-align: right; font-variant-numeric: tabular-nums; }
+.bar-row small { display: block; font-family: var(--body); color: var(--muted); font-size: 0.78rem; font-weight: 400; }
+@media (max-width: 480px) { .bar-row { grid-template-columns: 7.5rem 1fr 3rem; } }
+
+/* Boards */
+.figure { display: flex; flex-direction: column; gap: 10px; background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.figure figcaption { font-size: 0.93rem; }
+.boards { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+.bd { display: grid; gap: 2px; font-family: var(--display); }
+.bd .lbl { font-size: 0.68rem; color: var(--muted); display: grid; place-items: center; font-family: var(--mono); }
+.bd .sq { width: var(--cell, 34px); height: var(--cell, 34px); background: var(--tile); border-radius: 3px; display: grid; place-items: center; position: relative; }
+.bd .sq.midz { background: var(--tile-mid); }
+.bd .sq.route { box-shadow: inset 0 0 0 2px var(--route); }
+.bd .sq .step { position: absolute; top: 1px; right: 3px; font-family: var(--mono); font-size: 0.6rem; color: var(--route); font-weight: 500; }
+.bd .sq.num { font-family: var(--mono); font-size: 0.82rem; font-weight: 500; }
+.pc { width: 78%; height: 78%; display: grid; place-items: center; font-size: 0.66rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1; border: 2px solid transparent; }
+.pc.w { color: #1d2422; } .pc.b { color: #fbfcfa; }
+.pc.fire { border-radius: 3px; } .pc.wind { border-radius: 3px; transform: rotate(45deg) scale(0.82); }
+.pc.wind span { transform: rotate(-45deg); }
+.pc.water { border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; } .pc.earth { clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); }
+.pc.wiz { clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); width: 92%; height: 92%; }
+.pc.w.fire { background: #f08a74; } .pc.b.fire { background: #a3301f; }
+.pc.w.wind { background: #f2cf62; } .pc.b.wind { background: #8f6a06; }
+.pc.w.water { background: #8fc0e6; } .pc.b.water { background: #1f5680; }
+.pc.w.earth { background: #d2b28e; } .pc.b.earth { background: #6b4f33; }
+.pc.w.wiz { background: #f4f1e8; border: 0; outline: 1px solid #1d2422; } .pc.b.wiz { background: #1d2422; }
+.pc.w { box-shadow: 0 0 0 1.5px #fbfcfa inset; } .pc.b { box-shadow: 0 0 0 1.5px #1d2422 inset; }
+.pc.stack { outline: 2px dashed var(--ink); outline-offset: 1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.82rem; color: var(--muted); font-family: var(--display); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .swatch { width: 14px; height: 14px; display: inline-block; }
+
+.next { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.next ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; }
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="stack">
+  <span class="eyebrow">Elements · computer playtest · 28 Oct 2026 · about 50,000 games</span>
+  <h1>What the computer learned playing Elements</h1>
+  <p class="lede">The core game is healthy: fair, decisive, with real depth and no unbeatable defence. <strong>Water is the strongest element.</strong> The first, weak bots made it look overwhelming and Fire useless, but a much stronger bot shows every attacking piece matters. If you want the elements even, one small rule change does it: <strong>Water captures only straight</strong>.</p>
+</header>
+
+<section class="howto" aria-label="How to read this page">
+  <p><strong>Score</strong> counts a win as 1 and a draw as ½, so 50% means even. Numbers in brackets are the 95% uncertainty range: if it includes 50%, the games can't tell the two sides apart.</p>
+  <p>One <strong>move</strong> means one player's turn. All results are for bots that look 2–3 moves ahead, roughly a careful club player who doesn't plan. Treat anything that looks like a problem as a hint to try on the real board.</p>
+  <div class="legend" aria-label="Piece legend">
+    <span><i class="swatch pc w fire" style="width:14px;height:14px"></i>Fire</span>
+    <span><i class="swatch pc w wind" style="width:12px;height:12px"></i>Wind</span>
+    <span><i class="swatch pc w water" style="width:14px;height:14px"></i>Water</span>
+    <span><i class="swatch pc w earth" style="width:14px;height:14px"></i>Earth</span>
+    <span>light = White, dark = Black, number = size, dashed ring = stack, blue frame = route</span>
+  </div>
+</section>
+
+<section class="stack" aria-labelledby="sum">
+  <h2 id="sum">The answers</h2>
+  <div class="verdicts">
+    <div class="verdict"><span class="q">Does White win too often?</span><span class="a">White scores 52–56% between equal players. The same bots give chess 48%, so the edge is a little larger than chess's, but small.</span><span class="pill ok">healthy</span></div>
+    <div class="verdict"><span class="q">How many draws?</span><span class="a">1 game in 4 to 1 in 3, mostly by the 50-move rule. More than chess at the same level (10%).</span><span class="pill warn">keep an eye on it</span></div>
+    <div class="verdict"><span class="q">Do games end?</span><span class="a">Every one did, typically after 45–55 moves each.</span><span class="pill ok">healthy</span></div>
+    <div class="verdict"><span class="q">How do they end?</span><span class="a">Between strong bots, 40–50% checkmate and 25–30% elimination; the rest drawn.</span><span class="pill ok">both matter</span></div>
+    <div class="verdict"><span class="q">Does skill matter?</span><span class="a">Each step up the ladder wins 92–99%, and the weaker player never won.</span><span class="pill ok">very good</span></div>
+    <div class="verdict"><span class="q">An unbeatable Earth wall?</span><span class="a">No. The Turtle and both fortresses lose clearly.</span><span class="pill ok">healthy</span></div>
+    <div class="verdict"><span class="q">A dominant strategy?</span><span class="a">None. Rushing, hunting and turtling all do worse than balanced play.</span><span class="pill ok">healthy</span></div>
+    <div class="verdict"><span class="q">Forced quick wins?</span><span class="a">None from the default formation. The quickest win in 500 games took 9 moves each.</span><span class="pill ok">healthy</span></div>
+    <div class="verdict"><span class="q">Pieces too strong or useless?</span><span class="a">Water leads and gives two thirds of checkmates. With strong play, losing Fire 3 clearly hurts too.</span><span class="pill warn">Water leads</span></div>
+    <div class="verdict"><span class="q">Does combining matter?</span><span class="a">Very much. A player who never combines scores 23%.</span><span class="pill ok">healthy</span></div>
+    <div class="verdict"><span class="q">Exact range?</span><span class="a">Just as fair, but games run twice as long and draws rise to 43–59%.</span><span class="pill warn">plays worse</span></div>
+    <div class="verdict"><span class="q">Default formation?</span><span class="a">It beats random setups and both fortresses. A search through about 100 formations found none better, but several just as good.</span><span class="pill ok">good</span></div>
+    <div class="verdict"><span class="q">Can a formation tame Water?</span><span class="a">No. Moving Fire forward changes nothing, and Earth beside the Wizard makes Water far more dangerous.</span><span class="pill warn">not by formation</span></div>
+    <div class="verdict"><span class="q">Can a rule change tame Water?</span><span class="a">Yes. With "Water captures only straight", Water, Wind and Fire pull about equal weight and the game stays fair. Games get about a quarter longer, with a few more draws.</span><span class="pill ok">worth trying</span></div>
+    <div class="verdict"><span class="q">Can these results be trusted?</span><span class="a">Checked on chess, where the answers are known: piece rankings come out right, exact sizes are understated, and White's edge can't be read off directly.</span><span class="pill ok">rankings: yes</span></div>
+    <div class="verdict"><span class="q">A stronger bot?</span><span class="a">Deep, built from chess-engine techniques with learned piece values, rates about 430 points above Thinker at a sixth of its time.</span><span class="pill ok">new standard</span></div>
+  </div>
+</section>
+
+<section class="stack" aria-labelledby="s1">
+  <span class="eyebrow">1 · Balance</span>
+  <h2 id="s1">White's edge is chess-sized</h2>
+  <div class="bars" role="img" aria-label="White's score between equal players: Careful 52%, Careful with other values 54%, Careful with same random formation 53%, Thinker 56%">
+    <div class="bar-row"><span>Careful vs Careful<small>400 games · 47–56</small></span><div class="track"><i style="width:52%"></i><span class="mid"></span></div><b>52%</b></div>
+    <div class="bar-row"><span>other piece values<small>200 games · 47–60</small></span><div class="track"><i style="width:54%"></i><span class="mid"></span></div><b>54%</b></div>
+    <div class="bar-row"><span>same random formation<small>300 games · 47–58</small></span><div class="track"><i style="width:53%"></i><span class="mid"></span></div><b>53%</b></div>
+    <div class="bar-row"><span>Thinker vs Thinker<small>100 games · 47–66</small></span><div class="track"><i style="width:56%"></i><span class="mid"></span></div><b>56%</b></div>
+  </div>
+  <p class="muted">White's score between equal players. The thin line marks 50%.</p>
+  <p>In chess White scores about 52–56% too, so moving first gives a small edge and nothing more. The random-formation row shows the edge comes from the first move, not from the default formation. One thing to watch: the edge looks bigger for the stronger players (56%). With only 100 Thinker games that may be luck, but in chess the edge shrinks as players get stronger.</p>
+</section>
+
+<section class="stack" aria-labelledby="s2">
+  <span class="eyebrow">2 · Endings</span>
+  <h2 id="s2">Every game ends, and checkmate decides most</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Players</th><th>Moves each</th><th>Checkmate</th><th>Elimination</th><th>Repetition</th><th>50-move rule</th></tr></thead>
+    <tbody>
+      <tr><td>Random</td><td class="n">167</td><td class="n">12%</td><td class="n">43%</td><td class="n">0%</td><td class="n">45%</td></tr>
+      <tr><td>Greedy</td><td class="n">74</td><td class="n">3%</td><td class="n hi">85%</td><td class="n">0%</td><td class="n">12%</td></tr>
+      <tr><td>Careful</td><td class="n">55</td><td class="n hi">72%</td><td class="n">5%</td><td class="n">14%</td><td class="n">9%</td></tr>
+      <tr><td>Thinker</td><td class="n">45</td><td class="n hi">61%</td><td class="n">18%</td><td class="n">9%</td><td class="n">12%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Players who only grab pieces win by elimination. Once they defend their pieces, removing all nine capturing pieces takes too long, and the Wizard falls first.</p>
+  <p>There's real drama. In 45% of decided Careful games, the winner was behind by at least a small piece at some point, and in 25% by a big one.</p>
+</section>
+
+<section class="stack" aria-labelledby="s3">
+  <span class="eyebrow">3 · Skill</span>
+  <h2 id="s3">Thinking further ahead always pays</h2>
+  <div class="bars" role="img" aria-label="Stronger player's score: Greedy vs Random 99%, Careful vs Greedy 99%, Thinker vs Careful 96%">
+    <div class="bar-row"><span>Greedy vs Random<small>400 games</small></span><div class="track"><i style="width:99%"></i></div><b>99%</b></div>
+    <div class="bar-row"><span>Careful vs Greedy<small>200 games</small></span><div class="track"><i style="width:99%"></i></div><b>99%</b></div>
+    <div class="bar-row"><span>Thinker vs Careful<small>100 games</small></span><div class="track"><i style="width:96%"></i></div><b>96%</b></div>
+  </div>
+  <p>The weaker player never won a game. Game designers use exactly this test for depth, and Elements passes it at every step we could measure: the "easy to learn, hard to master" sign.</p>
+</section>
+
+<section class="stack" aria-labelledby="s4">
+  <span class="eyebrow">4 · Pieces</span>
+  <h2 id="s4">Water is the star, Fire the passenger</h2>
+  <p>To measure each piece, Careful played the default formation with that piece removed, 80 games per piece. The number on each square is the score of the side <strong>missing</strong> that piece: 50 means losing it doesn't matter, and lower means the piece matters more (±10).</p>
+  <figure class="figure">
+    <div class="boards" id="handicap"></div>
+    <figcaption>Left: White's default formation. Right: the score without each piece. Water 3 (g2) is worth the most by far. Removing any Fire (d1, f1, f2) makes no measurable difference.</figcaption>
+  </figure>
+  <div class="bars" role="img" aria-label="Captures per game by element, Careful players: Water 3.07, Wind 1.43, Fire 0.55, Wizard 0.43">
+    <div class="bar-row" style="--c: var(--water)"><span>Water</span><div class="track"><i style="width:69%"></i></div><b>3.07</b></div>
+    <div class="bar-row" style="--c: var(--wind)"><span>Wind</span><div class="track"><i style="width:32%"></i></div><b>1.43</b></div>
+    <div class="bar-row" style="--c: var(--fire)"><span>Fire</span><div class="track"><i style="width:12%"></i></div><b>0.55</b></div>
+    <div class="bar-row" style="--c: var(--muted)"><span>Wizard</span><div class="track"><i style="width:10%"></i></div><b>0.43</b></div>
+  </div>
+  <p class="muted">Captures per game by element, Careful from the default formation (a stack's capture is split between its two elements). With Thinker, Water makes 4.42 captures a game and Fire 1.77.</p>
+  <h3>Is Fire weak, or just badly placed?</h3>
+  <p>To find out, both sides got the <strong>same random formation</strong>, a new one every game, and one side was missing one piece (100 games per piece). Now every piece starts in all sorts of places.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Score without…</th><th>Size 3</th><th>Size 2</th><th>Size 1</th></tr></thead>
+    <tbody>
+      <tr><td>Water</td><td class="n hi">25%</td><td class="n">45%</td><td class="n">42%</td></tr>
+      <tr><td>Wind</td><td class="n hi">38%</td><td class="n">48%</td><td class="n">45%</td></tr>
+      <tr><td>Earth</td><td class="n">45%</td><td class="n">42%</td><td class="n">49%</td></tr>
+      <tr><td>Fire</td><td class="n hi">50%</td><td class="n">45%</td><td class="n">50%</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Fire is weak wherever it starts.</strong> Losing Fire 3 still makes no difference, while losing Water 3 or Wind 3 clearly does. Fire isn't idle: it gave 16% of the checkmates in these games and captured about one piece per game. But that's work the other pieces would have done anyway. Section 9 shows why: Water does Fire's job, and does it better.</p>
+
+  <h3>How the Wizard falls: 78% to Water</h3>
+  <div class="scroll"><table>
+    <thead><tr><th>How the mating piece got there</th><th>Careful mates (287)</th></tr></thead>
+    <tbody>
+      <tr><td>Water, straight along its column</td><td class="n">70</td></tr>
+      <tr><td>Water, sliding along the board edge</td><td class="n">69</td></tr>
+      <tr><td>Water, bending around its own side's Earth</td><td class="n">61</td></tr>
+      <tr><td>Water, bending around the defender's Earth</td><td class="n">25</td></tr>
+      <tr><td>Fire</td><td class="n">31</td></tr>
+      <tr><td>Wind</td><td class="n">31</td></tr>
+    </tbody>
+  </table></div>
+  <p>Half of all mates (145 of 287) catch the Wizard on its own back row. Three typical patterns:</p>
+
+  <figure class="figure">
+    <div class="boards" id="edge"></div>
+    <figcaption><strong>Along the edge.</strong> Black's Water + Wind stack has just taken White's Fire 2 on g1. It now attacks e1 along the bottom edge (g1 → f1 → e1). The Wizard is boxed in by its own pieces, and nothing can block f1.</figcaption>
+  </figure>
+  <figure class="figure">
+    <div class="boards" id="own"></div>
+    <figcaption><strong>Around the defender's own Earth.</strong> Thinker's quickest win: Black after 9 moves each. Black combines Water 3 onto Wind 3 on e4, and the stack bends around <em>White's own</em> Earth 3 on e3 (e4 → f3 → e2 → e1). White's Earth stands guard against Fire and Wind, but for Water it's a turning post.</figcaption>
+  </figure>
+  <figure class="figure">
+    <div class="boards" id="ramp"></div>
+    <figcaption><strong>Earth as a ramp.</strong> The attacker walks its own Earth up next to the enemy Wizard. Black's Earth 2 on d4 lets Black's stack on d3 step sideways to c3. This Wizard wandered out too far, a bot weakness, but the pattern is real.</figcaption>
+  </figure>
+  <p><strong>In short:</strong> Earth blocks Fire and Wind, but gives Water a way around, and so does the board edge. Water reaches a Wizard from directions no other piece can. This matches your own tactical example in the spec, where an Earth block is what lets Water capture. The computer says it's the most important pattern in the game.</p>
+</section>
+
+<section class="stack" aria-labelledby="s5">
+  <span class="eyebrow">5 · Combining</span>
+  <h2 id="s5">Combining matters, and one combo stands out</h2>
+  <div class="bars" role="img" aria-label="Score against Careful: Never-combiner 23%, Combiner 51%">
+    <div class="bar-row" style="--c: var(--fire)"><span>Never combines<small>16–32</small></span><div class="track"><i style="width:23%"></i><span class="mid"></span></div><b>23%</b></div>
+    <div class="bar-row"><span>Always combines<small>41–61</small></span><div class="track"><i style="width:51%"></i><span class="mid"></span></div><b>51%</b></div>
+  </div>
+  <p>Never combining loses badly, and combining more than Careful does gains nothing. So combining earns its place without being automatic.</p>
+  <figure class="figure">
+    <div class="boards" id="combo"></div>
+    <figcaption><strong>The favourite combination: Water 1 onto Wind 3.</strong> A stack moves at its larger size, so the little Water 1 becomes a Water that moves 3, and the stack can also move as Wind 3. It's the most common combination by far and one of White's most common first moves. That's why removing Water 1 costs so much in the handicap test.</figcaption>
+  </figure>
+</section>
+
+<section class="stack" aria-labelledby="s6">
+  <span class="eyebrow">6 · Cheat hunt</span>
+  <h2 id="s6">No unbeatable setup, no dominant style</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>Style player</th><th>Score vs Careful</th><th>What it shows</th></tr></thead>
+    <tbody>
+      <tr><td>Turtle (never crosses the middle)</td><td class="n">26% (18–35)</td><td>Hiding doesn't work. 42% draws, but far more losses than wins</td></tr>
+      <tr><td>Turtle against Thinker</td><td class="n">4% (1–15)</td><td>A stronger attacker breaks it almost every time</td></tr>
+      <tr><td>Turtle in the corner fortress</td><td class="n">27% (19–36)</td><td>The fortress doesn't save it either</td></tr>
+      <tr><td>Rusher (always forward)</td><td class="n">32% (24–42)</td><td>All-out attack is worse than balanced play</td></tr>
+      <tr><td>Hunter (only the Wizard)</td><td class="n">40% (31–50)</td><td>Same</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="figure">
+    <div class="boards" id="fortress"></div>
+    <figcaption><strong>The corner fortress from the plan.</strong> Each side has only three Earth pieces, and Water bends around them. It scores 41% against the default formation, mostly by drawing.</figcaption>
+  </figure>
+  <p><strong>One catch:</strong> a careless setup can lose at once. In 3 of 300 games with random formations, the game was over within 3 moves each. Once White gave checkmate on its very first move: a Water 3 moved up the edge column, and from there it attacked a Wizard boxed in by its own pieces. With alternating, visible placement a player would see it coming, but a new player might not.</p>
+</section>
+
+<section class="stack" aria-labelledby="s7">
+  <span class="eyebrow">7 · Exact range</span>
+  <h2 id="s7">Just as fair, but slower and drawish</h2>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th>Up to N (normal)</th><th>Exact range</th></tr></thead>
+    <tbody>
+      <tr><td>White's score, Careful</td><td class="n">52%</td><td class="n">50%</td></tr>
+      <tr><td>White's score, Thinker</td><td class="n">56%</td><td class="n">53%</td></tr>
+      <tr><td>Thinker vs Careful</td><td class="n">96%</td><td class="n">92%</td></tr>
+      <tr><td>Draws, Careful</td><td class="n">23%</td><td class="n hi">59%</td></tr>
+      <tr><td>Draws, Thinker</td><td class="n">21%</td><td class="n hi">43%</td></tr>
+      <tr><td>Moves each, Careful</td><td class="n">55</td><td class="n hi">110</td></tr>
+    </tbody>
+  </table></div>
+  <p>Most of the extra draws come from the 50-move rule: nobody can make progress. The likely reason is that pieces can't stop short, so it's much harder to put one exactly where it attacks. By the usual yardstick (fair, decisive, a good length), exact range plays worse at this level. People plan further ahead than these bots, so it might feel different at the table.</p>
+</section>
+
+<section class="stack" aria-labelledby="s8">
+  <span class="eyebrow">8 · Formations</span>
+  <h2 id="s8">Your default formation is good</h2>
+  <div class="bars" role="img" aria-label="Score against the default formation: random 31%, centre bunker 35%, corner fortress 41%">
+    <div class="bar-row"><span>A random formation<small>200 games · 25–37</small></span><div class="track"><i style="width:31%"></i><span class="mid"></span></div><b>31%</b></div>
+    <div class="bar-row"><span>Centre bunker<small>100 games · 26–44</small></span><div class="track"><i style="width:35%"></i><span class="mid"></span></div><b>35%</b></div>
+    <div class="bar-row"><span>Corner fortress<small>100 games · 32–51</small></span><div class="track"><i style="width:41%"></i><span class="mid"></span></div><b>41%</b></div>
+  </div>
+  <p class="muted">Each formation's score against your default formation, both played by Careful.</p>
+
+  <h3>Searching for better formations</h3>
+  <p>A search tried about 100 formations in about 5,000 games: variations of your default, random setups, and hand-made ones with Fire moved forward. Each round it kept the best eight and varied them again. At the end the top six played each other and your default.</p>
+  <p><strong>Nothing beats your default.</strong> It scored best in the final round robin (53%), and the six finalists scored 45–51%. Early on some formations scored up to 67%, but that was luck from only 30 games. What the search does show is that <strong>many formations are about equally good</strong>: a set of good starting formations is easy to offer, and a player's setup won't decide the game. All six finalists moved Fire 2 forward, yet Fire still made only 0.4–0.75 captures per game, against Water's 2.0–2.4.</p>
+  <figure class="figure">
+    <div class="boards" id="fireforward"></div>
+    <figcaption><strong>Fire forward</strong>, one of the search's finalists: about as strong as your default, but Fire still hardly captures.</figcaption>
+  </figure>
+
+  <h3>Can a formation hold off Water?</h3>
+  <p>Each formation played 150 games against your default. The table counts how often <strong>the formation under test</strong> was checkmated.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Formation</th><th>Score</th><th>Times mated</th><th>…by Water</th><th>Pieces lost to Water per game</th></tr></thead>
+    <tbody>
+      <tr><td>Your default (against itself)</td><td class="n">56%</td><td class="n">42</td><td class="n">34</td><td class="n">1.35</td></tr>
+      <tr><td>Fire forward</td><td class="n">52%</td><td class="n">51</td><td class="n">42</td><td class="n">1.34</td></tr>
+      <tr><td>Fire forward 2</td><td class="n">49%</td><td class="n">52</td><td class="n">44</td><td class="n">1.61</td></tr>
+      <tr><td>Earth shield</td><td class="n hi">29%</td><td class="n hi">86</td><td class="n hi">68</td><td class="n hi">2.26</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="figure">
+    <div class="boards" id="shield"></div>
+    <figcaption><strong>The Earth shield</strong> is the obvious defence against edge slides: Earth on both sides of the Wizard, where nothing can capture it. It backfires badly. The Earth takes the Wizard's own escape squares and gives enemy Water posts to bend around, and once it steps away the edge is open again. It was mated twice as often as your default.</figcaption>
+  </figure>
+  <p><strong>So Water's strength isn't a formation problem.</strong> No formation we tried makes the enemy Water less dangerous, and the one built to stop it is the worst of all.</p>
+</section>
+
+<section class="stack" aria-labelledby="s9">
+  <span class="eyebrow">9 · Water rules</span>
+  <h2 id="s9">One rule change evens out the elements</h2>
+  <p>Two variants, both switchable in the rules:</p>
+  <ul class="plain">
+    <li><strong>No edge slide:</strong> Water can't turn along the board edge, only around Earth.</li>
+    <li><strong>Straight captures:</strong> Water still flows and bends around Earth to get somewhere, but the step that lands on an enemy piece must be a straight flow along the column.</li>
+  </ul>
+  <figure class="figure">
+    <div class="boards" id="straight"></div>
+    <figcaption>Left: normal rules, Water bends around Earth onto the Wizard. Right: with straight captures, Water has to arrive moving up its column.</figcaption>
+  </figure>
+  <div class="scroll"><table>
+    <thead><tr><th>Equal Careful players</th><th>Normal</th><th>No edge slide</th><th>Straight captures</th><th>Both</th></tr></thead>
+    <tbody>
+      <tr><td>White's score</td><td class="n">52%</td><td class="n">53%</td><td class="n hi">54%</td><td class="n">56%</td></tr>
+      <tr><td>Draws</td><td class="n">23%</td><td class="n">30%</td><td class="n hi">24%</td><td class="n">31%</td></tr>
+      <tr><td>Moves each</td><td class="n">55</td><td class="n">69</td><td class="n hi">74</td><td class="n">84</td></tr>
+      <tr><td>Checkmates by Water</td><td class="n">78%</td><td class="n">74%</td><td class="n hi">40%</td><td class="n">32%</td></tr>
+      <tr><td>…by Fire / by Wind</td><td class="n">11% / 11%</td><td class="n">12% / 14%</td><td class="n hi">31% / 29%</td><td class="n">35% / 35%</td></tr>
+      <tr><td>Score without Water 3</td><td class="n">17%</td><td class="n">32%</td><td class="n hi">38%</td><td class="n">32%</td></tr>
+      <tr><td>Score without Wind 3</td><td class="n">31%</td><td class="n">29%</td><td class="n hi">37%</td><td class="n">36%</td></tr>
+      <tr><td>Score without Fire 3</td><td class="n">49%</td><td class="n">45%</td><td class="n hi">41%</td><td class="n">39%</td></tr>
+      <tr><td>Thinker vs Careful</td><td class="n">96%</td><td class="n">94%</td><td class="n hi">100%</td><td class="n">95%</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Straight captures even out the elements.</strong> Water, Wind and Fire each give about a third of the checkmates, and their big pieces are worth about the same. For the first time, losing Fire 3 costs something. So Fire was never broken: Water's bent and sideways captures simply did its job better. <strong>No edge slide alone is a small fix:</strong> Water just bends around the attacker's own Earth instead, and still gives three quarters of the checkmates.</p>
+  <h3>The strongest bots</h3>
+  <p>Thinker almost always picks its single best move, so it can play the same game again and again. Under straight captures it did: all 50 games opened with the same Wind raid, and Black seemed to win almost every one. So these games start with one random move per side.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Thinker vs Thinker, random first moves</th><th>Normal (60 games)</th><th>Straight captures (200 games)</th></tr></thead>
+    <tbody>
+      <tr><td>White's score</td><td class="n">55% (42–67)</td><td class="n hi">52% (45–59)</td></tr>
+      <tr><td>Draws</td><td class="n">23%</td><td class="n hi">34%</td></tr>
+      <tr><td>Moves each</td><td class="n">49</td><td class="n">62</td></tr>
+      <tr><td>Won by checkmate / elimination</td><td class="n">52% / 25%</td><td class="n hi">31% / 36%</td></tr>
+      <tr><td>Checkmates by Water</td><td class="n">84%</td><td class="n">53%</td></tr>
+    </tbody>
+  </table></div>
+  <p>A first batch of 60 games had White at 37%. The 200 fresh games put White back at 52%, so that was luck. Between the strongest bots the variant costs a little, with more draws and longer games. It also makes <strong>elimination a real second way to win</strong>, as common as checkmate.</p>
+  <p><strong>Recommendation:</strong> try straight captures at the table. It keeps Water's signature move and stops it attacking around corners. It's easy to say: <em>Water moves like a river, but strikes straight.</em></p>
+</section>
+
+<section class="stack" aria-labelledby="s10">
+  <span class="eyebrow">10 · A stronger bot</span>
+  <h2 id="s10">Deep: chess-engine techniques, learned piece values</h2>
+  <p>Careful and Thinker look a fixed 2 or 3 moves ahead with guessed piece values. <strong>Deep</strong> uses the standard techniques of chess engines:</p>
+  <ul class="plain">
+    <li>It looks one move deeper at a time until its budget runs out.</li>
+    <li>It remembers positions it has already searched.</li>
+    <li>It tries the most promising moves first.</li>
+    <li>It follows captures and checks to the end of its look-ahead.</li>
+    <li>It treats a repeated position as a draw.</li>
+  </ul>
+  <p>Its piece values are <strong>learned</strong>: from 4,000 games of Deep against itself, the values that best predict who went on to win. Relative to the average attacking piece (= 1):</p>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th>Size 1</th><th>Size 2</th><th>Size 3</th></tr></thead>
+    <tbody>
+      <tr><td>Water</td><td class="n">0.7</td><td class="n">1.1–1.5</td><td class="n hi">2.7</td></tr>
+      <tr><td>Wind</td><td class="n">0.2–0.3</td><td class="n">0.4–0.7</td><td class="n">1.4</td></tr>
+      <tr><td>Fire</td><td class="n">0.3–0.4</td><td class="n">0.6</td><td class="n">1.2</td></tr>
+    </tbody>
+  </table></div>
+  <div class="bars" role="img" aria-label="Ratings: Careful 1000, Thinker 1256, Deep 2k 1425, Deep 2k learned values 1690, Deep 20k learned values 1942">
+    <div class="bar-row"><span>Careful<small>5 ms a move</small></span><div class="track"><i style="width:51%"></i></div><b>1000</b></div>
+    <div class="bar-row"><span>Thinker<small>44 ms</small></span><div class="track"><i style="width:65%"></i></div><b>1256</b></div>
+    <div class="bar-row"><span>Deep 2k<small>7 ms, guessed values</small></span><div class="track"><i style="width:73%"></i></div><b>1425</b></div>
+    <div class="bar-row"><span>Deep 2k, learned<small>7 ms</small></span><div class="track"><i style="width:87%"></i></div><b>1690</b></div>
+    <div class="bar-row"><span>Deep 20k, learned<small>62 ms</small></span><div class="track"><i style="width:100%"></i></div><b>1942</b></div>
+  </div>
+  <p class="muted">Ratings on the chess Elo scale from a round robin, Careful fixed at 1000. 200 points apart means the stronger bot scores about 76%.</p>
+  <p>Learned values gave the biggest single gain. Deep 2k with learned values is as fast as Careful, and Thinker scores only 5% against it.</p>
+</section>
+
+<section class="stack" aria-labelledby="s11">
+  <span class="eyebrow">11 · Rechecked</span>
+  <h2 id="s11">The key tests again, with the strong bot</h2>
+  <p>Colours, both handicap tests and the Water variants, rerun with Deep 2k with learned values: 6,000 games. Where it disagrees with the weak bots, trust this section.</p>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th>Careful</th><th>Deep 2k, learned</th></tr></thead>
+    <tbody>
+      <tr><td>White's score</td><td class="n">52%</td><td class="n hi">53–56%</td></tr>
+      <tr><td>Draws</td><td class="n">23%</td><td class="n">24–33%</td></tr>
+      <tr><td>Won by checkmate / elimination</td><td class="n">72% / 5%</td><td class="n hi">39–52% / 24–32%</td></tr>
+      <tr><td>Checkmates by Water / Fire / Wind</td><td class="n">78 / 11 / 11%</td><td class="n hi">65–72 / 24–29 / 4–8%</td></tr>
+      <tr><td>Captures per game: Water / Wind / Fire</td><td class="n">3.1 / 1.4 / 0.6</td><td class="n hi">3.1 / 2.8 / 2.1</td></tr>
+    </tbody>
+  </table></div>
+  <figure class="figure">
+    <div class="boards" id="handicap2"></div>
+    <figcaption>Score without each piece, default formation. Left: Careful. Right: Deep 2k with learned values. With strong play, Fire 3 (d1) matters: 24%, against 49% before. Wind 3 (b3) is worth as much as Water 3 (g2).</figcaption>
+  </figure>
+  <div class="scroll"><table>
+    <thead><tr><th>Deep 2k, learned</th><th>Normal</th><th>No edge slide</th><th>Straight captures</th><th>Both</th></tr></thead>
+    <tbody>
+      <tr><td>White's score</td><td class="n">56%</td><td class="n">57%</td><td class="n hi">54%</td><td class="n">54%</td></tr>
+      <tr><td>Draws</td><td class="n">33%</td><td class="n">40%</td><td class="n hi">37%</td><td class="n">43%</td></tr>
+      <tr><td>Moves each</td><td class="n">54</td><td class="n">63</td><td class="n hi">68</td><td class="n">68</td></tr>
+      <tr><td>Checkmates by Water</td><td class="n">65%</td><td class="n">50%</td><td class="n hi">35%</td><td class="n">35%</td></tr>
+      <tr><td>Score without Water 3 / Fire 3 / Wind 3</td><td class="n">11 / 24 / 18</td><td class="n">16 / 30 / 14</td><td class="n hi">20 / 21 / 18</td><td class="n">21 / 17 / 24</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>What holds:</strong> White's edge is chess-sized, Water is the strongest element, and straight captures even the elements out. <strong>What changes:</strong> Fire was never useless; the weak bots couldn't use it. Elimination is a real second way to win. And Water's lead is smaller than it looked, so straight captures is now a fine-tuning choice rather than a fix for a broken piece.</p>
+</section>
+
+<section class="stack" aria-labelledby="s12">
+  <span class="eyebrow">12 · Calibration</span>
+  <h2 id="s12">The same tests on chess</h2>
+  <p>To see how far these methods can be trusted, chess went through the same framework: the same Deep search and the same tests, on a game whose answers are known.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Learned values</th><th>Round 1</th><th>Round 2</th><th>Textbook</th></tr></thead>
+    <tbody>
+      <tr><td>Pawn</td><td class="n">1</td><td class="n">1</td><td class="n">1</td></tr>
+      <tr><td>Knight</td><td class="n">1.7</td><td class="n">2.0</td><td class="n">3</td></tr>
+      <tr><td>Bishop</td><td class="n">1.9</td><td class="n">2.15</td><td class="n">3+</td></tr>
+      <tr><td>Rook</td><td class="n">3.1</td><td class="n">3.5</td><td class="n">5</td></tr>
+      <tr><td>Queen</td><td class="n">4.8</td><td class="n hi">6.2</td><td class="n">9</td></tr>
+    </tbody>
+  </table></div>
+  <p>Starting from a bot that thinks every piece is worth 1, the learning finds the right order, and the right ratios between pieces (queen ÷ rook 1.79, textbook 1.8). Only the pawn comes out too valuable.</p>
+  <div class="bars" role="img" aria-label="Score without the piece. Chess: queen 7%, rook 21%, knight 32%, bishop 35%, pawn 47%. Elements: Water 3 13%, Wind 3 14%, Water 2 18%, Fire 3 24%.">
+    <div class="bar-row" style="--c: var(--muted)"><span>Chess: queen<small>200 games</small></span><div class="track"><i style="width:7%"></i><span class="mid"></span></div><b>7%</b></div>
+    <div class="bar-row" style="--c: var(--water)"><span>Elements: Water 3<small>100 games</small></span><div class="track"><i style="width:13%"></i><span class="mid"></span></div><b>13%</b></div>
+    <div class="bar-row" style="--c: var(--wind)"><span>Elements: Wind 3</span><div class="track"><i style="width:14%"></i><span class="mid"></span></div><b>14%</b></div>
+    <div class="bar-row" style="--c: var(--muted)"><span>Chess: rook</span><div class="track"><i style="width:21%"></i><span class="mid"></span></div><b>21%</b></div>
+    <div class="bar-row" style="--c: var(--fire)"><span>Elements: Fire 3</span><div class="track"><i style="width:24%"></i><span class="mid"></span></div><b>24%</b></div>
+    <div class="bar-row" style="--c: var(--muted)"><span>Chess: knight</span><div class="track"><i style="width:32%"></i><span class="mid"></span></div><b>32%</b></div>
+    <div class="bar-row" style="--c: var(--muted)"><span>Chess: bishop</span><div class="track"><i style="width:35%"></i><span class="mid"></span></div><b>35%</b></div>
+    <div class="bar-row" style="--c: var(--muted)"><span>Chess: pawn</span><div class="track"><i style="width:47%"></i><span class="mid"></span></div><b>47%</b></div>
+  </div>
+  <p class="muted">Score of the side missing the piece, same bot in both games (Deep 2k with learned values). 50% means losing it doesn't matter.</p>
+  <p><strong>A dominant piece is normal.</strong> Losing the queen hurts chess more than losing Water 3 hurts Elements. Elements seems to make up for a missing piece better: Wind 3 and Water 2 take over part of Water 3's job.</p>
+  <p><strong>What chess says about the method:</strong></p>
+  <ul class="plain">
+    <li>Rankings and rough ratios of pieces come out right, so the Elements rankings can be trusted.</li>
+    <li>The sizes of effects are understated: a missing pawn costs strong humans about 100 rating points, these bots about 20.</li>
+    <li>White's edge can't be read off directly: the same bots give chess 48%, against 54–56% among masters. With the same bots, Elements shows 53–56%, so its first-move edge is probably a little larger than chess's.</li>
+    <li>Elements is more drawish than chess at the same level: 24–33% draws against 10%.</li>
+  </ul>
+</section>
+
+<section class="next" aria-labelledby="mean">
+  <h2 id="mean">What this means, and your questions</h2>
+  <ol>
+    <li><strong>The core is healthy:</strong> fair, decisive, deep, no unbeatable defence, and games of a good length. The first-move edge is a little larger than chess's at the same level, and draws more common.</li>
+    <li><strong>Water leads, but every attacking piece matters</strong> with strong play. Formations can't change Water's lead. Straight captures even the elements out, at the cost of longer games and a few more draws, so it's a matter of taste.</li>
+    <li><strong>Both ways to win matter:</strong> checkmate decides about half the games between strong bots, and elimination a quarter to a third.</li>
+    <li><strong>Exact range makes the game slower and more drawish.</strong> It stays off by default.</li>
+  </ol>
+  <p>These are recorded as open questions 6–9 in <code>GAME_SPEC.md</code>, plus setup safety and bot difficulty in <code>PRODUCT_BRIEF.md</code>. The biggest one is a rule to decide: whether Water may capture at the end of a bent route. The computer's answer is to try "straight captures" at the table.</p>
+</section>
+
+<section class="stack" aria-labelledby="lim">
+  <span class="eyebrow">Limits</span>
+  <h2 id="lim">What these results can't tell us</h2>
+  <ul class="plain">
+    <li><strong>Bot strength.</strong> Section 11 shows how much it matters: "Fire is useless" came from weak bots. Deep is much stronger but still doesn't plan, so a strong human may see things it can't.</li>
+    <li><strong>No placement phase.</strong> Games start from finished formations.</li>
+    <li><strong>Sample sizes.</strong> Most Thinker results are 50–100 games each, so differences under about 10 points could be luck. Section 9 shows how easily: 60 games said 37%, and 200 said 52%.</li>
+    <li><strong>Bots repeat themselves.</strong> A bot that always picks its best move can replay one game over and over, so the Thinker games in section 9 start with random first moves.</li>
+    <li><strong>Piece values:</strong> Careful and Thinker use guesses; Deep's are learned from games.</li>
+  </ul>
+</section>
+
+<footer>
+  <p>Full write-up with every number: <code>playtest/FINDINGS.md</code>. How the players work and where the methods come from: <code>playtest/README.md</code> and <code>docs/research/automated-playtesting.md</code>.</p>
+</footer>
+
+</div>
+
+<script>
+// Board diagrams. Pieces: upper case = White, lower case = Black; letters F W R E Z, then size; two letters = a stack.
+(function () {
+  const ELEMENT = { F: 'fire', W: 'wind', R: 'water', E: 'earth', Z: 'wiz' };
+  function piece(code) {
+    const white = code === code.toUpperCase();
+    const letters = code.replace(/\d/g, '').toUpperCase();
+    const size = code.replace(/\D/g, '');
+    const el = document.createElement('div');
+    el.className = 'pc ' + (white ? 'w ' : 'b ') + ELEMENT[letters[0]] + (letters.length > 1 ? ' stack' : '');
+    const t = document.createElement('span');
+    t.textContent = letters === 'Z' ? '' : letters + size;
+    el.appendChild(t);
+    return el;
+  }
+  // opts: files 'a'..'i' range, ranks [top, bottom], pieces {sq: code}, route [sq...], numbers {sq: text}, cell px
+  function board(opts) {
+    const files = 'abcdefghi'.slice('abcdefghi'.indexOf(opts.files[0]), 'abcdefghi'.indexOf(opts.files[1]) + 1);
+    const [top, bottom] = opts.ranks;
+    const g = document.createElement('div');
+    g.className = 'bd';
+    g.style.gridTemplateColumns = `14px repeat(${files.length}, var(--cell, 34px))`;
+    if (opts.cell) g.style.setProperty('--cell', opts.cell + 'px');
+    g.setAttribute('role', 'img');
+    g.setAttribute('aria-label', opts.label);
+    for (let r = top; r >= bottom; r--) {
+      const l = document.createElement('div'); l.className = 'lbl'; l.textContent = r; g.appendChild(l);
+      for (const f of files) {
+        const s = f + r, cell = document.createElement('div');
+        cell.className = 'sq' + (r >= 4 && r <= 6 ? ' midz' : '');
+        const ri = (opts.route || []).indexOf(s);
+        if (ri > 0) { cell.classList.add('route'); const st = document.createElement('span'); st.className = 'step'; st.textContent = ri; cell.appendChild(st); }
+        if (opts.numbers && opts.numbers[s]) { cell.classList.add('num'); cell.appendChild(document.createTextNode(opts.numbers[s])); }
+        else if (opts.pieces[s]) cell.appendChild(piece(opts.pieces[s]));
+        g.appendChild(cell);
+      }
+    }
+    g.appendChild(document.createElement('div'));
+    for (const f of files) { const l = document.createElement('div'); l.className = 'lbl'; l.textContent = f; g.appendChild(l); }
+    return g;
+  }
+  const put = (id, ...boards) => { const host = document.getElementById(id); boards.forEach(b => host.appendChild(board(b))); };
+  const parse = rows => { // rows: { rank: 'a b c ... i' tokens, '.' = empty }
+    const out = {};
+    for (const [rank, line] of Object.entries(rows)) line.trim().split(/\s+/).forEach((t, i) => { if (t !== '.') out['abcdefghi'[i] + rank] = t; });
+    return out;
+  };
+  const small = window.matchMedia('(max-width: 480px)').matches ? 28 : 34;
+
+  const DEFAULT = parse({ 3: '. W3 E1 . E3 . E2 W2 .', 2: '. . R1 W1 R2 F1 R3 . .', 1: '. . . F3 Z F2 . . .' });
+  put('handicap',
+    { files: 'ai', ranks: [3, 1], pieces: DEFAULT, cell: small, label: "White's default formation" },
+    { files: 'ai', ranks: [3, 1], pieces: { e1: 'Z' }, cell: small, label: 'Score without each piece',
+      numbers: { b3: '31', c3: '48', e3: '46', g3: '46', h3: '42', c2: '33', d2: '44', e2: '43', f2: '51', g2: '17', d1: '49', f1: '48' } });
+
+  put('edge', { files: 'ai', ranks: [3, 1], pieces: parse({ 3: '. . E1 R3 . . e2 . .', 2: '. . . W1 FR2 . . . .', 1: '. . . F3 Z . rw3 . .' }),
+    route: ['g1', 'f1', 'e1'], label: 'Checkmate along the edge: Black stack on g1 attacks e1 via f1' });
+
+  put('own', { files: 'ai', ranks: [5, 1], pieces: parse({ 5: '. . . . . . R3 . .', 4: 'W3 . . . rw3 . . E2 .', 3: '. R2 E1 . E3 . . W2 .', 2: '. . R1 . . . F1 . .', 1: '. . W1 F3 Z F2 . . .' }),
+    route: ['e4', 'f3', 'e2', 'e1'], label: "Checkmate around White's own Earth on e3: e4, f3, e2, e1" });
+
+  put('ramp', { files: 'af', ranks: [5, 2], pieces: parse({ 5: '. . . . r3 .', 4: '. E1 RW3 e2 . .', 3: '. . Z rw3 WE3 .', 2: '. . . . R2 F1' }),
+    route: ['d3', 'c3'], label: "Checkmate using Black's own Earth on d4 as a ramp: d3 to c3" });
+
+  put('combo',
+    { files: 'ad', ranks: [3, 2], pieces: parse({ 3: '. W3 E1 .', 2: '. . R1 W1' }), route: ['c2', 'b3'], label: 'Before: Water 1 on c2 next to Wind 3 on b3' },
+    { files: 'ad', ranks: [3, 2], pieces: parse({ 3: '. RW3 E1 .', 2: '. . . W1' }), label: 'After: one stack on b3 moving 3 as Water or Wind' });
+
+  put('fireforward', { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: '. W3 E1 . E3 . E2 W2 .', 2: '. . R1 R2 F2 . R3 F1 .', 1: '. . . F3 Z W1 . . .' }),
+    label: 'Fire forward: Fire 2 on e2 and Fire 1 on h2, Wind 1 on f1' });
+  put('shield', { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: '. W3 F3 . E3 . F2 W2 .', 2: '. . R1 W1 R2 F1 R3 . .', 1: '. . . E1 Z E2 . . .' }),
+    label: 'Earth shield: Earth on d1 and f1 beside the Wizard' });
+  put('handicap2',
+    { files: 'ai', ranks: [3, 1], pieces: { e1: 'Z' }, cell: small, label: 'Careful: score without each piece',
+      numbers: { b3: '31', c3: '48', e3: '46', g3: '46', h3: '42', c2: '33', d2: '44', e2: '43', f2: '51', g2: '17', d1: '49', f1: '48' } },
+    { files: 'ai', ranks: [3, 1], pieces: { e1: 'Z' }, cell: small, label: 'Deep 2k with learned values: score without each piece',
+      numbers: { b3: '14', c3: '50', e3: '41', g3: '40', h3: '36', c2: '23', d2: '28', e2: '18', f2: '50', g2: '13', d1: '24', f1: '41' } });
+  put('straight',
+    { files: 'be', ranks: [3, 1], pieces: { c3: 'E1', d3: 'z', c2: 'R2' }, route: ['c2', 'd3'], label: 'Normal rules: Water on c2 bends around Earth on c3 onto the Wizard on d3' },
+    { files: 'be', ranks: [3, 1], pieces: { c3: 'E1', d3: 'z', d1: 'R2' }, route: ['d1', 'd2', 'd3'], label: 'Straight captures: Water on d1 captures straight up the d column' });
+
+  put('fortress', { files: 'ai', ranks: [3, 1], cell: small, pieces: parse({ 3: 'W3 W2 F2 R3 W1 R2 . R1 .', 2: 'E3 E2 E1 . . . . . .', 1: 'Z F3 F1 . . . . . .' }),
+    label: 'The corner fortress: Wizard on a1 under three Earth' });
+})();
+</script>
+</body>
+</html>

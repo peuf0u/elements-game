@@ -11,3 +11,14 @@ A digital version of **Elements**, an abstract two-player strategy board game (c
 | [PRODUCT_BRIEF.md](PRODUCT_BRIEF.md) | Product and technical decisions (D1…), plus open questions |
 | [docs/research/](docs/research/) | Research behind the decisions: tech stack, architecture, 2D game frameworks |
 | [spike/](spike/) | Throwaway prototype for trying the game on screen (D11); task in [spike/BRIEF.md](spike/BRIEF.md) |
+| [packages/engine/](packages/engine/) | The rules engine of the real app (D7, D8, D13): pure TypeScript, tested against the spec, perft totals and the spike; see its [README](packages/engine/README.md) |
+| [playtest/](playtest/) | Computer players that play the game against each other to test balance (D12); results in [playtest/FINDINGS.md](playtest/FINDINGS.md) |
+
+## Running the tests
+
+Needs Node 24 (it runs TypeScript directly). Run `npm install` once for the type checker, then:
+
+```sh
+npm test            # the engine's rules tests
+npm run typecheck
+```

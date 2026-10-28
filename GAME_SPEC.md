@@ -52,7 +52,7 @@ The designer names them "defensive, middle, attacking zone" ✅ `[11:39]` — pr
 General rules:
 - Every element can move **forwards and backwards**. ✅ `[03:48]`
 - A piece moves **up to N squares**, where N = its size (1–3). ✅ `[05:30]` + *(designer, Q&A)*
-  - 🔧 **Variant "Exact range":** a piece must move **exactly** N squares. The designer wants to playtest this, so the app should support it as a toggle, **off by default**. ✅ *(designer, spike 2026-10-27)* When on, it applies the same way to every piece ✅ *(designer, spike 2026-10-27)*:
+  - 🔧 **Variant "Exact range":** a piece must move **exactly** N squares. Playtested by computer (open question 9) and **not wanted** ✅ *(designer, playtest 2026-10-28)*: it isn't offered in the app. The engine keeps the switch for computer playtests only. The rest of this entry records how it worked. The designer first wanted to playtest it as a toggle, **off by default**. ✅ *(designer, spike 2026-10-27)* When on, it applies the same way to every piece ✅ *(designer, spike 2026-10-27)*:
     - Fire, Wind and Earth move exactly N squares, captures included.
     - Water's route has exactly N steps.
     - A combined piece moves exactly its range (the larger size), whichever element it moves as.
@@ -95,7 +95,10 @@ Further rules:
 - Every step counts toward the range, including steps spent around Earth or along the edge. ✅
 - Once it is no longer next to Earth or on the edge, it can only flow forward or backward. ✅
 - No square is visited twice in one move, and Water can't end where it started. 🟡 (a full loop would need more range than the maximum of 3)
-- Every square on the path must be empty; the **last** step may land on an enemy piece to capture it (not on Earth). 🟡 (chess-like, same as the other pieces)
+- Every square on the path must be empty; the **last** step may land on an enemy piece to capture it (not on Earth). 🟡 (chess-like, same as the other pieces) Still open: the designer wants the computer to compare both versions first (open question 6). ✅ *(designer, playtest 2026-10-28)*
+- Two Water variants for computer playtesting, both **off by default** ✅ *(designer, playtest 2026-10-28)*:
+  - 🔧 **"No edge slide":** Water can't slide along the board edge (step 3 above is gone). Bending around Earth still works.
+  - 🔧 **"Straight captures":** Water may bend and slide to move, but its capturing step must be a straight flow up or down its column. Combining at the end of a bent route is still allowed.
 
 Example: Water size 3 (W) at b2, Earth (E) at c3. Ring around E = ○.
 
@@ -201,6 +204,13 @@ Example: a move that removes the opponent's last capturing piece **and** leaves 
 ## 8. Known balance concerns (from the designer)
 - Wind diagonal lock depends heavily on setup. `[16:49]`
 - Looking for dominant strategies or "too easy to win" tactics through playtesting. `[17:44]`–`[18:03]`
+- **From computer playtesting** (2026-10-28, [playtest/FINDINGS.md](playtest/FINDINGS.md), bots that look 2–3 moves ahead). White's edge is chess-sized (52–56%), about 1 in 4 games is drawn, and no unbeatable defence or forced quick win turned up. Two things stand out:
+  - **Water is by far the strongest element.** It gives about 80% of all checkmates, by bending around Earth (either side's) or sliding along the edge. Removing Water 3 from the default formation drops that side to a 17% score.
+  - **Fire barely matters, in any formation.** Removing any one Fire piece makes no measurable difference, from the default formation or from random ones.
+  - **Formations don't change this.** A search through about 100 formations found none better than the default, and none that holds off Water. Earth beside the Wizard makes Water more dangerous, not less.
+  - **The `waterStraightCapture` variant evens the elements out.** Water, Wind and Fire each give about a third of the checkmates, and losing Fire 3 starts to cost something. It stays fair, with games about a third longer and a few more draws between the strongest bots. `noWaterEdge` alone changes little.
+  - **Rechecked with a much stronger bot** (Deep, [playtest/FINDINGS.md](playtest/FINDINGS.md) §10–§11). White's edge stays small (53–56%; the same bots give chess 48%, so it's a little larger than chess's at this level), and Water still leads (two thirds of checkmates; losing Water 3 hurts most). But "Fire barely matters" was an artifact of weak bots: with strong play, losing Fire 3 drops a side to 24%. Elimination decides a quarter to a third of games.
+  - See open questions 6–9.
 
 ---
 
@@ -209,7 +219,8 @@ Example: a move that removes the opponent's last capturing piece **and** leaves 
 - **Core rules only**: §2–§6 plus the provisional draw rules. ✅ *(designer, Q&A)*
 - The 🧪 mechanics in §7 are left out of v1. Each one is added later as a **variant toggle**, so they can be playtested one at a time.
 - The rules engine should be written with variants in mind from day one. Known toggles so far:
-  - `exactRange`: pieces must move exactly N squares (§3)
+  - `exactRange`: pieces must move exactly N squares (§3). Playtest only, not offered in the app ✅ *(designer, playtest 2026-10-28)*
+  - `noWaterEdge`, `waterStraightCapture`: the two Water experiments (§3)
   - `hiddenSetup`: simultaneous secret formation (§6)
   - later: `hiddenElement`, `castle`, `windDiagonalSwitch`, `turnTimer` (§7)
 
@@ -217,6 +228,29 @@ Example: a move that removes the opponent's last capturing piece **and** leaves 
 
 1. ~~Under the `exactRange` variant, must Water take exactly N steps too?~~ Yes, see §3. ✅ *(designer, spike 2026-10-27)*
 2. Draw rules are provisional chess defaults. Revisit after playtesting.
+   - Computer playtesting (2026-10-28): about 1 in 4 games between equal players is drawn, roughly half by repetition and half by the 50-move rule. With `exactRange` on, the 50-move rule alone ends 44% of games. [playtest/FINDINGS.md](playtest/FINDINGS.md) §2, §7.
+   - With the strong bot, 24–33% of games are drawn, mostly by the 50-move rule. The same bot draws only 10% of chess games, so Elements is more drawish than chess at the same level of play (§11, §12).
 3. Same-element combining is provisionally disallowed. Revisit if a use for it shows up.
 4. Wizard's own restricted starting area: shape and size (ties into the Castle idea).
 5. Names and look of the two sides (currently White/Black from chess), and the visual form of element pieces (currently pyramids). Neither affects the rules.
+
+From computer playtesting (2026-10-28, [playtest/FINDINGS.md](playtest/FINDINGS.md)). None of these block v1:
+
+6. **Water capturing at the end of a bent route.** §3 marks "the last step may land on an enemy piece to capture it" as 🟡 inferred. It decides most games: about 80% of checkmates are given by Water, and about 70% of those bend around Earth or slide along the edge. Can Water capture (and give check) at the end of a route that bent around Earth or along the edge? The designer isn't sure yet and asked for both versions to be compared, along with a "no edge slide" version (the two 🔧 Water variants in §3). ✅ *(designer, playtest 2026-10-28)*
+   - Compared (2026-10-28, [playtest/FINDINGS.md](playtest/FINDINGS.md) §9): with `waterStraightCapture`, Water's share of checkmates drops from 78% to 40%, and Water, Wind and Fire end up about equally valuable. White still scores 54% (52% between the strongest bots). Draws stay at about 1 in 4 between Careful bots but rise to 1 in 3 between Thinker bots, and games run about a third longer (74 moves each instead of 55). Elimination becomes as common as checkmate between Thinker bots (see question 8). `noWaterEdge` alone barely helps: Water switches to bending around the attacker's own Earth. Both together add draws and length for little gain. Recommendation: try `waterStraightCapture` at the table.
+   - Rechecked with the strong bot (§11): Water gives 65% of checkmates under normal rules and 35% with straight captures; losing Water 3 / Fire 3 / Wind 3 costs 11 / 24 / 18% normally and 20 / 21 / 18% with straight captures. Draws go from 33% to 37% and games from 54 to 68 moves each. Water's lead is smaller than the weak bots showed, so straight captures is now a fine-tuning choice rather than a fix for a broken piece.
+   - The designer doesn't like the straight-capture rule and prefers to keep Water as it is; with the strong bot's results, Water's lead is acceptable. `waterStraightCapture` stays a playtest toggle only, off by default. ✅ *(designer, playtest 2026-10-28)*
+   ```
+    3  ·   ·   E1  R3  ·   ·   e2  ·   ·     Black's Water + Wind stack on g1 checks
+    2  ·   ·   ·   W1  FR2 ·   ·   ·   ·     White's Wizard along the edge:
+    1  ·   ·   ·   F3  Z   ·   rw3 ·   ·     g1 → f1 → e1. Checkmate.
+       a   b   c   d   e   f   g   h   i
+   ```
+7. **Is Water meant to be the strongest element, and Fire the weakest?** The video calls Fire and Wind "very offensive" `[03:33]`. Between computer players, Water does more than half of all capturing, and from the default formation Fire hardly matters. If Fire should be stronger, the default formation (Fire 3 and Fire 2 start on the back row) or Fire's movement could change.
+   - Tested (2026-10-28): it isn't the formation. Fire matters no more from random formations or from searched formations with Fire in front. Under `waterStraightCapture` it does start to matter (losing Fire 3 drops a side to about 40%). So Fire's weakness looks like Water doing its job, not something wrong with Fire itself.
+   - Rechecked with a much stronger bot (§11): Fire does matter. Losing Fire 3 drops a side to 24% from the default formation (Water 3: 13%, Wind 3: 14%). Fire gives about a quarter of the checkmates. Water is still the strongest element, and Fire the weakest attacker, but the gap is much smaller than the weak bots showed.
+   - Compared with chess in the same framework (§12): losing the queen costs chess more (7%) than losing Water 3 costs Elements (13%). A dominant piece is normal, and Water 3 is no more decisive than the queen.
+8. ~~**Elimination is rarely how a game is won** between players who look ahead: about 5% of games for Careful and 18% for Thinker, against about 70% checkmate. Is elimination meant as an equal second goal, or as a backstop?~~ Elimination stays as a way to win ✅ *(designer, playtest 2026-10-28)*.
+   - Under `waterStraightCapture`, elimination decides 36% of Thinker games, more than checkmate (31%).
+   - Rechecked with a much stronger bot (§11): elimination decides 24–32% of games under normal rules, against 39–52% checkmate. Between strong players it's a real second way to win.
+9. ~~**The `exactRange` variant** is just as fair in computer play, but games get twice as long and draws rise from about 1 in 4 to about half. It stays off by default. Is it still worth trying at the table?~~ No: the designer doesn't want exact range ✅ *(designer, playtest 2026-10-28)*. It's dropped from the app, and the engine keeps the switch for playtests only.
