@@ -1,0 +1,930 @@
+{
+ "experiment": "presets20k",
+ "scale": 1,
+ "seconds": 945,
+ "matchups": {
+  "windHeldBack v mirrored": {
+   "games": 60,
+   "aScore": 48,
+   "aScoreRange": [
+    36,
+    61
+   ],
+   "aWins": 43,
+   "bWins": 47,
+   "draws": 10,
+   "whiteWins": 57,
+   "blackWins": 33,
+   "whiteOfDecisive": 63,
+   "whiteOfDecisiveRange": [
+    50,
+    75
+   ],
+   "endings": {
+    "elimination": 47,
+    "checkmate": 43,
+    "draw:fifty": 7,
+    "draw:repetition": 3
+   },
+   "movesPerPlayer": {
+    "median": 34.5,
+    "shortest": 18.5,
+    "longest": 123
+   },
+   "combinesPerGame": 9,
+   "capturesPerGame": 8
+  },
+  "windHeldBack v fireBeforeWizard": {
+   "games": 60,
+   "aScore": 57,
+   "aScoreRange": [
+    45,
+    69
+   ],
+   "aWins": 53,
+   "bWins": 38,
+   "draws": 8,
+   "whiteWins": 43,
+   "blackWins": 48,
+   "whiteOfDecisive": 47,
+   "whiteOfDecisiveRange": [
+    35,
+    60
+   ],
+   "endings": {
+    "elimination": 52,
+    "checkmate": 40,
+    "draw:fifty": 7,
+    "draw:repetition": 2
+   },
+   "movesPerPlayer": {
+    "median": 36.5,
+    "shortest": 16.5,
+    "longest": 155.5
+   },
+   "combinesPerGame": 9.1,
+   "capturesPerGame": 7.9
+  },
+  "windHeldBack v fireOneInFront": {
+   "games": 60,
+   "aScore": 52,
+   "aScoreRange": [
+    39,
+    64
+   ],
+   "aWins": 47,
+   "bWins": 43,
+   "draws": 10,
+   "whiteWins": 38,
+   "blackWins": 52,
+   "whiteOfDecisive": 43,
+   "whiteOfDecisiveRange": [
+    30,
+    56
+   ],
+   "endings": {
+    "checkmate": 63,
+    "elimination": 27,
+    "draw:repetition": 7,
+    "draw:fifty": 3
+   },
+   "movesPerPlayer": {
+    "median": 38,
+    "shortest": 16,
+    "longest": 143.5
+   },
+   "combinesPerGame": 9.1,
+   "capturesPerGame": 7.3
+  },
+  "windHeldBack v lowWinds": {
+   "games": 60,
+   "aScore": 56,
+   "aScoreRange": [
+    43,
+    68
+   ],
+   "aWins": 48,
+   "bWins": 37,
+   "draws": 15,
+   "whiteWins": 47,
+   "blackWins": 38,
+   "whiteOfDecisive": 55,
+   "whiteOfDecisiveRange": [
+    41,
+    68
+   ],
+   "endings": {
+    "checkmate": 43,
+    "elimination": 42,
+    "draw:fifty": 12,
+    "draw:repetition": 3
+   },
+   "movesPerPlayer": {
+    "median": 41,
+    "shortest": 15,
+    "longest": 139
+   },
+   "combinesPerGame": 9.3,
+   "capturesPerGame": 8.1
+  },
+  "windHeldBack v wizardForward": {
+   "games": 60,
+   "aScore": 60,
+   "aScoreRange": [
+    47,
+    71
+   ],
+   "aWins": 55,
+   "bWins": 35,
+   "draws": 10,
+   "whiteWins": 53,
+   "blackWins": 37,
+   "whiteOfDecisive": 59,
+   "whiteOfDecisiveRange": [
+    46,
+    71
+   ],
+   "endings": {
+    "checkmate": 48,
+    "elimination": 42,
+    "draw:fifty": 5,
+    "draw:repetition": 5
+   },
+   "movesPerPlayer": {
+    "median": 35.5,
+    "shortest": 9,
+    "longest": 115.5
+   },
+   "combinesPerGame": 8.6,
+   "capturesPerGame": 7.8
+  },
+  "windHeldBack v original": {
+   "games": 60,
+   "aScore": 54,
+   "aScoreRange": [
+    42,
+    66
+   ],
+   "aWins": 48,
+   "bWins": 40,
+   "draws": 12,
+   "whiteWins": 45,
+   "blackWins": 43,
+   "whiteOfDecisive": 51,
+   "whiteOfDecisiveRange": [
+    38,
+    64
+   ],
+   "endings": {
+    "checkmate": 55,
+    "elimination": 33,
+    "draw:fifty": 8,
+    "draw:repetition": 3
+   },
+   "movesPerPlayer": {
+    "median": 38,
+    "shortest": 15.5,
+    "longest": 157
+   },
+   "combinesPerGame": 8.9,
+   "capturesPerGame": 7.4
+  },
+  "mirrored v fireBeforeWizard": {
+   "games": 60,
+   "aScore": 51,
+   "aScoreRange": [
+    39,
+    63
+   ],
+   "aWins": 47,
+   "bWins": 45,
+   "draws": 8,
+   "whiteWins": 43,
+   "blackWins": 48,
+   "whiteOfDecisive": 47,
+   "whiteOfDecisiveRange": [
+    35,
+    60
+   ],
+   "endings": {
+    "checkmate": 62,
+    "elimination": 30,
+    "draw:fifty": 5,
+    "draw:repetition": 3
+   },
+   "movesPerPlayer": {
+    "median": 33.5,
+    "shortest": 14,
+    "longest": 113.5
+   },
+   "combinesPerGame": 9,
+   "capturesPerGame": 7.2
+  },
+  "mirrored v fireOneInFront": {
+   "games": 60,
+   "aScore": 63,
+   "aScoreRange": [
+    50,
+    74
+   ],
+   "aWins": 58,
+   "bWins": 33,
+   "draws": 8,
+   "whiteWins": 47,
+   "blackWins": 45,
+   "whiteOfDecisive": 51,
+   "whiteOfDecisiveRange": [
+    38,
+    64
+   ],
+   "endings": {
+    "checkmate": 53,
+    "elimination": 38,
+    "draw:repetition": 5,
+    "draw:fifty": 3
+   },
+   "movesPerPlayer": {
+    "median": 39.5,
+    "shortest": 18.5,
+    "longest": 124
+   },
+   "combinesPerGame": 9.1,
+   "capturesPerGame": 7.6
+  },
+  "mirrored v lowWinds": {
+   "games": 60,
+   "aScore": 63,
+   "aScoreRange": [
+    51,
+    74
+   ],
+   "aWins": 55,
+   "bWins": 28,
+   "draws": 17,
+   "whiteWins": 48,
+   "blackWins": 35,
+   "whiteOfDecisive": 58,
+   "whiteOfDecisiveRange": [
+    44,
+    71
+   ],
+   "endings": {
+    "checkmate": 47,
+    "elimination": 37,
+    "draw:repetition": 12,
+    "draw:fifty": 5
+   },
+   "movesPerPlayer": {
+    "median": 35.5,
+    "shortest": 19.5,
+    "longest": 118
+   },
+   "combinesPerGame": 8.9,
+   "capturesPerGame": 8
+  },
+  "mirrored v wizardForward": {
+   "games": 60,
+   "aScore": 68,
+   "aScoreRange": [
+    55,
+    78
+   ],
+   "aWins": 63,
+   "bWins": 28,
+   "draws": 8,
+   "whiteWins": 35,
+   "blackWins": 57,
+   "whiteOfDecisive": 38,
+   "whiteOfDecisiveRange": [
+    27,
+    51
+   ],
+   "endings": {
+    "checkmate": 68,
+    "elimination": 23,
+    "draw:repetition": 7,
+    "draw:fifty": 2
+   },
+   "movesPerPlayer": {
+    "median": 33,
+    "shortest": 3.5,
+    "longest": 129.5
+   },
+   "combinesPerGame": 8.1,
+   "capturesPerGame": 6.8
+  },
+  "mirrored v original": {
+   "games": 60,
+   "aScore": 63,
+   "aScoreRange": [
+    50,
+    74
+   ],
+   "aWins": 57,
+   "bWins": 32,
+   "draws": 12,
+   "whiteWins": 45,
+   "blackWins": 43,
+   "whiteOfDecisive": 51,
+   "whiteOfDecisiveRange": [
+    38,
+    64
+   ],
+   "endings": {
+    "checkmate": 50,
+    "elimination": 38,
+    "draw:fifty": 7,
+    "draw:repetition": 5
+   },
+   "movesPerPlayer": {
+    "median": 40.5,
+    "shortest": 15.5,
+    "longest": 174.5
+   },
+   "combinesPerGame": 8.9,
+   "capturesPerGame": 7.9
+  },
+  "fireBeforeWizard v fireOneInFront": {
+   "games": 60,
+   "aScore": 62,
+   "aScoreRange": [
+    49,
+    73
+   ],
+   "aWins": 57,
+   "bWins": 33,
+   "draws": 10,
+   "whiteWins": 43,
+   "blackWins": 47,
+   "whiteOfDecisive": 48,
+   "whiteOfDecisiveRange": [
+    35,
+    61
+   ],
+   "endings": {
+    "checkmate": 47,
+    "elimination": 43,
+    "draw:fifty": 5,
+    "draw:repetition": 5
+   },
+   "movesPerPlayer": {
+    "median": 33,
+    "shortest": 18,
+    "longest": 103
+   },
+   "combinesPerGame": 9.1,
+   "capturesPerGame": 7.6
+  },
+  "fireBeforeWizard v lowWinds": {
+   "games": 60,
+   "aScore": 53,
+   "aScoreRange": [
+    40,
+    65
+   ],
+   "aWins": 43,
+   "bWins": 38,
+   "draws": 18,
+   "whiteWins": 35,
+   "blackWins": 47,
+   "whiteOfDecisive": 43,
+   "whiteOfDecisiveRange": [
+    30,
+    57
+   ],
+   "endings": {
+    "checkmate": 48,
+    "elimination": 33,
+    "draw:fifty": 10,
+    "draw:repetition": 8
+   },
+   "movesPerPlayer": {
+    "median": 37,
+    "shortest": 15.5,
+    "longest": 131
+   },
+   "combinesPerGame": 9.3,
+   "capturesPerGame": 7.7
+  },
+  "fireBeforeWizard v wizardForward": {
+   "games": 60,
+   "aScore": 69,
+   "aScoreRange": [
+    57,
+    79
+   ],
+   "aWins": 67,
+   "bWins": 28,
+   "draws": 5,
+   "whiteWins": 47,
+   "blackWins": 48,
+   "whiteOfDecisive": 49,
+   "whiteOfDecisiveRange": [
+    37,
+    62
+   ],
+   "endings": {
+    "checkmate": 63,
+    "elimination": 32,
+    "draw:repetition": 3,
+    "draw:fifty": 2
+   },
+   "movesPerPlayer": {
+    "median": 35.5,
+    "shortest": 4,
+    "longest": 126.5
+   },
+   "combinesPerGame": 8.2,
+   "capturesPerGame": 7.2
+  },
+  "fireBeforeWizard v original": {
+   "games": 60,
+   "aScore": 65,
+   "aScoreRange": [
+    52,
+    76
+   ],
+   "aWins": 60,
+   "bWins": 30,
+   "draws": 10,
+   "whiteWins": 68,
+   "blackWins": 22,
+   "whiteOfDecisive": 76,
+   "whiteOfDecisiveRange": [
+    63,
+    85
+   ],
+   "endings": {
+    "checkmate": 60,
+    "elimination": 30,
+    "draw:repetition": 8,
+    "draw:fifty": 2
+   },
+   "movesPerPlayer": {
+    "median": 36.5,
+    "shortest": 18,
+    "longest": 127.5
+   },
+   "combinesPerGame": 8.8,
+   "capturesPerGame": 7.4
+  },
+  "fireOneInFront v lowWinds": {
+   "games": 60,
+   "aScore": 39,
+   "aScoreRange": [
+    28,
+    52
+   ],
+   "aWins": 32,
+   "bWins": 53,
+   "draws": 15,
+   "whiteWins": 38,
+   "blackWins": 47,
+   "whiteOfDecisive": 45,
+   "whiteOfDecisiveRange": [
+    32,
+    59
+   ],
+   "endings": {
+    "checkmate": 50,
+    "elimination": 35,
+    "draw:repetition": 8,
+    "draw:fifty": 7
+   },
+   "movesPerPlayer": {
+    "median": 33.5,
+    "shortest": 17.5,
+    "longest": 109
+   },
+   "combinesPerGame": 9.3,
+   "capturesPerGame": 7.4
+  },
+  "fireOneInFront v wizardForward": {
+   "games": 60,
+   "aScore": 46,
+   "aScoreRange": [
+    34,
+    58
+   ],
+   "aWins": 42,
+   "bWins": 50,
+   "draws": 8,
+   "whiteWins": 52,
+   "blackWins": 40,
+   "whiteOfDecisive": 56,
+   "whiteOfDecisiveRange": [
+    43,
+    69
+   ],
+   "endings": {
+    "checkmate": 53,
+    "elimination": 38,
+    "draw:fifty": 5,
+    "draw:repetition": 3
+   },
+   "movesPerPlayer": {
+    "median": 38,
+    "shortest": 19,
+    "longest": 122
+   },
+   "combinesPerGame": 8.8,
+   "capturesPerGame": 8.1
+  },
+  "fireOneInFront v original": {
+   "games": 60,
+   "aScore": 55,
+   "aScoreRange": [
+    42,
+    67
+   ],
+   "aWins": 48,
+   "bWins": 38,
+   "draws": 13,
+   "whiteWins": 45,
+   "blackWins": 42,
+   "whiteOfDecisive": 52,
+   "whiteOfDecisiveRange": [
+    39,
+    65
+   ],
+   "endings": {
+    "elimination": 50,
+    "checkmate": 37,
+    "draw:fifty": 7,
+    "draw:repetition": 7
+   },
+   "movesPerPlayer": {
+    "median": 43,
+    "shortest": 16.5,
+    "longest": 146
+   },
+   "combinesPerGame": 8.7,
+   "capturesPerGame": 7.9
+  },
+  "lowWinds v wizardForward": {
+   "games": 60,
+   "aScore": 62,
+   "aScoreRange": [
+    49,
+    73
+   ],
+   "aWins": 55,
+   "bWins": 32,
+   "draws": 13,
+   "whiteWins": 43,
+   "blackWins": 43,
+   "whiteOfDecisive": 50,
+   "whiteOfDecisiveRange": [
+    37,
+    63
+   ],
+   "endings": {
+    "checkmate": 63,
+    "elimination": 23,
+    "draw:repetition": 10,
+    "draw:fifty": 3
+   },
+   "movesPerPlayer": {
+    "median": 45,
+    "shortest": 1.5,
+    "longest": 127.5
+   },
+   "combinesPerGame": 8.5,
+   "capturesPerGame": 7.3
+  },
+  "lowWinds v original": {
+   "games": 60,
+   "aScore": 52,
+   "aScoreRange": [
+    39,
+    64
+   ],
+   "aWins": 48,
+   "bWins": 45,
+   "draws": 7,
+   "whiteWins": 40,
+   "blackWins": 53,
+   "whiteOfDecisive": 43,
+   "whiteOfDecisiveRange": [
+    31,
+    56
+   ],
+   "endings": {
+    "checkmate": 55,
+    "elimination": 38,
+    "draw:fifty": 3,
+    "draw:repetition": 3
+   },
+   "movesPerPlayer": {
+    "median": 35,
+    "shortest": 14.5,
+    "longest": 106
+   },
+   "combinesPerGame": 8.9,
+   "capturesPerGame": 7.3
+  },
+  "wizardForward v original": {
+   "games": 60,
+   "aScore": 51,
+   "aScoreRange": [
+    39,
+    63
+   ],
+   "aWins": 45,
+   "bWins": 43,
+   "draws": 12,
+   "whiteWins": 53,
+   "blackWins": 35,
+   "whiteOfDecisive": 60,
+   "whiteOfDecisiveRange": [
+    47,
+    72
+   ],
+   "endings": {
+    "checkmate": 57,
+    "elimination": 32,
+    "draw:fifty": 7,
+    "draw:repetition": 5
+   },
+   "movesPerPlayer": {
+    "median": 41,
+    "shortest": 1.5,
+    "longest": 166.5
+   },
+   "combinesPerGame": 8.4,
+   "capturesPerGame": 7.6
+  }
+ },
+ "pieces": {
+  "takenPerGame": {
+   "fire3+wind1": 1.27,
+   "water1+wind3": 0.74,
+   "water3": 0.63,
+   "wind3+water1": 0.4,
+   "wind2+fire1": 0.28,
+   "water3+fire1": 0.22,
+   "water2": 0.22,
+   "water2+fire2": 0.19,
+   "wind2+fire2": 0.19,
+   "fire1+wind3": 0.18,
+   "fire1+water2": 0.18,
+   "fire2+wind1": 0.16,
+   "wind2+water2": 0.15,
+   "fire2+wind2": 0.15,
+   "fire1+wind2": 0.14,
+   "water1+fire2": 0.14,
+   "earth3+water2": 0.13,
+   "water3+wind2": 0.13,
+   "wind2+water3": 0.13,
+   "water3+fire2": 0.12,
+   "fire3": 0.11,
+   "water2+wind2": 0.11,
+   "water2+fire1": 0.09,
+   "water2+earth3": 0.09,
+   "fire2": 0.09,
+   "water1+fire3": 0.08,
+   "fire1+water3": 0.06,
+   "earth2+fire1": 0.05,
+   "wind3+fire1": 0.05,
+   "water2+wind3": 0.04,
+   "fire1": 0.04,
+   "water2+earth1": 0.04,
+   "wind3": 0.04,
+   "wind2": 0.04,
+   "earth2+water3": 0.03,
+   "earth3+fire1": 0.03,
+   "earth2+wind2": 0.03,
+   "earth2+water2": 0.03,
+   "water3+earth2": 0.03,
+   "water2+wind1": 0.03,
+   "water3+earth1": 0.03,
+   "fire3+wind3": 0.03,
+   "fire2+water1": 0.03,
+   "fire3+water1": 0.03,
+   "earth1+water2": 0.03,
+   "fire2+water3": 0.03,
+   "earth3+water1": 0.02,
+   "fire2+earth2": 0.02,
+   "earth1+water1": 0.02,
+   "fire2+water2": 0.02,
+   "earth2+fire2": 0.02,
+   "water3+wind3": 0.02,
+   "earth2+water1": 0.02,
+   "water3+earth3": 0.02,
+   "fire2+earth3": 0.02,
+   "wind1+earth3": 0.02,
+   "earth1+fire2": 0.01,
+   "water3+fire3": 0.01,
+   "fire2+earth1": 0.01,
+   "earth3+water3": 0.01,
+   "water2+fire3": 0.01,
+   "water2+earth2": 0.01,
+   "fire3+earth1": 0.01,
+   "fire1+wind1": 0.01,
+   "wind1+fire3": 0.01,
+   "water1": 0.01,
+   "wind1+earth1": 0.01,
+   "water1+wind1": 0.01,
+   "earth1+wind1": 0.01,
+   "fire1+earth3": 0.01,
+   "earth1+water3": 0.01,
+   "fire1+earth2": 0.01,
+   "earth3+wind2": 0.01,
+   "fire3+water3": 0.01,
+   "earth2+wind1": 0.01,
+   "earth3+wind1": 0.01,
+   "wind1+fire1": 0.01,
+   "water3+wind1": 0.01,
+   "earth1+wind3": 0.01,
+   "fire3+water2": 0.01,
+   "earth1+fire3": 0.01,
+   "earth1+wind2": 0.01,
+   "earth3+fire2": 0.01,
+   "earth1+fire1": 0.01,
+   "wind3+fire3": 0.01,
+   "wind1+fire2": 0.01,
+   "wind1+water1": 0.01,
+   "wind1": 0.01,
+   "wind3+earth3": 0,
+   "wind2+earth2": 0,
+   "wind2+earth3": 0,
+   "water1+earth1": 0,
+   "earth2+fire3": 0,
+   "wind2+earth1": 0,
+   "wind1+water3": 0,
+   "wind3+water2": 0,
+   "wind3+fire2": 0,
+   "fire3+wind2": 0,
+   "earth3+wind3": 0,
+   "fire3+earth2": 0,
+   "water1+wind2": 0,
+   "wind3+earth1": 0,
+   "water1+earth3": 0,
+   "wind3+earth2": 0,
+   "fire3+earth3": 0,
+   "earth2+wind3": 0,
+   "fire2+wind3": 0,
+   "wind2+fire3": 0,
+   "fire1+earth1": 0
+  },
+  "capturesMadePerGame": {
+   "fire3+wind1": 1.13,
+   "water1+wind3": 0.83,
+   "water3": 0.52,
+   "wind3+water1": 0.47,
+   "wizard": 0.37,
+   "water3+fire1": 0.31,
+   "wind2+fire1": 0.28,
+   "water2": 0.28,
+   "water3+wind2": 0.2,
+   "wind2+water3": 0.18,
+   "fire1+wind3": 0.18,
+   "wind2+fire2": 0.17,
+   "water2+fire2": 0.16,
+   "fire1+water2": 0.16,
+   "water3+fire2": 0.16,
+   "wind2+water2": 0.15,
+   "fire2+wind1": 0.15,
+   "fire2+wind2": 0.15,
+   "fire1+wind2": 0.12,
+   "earth3+water2": 0.12,
+   "water1+fire2": 0.11,
+   "water2+wind2": 0.09,
+   "water2+earth3": 0.09,
+   "fire3": 0.08,
+   "fire1+water3": 0.08,
+   "fire2": 0.07,
+   "water2+fire1": 0.06,
+   "water1+fire3": 0.06,
+   "water2+wind3": 0.05,
+   "wind3+fire1": 0.04,
+   "wind2": 0.04,
+   "fire2+water3": 0.04,
+   "earth2+water3": 0.03,
+   "water3+earth1": 0.03,
+   "water2+earth1": 0.03,
+   "earth3+fire1": 0.03,
+   "fire3+wind3": 0.03,
+   "fire2+water1": 0.03,
+   "wind3": 0.02,
+   "water3+earth2": 0.02,
+   "earth1+water2": 0.02,
+   "earth2+water2": 0.02,
+   "water2+fire3": 0.02,
+   "earth3+water1": 0.02,
+   "water2+wind1": 0.02,
+   "water3+earth3": 0.02,
+   "earth2+fire1": 0.02,
+   "water3+wind3": 0.02,
+   "fire2+water2": 0.02,
+   "fire3+water1": 0.01,
+   "earth2+water1": 0.01,
+   "water2+earth2": 0.01,
+   "wind1+earth3": 0.01,
+   "earth3+water3": 0.01,
+   "water3+wind1": 0.01,
+   "water3+fire3": 0.01,
+   "earth2+fire2": 0.01,
+   "fire1+earth3": 0.01,
+   "fire3+earth1": 0.01,
+   "earth2+wind2": 0.01,
+   "fire1": 0.01,
+   "fire2+earth2": 0.01,
+   "fire1+wind1": 0.01,
+   "earth3+fire2": 0.01,
+   "fire2+earth3": 0.01,
+   "wind1+fire3": 0.01,
+   "earth1+water3": 0.01,
+   "earth1+wind3": 0.01,
+   "earth3+wind1": 0.01,
+   "wind3+fire3": 0.01,
+   "water1": 0.01,
+   "wind1": 0.01,
+   "fire3+water2": 0.01,
+   "wind1+water3": 0.01,
+   "earth2+wind1": 0.01,
+   "earth1+fire2": 0,
+   "wind2+earth3": 0,
+   "fire3+water3": 0,
+   "water1+wind1": 0,
+   "earth3+wind2": 0,
+   "earth1+fire3": 0,
+   "wind1+fire2": 0,
+   "wind3+water2": 0,
+   "earth2+wind3": 0,
+   "fire1+earth2": 0,
+   "wind2+earth2": 0,
+   "fire2+earth1": 0,
+   "earth1+water1": 0,
+   "earth1+wind2": 0,
+   "earth1+fire1": 0,
+   "earth1+wind1": 0,
+   "wind2+earth1": 0,
+   "wind1+water1": 0,
+   "fire3+earth2": 0,
+   "fire3+wind2": 0,
+   "water1+earth3": 0,
+   "wind3+fire2": 0,
+   "wind3+earth3": 0,
+   "wind2+fire3": 0,
+   "wind1+fire1": 0,
+   "wind3+earth2": 0,
+   "fire3+earth3": 0,
+   "fire2+wind3": 0,
+   "water1+earth1": 0,
+   "earth3+wind3": 0,
+   "wind1+earth1": 0
+  }
+ },
+ "ratings": {
+  "mirrored": {
+   "rating": 1032,
+   "range": [
+    985,
+    1091
+   ]
+  },
+  "fireBeforeWizard": {
+   "rating": 1013,
+   "range": [
+    966,
+    1060
+   ]
+  },
+  "windHeldBack": {
+   "rating": 1000,
+   "range": [
+    1000,
+    1000
+   ]
+  },
+  "lowWinds": {
+   "rating": 975,
+   "range": [
+    928,
+    1027
+   ]
+  },
+  "fireOneInFront": {
+   "rating": 936,
+   "range": [
+    886,
+    983
+   ]
+  },
+  "original": {
+   "rating": 933,
+   "range": [
+    884,
+    975
+   ]
+  },
+  "wizardForward": {
+   "rating": 918,
+   "range": [
+    865,
+    966
+   ]
+  }
+ }
+}

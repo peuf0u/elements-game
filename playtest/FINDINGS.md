@@ -2,7 +2,7 @@
 
 Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open in a browser), also online at https://claude.ai/artifact/V6KKL4vWUm7FLFiqehXhEJ (private until shared from the page's Share menu).
 
-*Run on 2026-10-28 (GAME_SPEC v0.2), about 50,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§11 were played on the real engine. How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
+*Run on 2026-10-28 (GAME_SPEC v0.2), about 90,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§14 were played on the real engine. How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
 
 **How to read the numbers.** A "score" counts a win as 1 and a draw as ½, so 50% means even. The range in brackets is the 95% uncertainty range: if it includes 50%, the games can't tell the two sides apart. One "move" means one player's turn. §1–§9 come from bots that look 2–3 moves ahead (Careful and Thinker). §11 repeats the key tests with Deep, a much stronger bot (§10), and **where the two disagree, §11 is the better guide**. Treat anything that looks like a problem as a hint to try on the real board, not a verdict.
 
@@ -25,7 +25,8 @@ Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open i
 | Pieces too strong or useless? | **Water is the strongest element and gives two thirds of the checkmates.** The weak bots made Fire look useless, but with strong play losing Fire 3 clearly hurts (§11). Wind 3 is worth about as much as Water 3 | ⚠️ Water still leads |
 | Does combining matter? | Very much: a player that never combines scores only 23% | ✅ healthy, one strong combo |
 | Exact range variant | Just as fair, but games get twice as long and draws jump to 43–59% | ⚠️ plays worse |
-| Default formation vs others | The default beats random setups (they score 31%) and both fortresses. A search through about 100 formations found none better, but several just as good | ✅ it's a good formation |
+| Default formation vs others | With weak bots nothing beat your default (§8). **With strong bots it came last of nine strong formations**, so "Wind 3 held back" is the new default, with five presets (§14). Mirror images play just as well | ✅ new default and presets |
+| What makes a formation strong? | Water next to your own Earth, pieces close together, Earth in front, Wind 3 held back. But these rules explain only part of it: strong formations are narrow peaks, and moving one piece costs about 8 points (§14) | ℹ️ presets are worth offering |
 | Can a formation tame Water? | No. Moving Fire forward changes nothing, and Earth beside the Wizard makes Water far *more* dangerous | ❌ not by formation |
 | Can a rule change tame Water? | Yes: **"Water captures only straight"** makes Water, Wind and Fire about equal and keeps the game fair. Games get about a quarter longer and draws rise a little (33% → 37% with the strong bot) | ✅ worth playtesting |
 | Can these results be trusted? | Checked on chess, where the answers are known (§12): piece rankings and ratios come out right, the sizes of effects are understated, and bots this weak can't measure White's edge reliably | ✅ rankings, ⚠️ exact numbers |
@@ -475,6 +476,103 @@ Deep 2k with learned values, 400 games per row, your default formation (`node ru
 
 With random formations it's 16% → 12% → 11%. **Decision: 75 moves each** ✅ *(designer, 2026-10-28)*. It turns a third of these draws into wins, and the typical game stays the same length; going further buys little. Games in §1–§12 were played with 50.
 
+## 14. Formations with strong play
+
+**The second formation search** is written up with drawn boards in [FORMATIONS.html](FORMATIONS.html). About 220 formations played a league with Deep 2k. The eight best then played each other and your default. Your default came last (43%), and **"Wind 3 held back"** came first, so it is now the app's default, with five more presets ✅ *(designer, 2026-10-28; GAME_SPEC §6)*. Mixed formations, where each side starts differently, give fewer draws (17%) and slightly shorter games than both sides using the same one.
+
+### What makes a formation strong?
+
+554 formations each played 28 games, two as White and two as Black against each of the seven presets (Deep 2k with learned values, 75-move rule, 15,500 games in all; `node formation-study.mjs collect`, then `fit`). There were three kinds: the seven presets, 354 variations of them with 1 to 6 pieces moved at random, and 200 random formations.
+
+**Good formations are narrow peaks.** Moving one piece of a preset to a random square costs about 8 points on average. After three or more moves, little is left of the preset's strength:
+
+| Formation | Score against the presets | Formations |
+|---|---|---|
+| The presets themselves | 52% | 7 |
+| A preset with 1 piece moved | 44% | 60 |
+| … 2 pieces moved | 41% | 63 |
+| … 3 pieces moved | 33% | 56 |
+| … 4 to 6 pieces moved | 31% | 168 |
+| Random formations | 25% | 200 |
+
+A few variations scored as well as the presets, up to 73%. With 28 games that is uncertain by about ±9 points, though, and in the search such high early scores usually turned out to be luck.
+
+**Rules of thumb.** These are the features that went with a higher score. Each was checked both near the presets and in the random formations:
+
+| Feature | Near the presets | Random formations |
+|---|---|---|
+| **Water touching your own Earth** (of 3 Waters) | 0: 28% · 1: 33% · 2: 35% · **3: 39%** | 0: 18% · 1: 24% · 2: 26% · **3: 30%** |
+| …with the Earth right in front of the Water | 0: 35% · 1: 34% · **2: 40%** | 0: 24% · 1: 26% |
+| **Combines possible on the first move** (pieces close together) | ≤20: 33% · 21–25: 36% · **26+: 40%** | ≤20: 23% · 21–25: 28% · 26+: 29% |
+| **Water on the front row** | none: **37%** · some: 33% | no difference |
+| **Earths on the front row** | 0: 30% · 1: 34% · **2: 38%** · 3: 36% | no difference |
+| **Earth right in front of the Wizard** | no: **36%** · yes: 30% (26 formations) | no difference |
+| **Wind 3** on row 1 · 2 · 3 | **37%** · 36% · 33% | no difference |
+
+So, in game terms:
+
+1. **Give each Water an Earth to lean on.** This is the strongest rule, and it holds everywhere. Water bends around Earth, so an Earth just ahead gives it routes to both sides, and the same Earth blocks attacks aimed at the Water.
+2. **Keep the pieces close together**, so they can combine early.
+3. **Water starts on the middle row, Earth on the front row.** The Earth walls the front, and the Water waits behind it.
+4. **Don't put Earth directly in front of your Wizard.** It probably takes the Wizard's escape square and gives enemy Water a post to bend around next to the Wizard, the same way the Earth shield failed in §8. This rule rests on only 26 formations, though.
+5. **Keep Wind 3 back.** Moving it back is the main change from your default to Wind 3 held back.
+
+Wind 3 held back follows them:
+
+```
+ 3  ·  ·  ·  ·  E3 ·  E2 F1 ·      E3 stands in front of R2, and E2 in front of R3
+ 2  ·  ·  R1 W1 R2 W2 R3 ·  ·      R1 touches E1; all three Waters lean on Earth
+ 1  ·  E1 W3 F3 Z  F2 ·  ·  ·      Wind 3 on the back row, nothing in front of the Wizard but Water
+    a  b  c  d  e  f  g  h  i
+```
+
+**What didn't matter:** whether the Wizard starts on row 1 or further forward (36% either way), whether it stands on the e-file, whether the three Winds share a square colour, and where Fire, Fire 3 or Water 3 stand.
+
+**These rules are only part of the story.** Together, all 23 features measured explain about a quarter of the real differences between formations, the part that isn't luck. Among the formations near the presets, they explain about a tenth. Your original formation is the clearest example. It follows rules 1–4 better than any preset: all three Waters have Earth right in front, three Earths are on the front row, and it has 27 combines. Yet it is the weakest preset (34% here), probably because Wind 3 stands exposed on b3. **What makes a formation strong is mostly how its pieces work together**: which piece covers which and where the Water can go. That can't be read off a checklist. It has to be found by playing, as the search did.
+
+What this means for players: a player who builds a formation from scratch at the table will rarely stumble on one as strong as the presets. So presets are worth offering, and the placement phase gives an experienced player a real edge.
+
+### Are mirror images as strong?
+
+Mirrored left to right, a formation is the same idea on the other wing. Playing a formation against its own mirror image would prove nothing: that game is the same board seen in a mirror, so it's a fair fight by symmetry. The real question is whether the mirror image does as well against *other* formations. So each preset, and its mirror image, played all seven presets, 40 games each (280 games per row, `node run.mjs mirrorCheck`):
+
+| Preset | As designed | Mirrored |
+|---|---|---|
+| Wind 3 held back | 59% (53–65) | 57% (51–63) |
+| Mirrored and reshaped | 50% | 51% |
+| Fire in front of the Wizard | 54% | 47% |
+| Fire 1 in front | 47% | 46% |
+| Low Winds, Earth forward | 46% | 52% |
+| Wizard forward | 53% | 46% |
+| Original | 42% | 46% |
+| **Average** | **50%** | **49%** |
+
+**Yes, mirror images are just as strong.** The biggest gaps, 6–7 points, are within what luck gives with 280 games each (about ±8 for a difference), and they go both ways. Draws and game length don't change either. So the app can offer every preset in both orientations.
+
+### Does the ranking hold with the strongest bot?
+
+The seven presets played a round robin, 60 games per pair (360 games per preset), once with Deep 2k and once with Deep 20k, which searches ten times as many positions (`node run.mjs presets2k`, `presets20k`):
+
+| Preset | Deep 2k | Deep 20k |
+|---|---|---|
+| Mirrored and reshaped | 51% | **60%** |
+| Fire in front of the Wizard | **56%** | **57%** |
+| Wind 3 held back | **54%** | **55%** |
+| Low Winds, Earth forward | 48% | 50% |
+| Fire 1 in front | 50% | 44% |
+| Original | 44% | 43% |
+| Wizard forward | 47% | 41% |
+| Draws | 17% | 11% |
+| Typical game (moves each) | 40 | 37 |
+
+Each score is uncertain by about ±5 points.
+
+**The ranking holds in broad terms.** The same three formations lead with both bots: Wind 3 held back, Fire in front of the Wizard, and Mirrored and reshaped. Your original stays near the bottom. Within the top three the order shuffles, which shows they are about equally strong: Wind 3 held back beat the other two 56% and 62% in the 200-game head-to-heads with Deep 2k, and here it is level with Mirrored and reshaped (48%) and beats Fire in front of the Wizard 58%. Wind 3 held back is in the top three in every test, and first in the most of them (the search's round robin, the head-to-heads and the mirror check), so it stays a sound default.
+
+**Wizard forward loses ground with stronger play** (47% → 41%). A Wizard on the front row is easier to attack for a bot that looks further ahead. It is still a fair choice for players who like it, but it is the weakest preset against strong opponents.
+
+**Stronger play draws less.** Draws fall from 17% to 11%, and games get a little shorter. That's a good sign: the draws come from weak play more than from the game itself.
+
 ---
 
 ## What this means for the game
@@ -483,6 +581,7 @@ With random formations it's 16% → 12% → 11%. **Decision: 75 moves each** ✅
 2. **Water leads, but every attacking piece matters** with strong play (§11). Formations can't change Water's lead (§8). Straight captures even the elements out (§9, §11), at the cost of longer games and a few more draws. Whether that's worth it is now a matter of taste.
 3. **Both ways to win matter.** Checkmate decides about half the games between strong bots, and elimination a quarter to a third.
 4. **Exact range makes the game slower and more drawish.** Keep it off by default, as it is now. (Not yet rechecked with the strong bot.)
+5. **Formations matter a little and are hard to build well** (§14). Your default came last with strong play, and the new default and presets are clearly better. No formation wins by itself, and their mirror images are just as good. A strong formation is a finely tuned whole, so presets are worth offering, and the placement phase rewards experience.
 
 The questions these raise are recorded in [GAME_SPEC.md](../GAME_SPEC.md) (open questions 6–9) and [PRODUCT_BRIEF.md](../PRODUCT_BRIEF.md) (Open).
 
@@ -499,4 +598,5 @@ The questions these raise are recorded in [GAME_SPEC.md](../GAME_SPEC.md) (open 
 - If draws still bother at the table, look at the endgame: Earth walls that a few attackers can't break (§13).
 - Recheck the exact-range variant and the cheat hunt (§6, §7) with the strong bot.
 - Try straight captures at the table, and if it stays, rerun the formation search under it: the best formations may change once Water strikes straight.
+- A catalogue of strong formations in different styles (a quality-diversity search, `catalogue.mjs`), so the presets can cover more ways to play.
 - A formation-builder player for the alternating placement phase.

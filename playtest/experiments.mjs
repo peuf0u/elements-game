@@ -1,6 +1,6 @@
 // The experiments from the plan. Each one is a list of games to play; run.mjs plays them.
 import fs from 'node:fs';
-import { DEFAULT_FORMATION, without } from './formations.mjs';
+import { DEFAULT_FORMATION, PRESETS, mirror as mirrorFiles, without } from './formations.mjs';
 
 let seed = 1;
 // n games of A against B, alternating colours: A is White in even games, Black in odd ones.
@@ -30,6 +30,20 @@ function roundRobin(tag, players, n, extra = {}) {
         const [w, b] = k % 2 ? [names[j], names[i]] : [names[i], names[j]];
         out.push({ tag: `${tag}: ${names[i]} v ${names[j]}`, a: k % 2 ? 'b' : 'w', seed: seed++, randomOpening: 2,
           white: players[w], black: players[b], whiteFormation: 'default', blackFormation: 'default', labels: { w, b }, ...extra });
+      }
+  return out;
+}
+
+// Every pair of presets meets n times, half with each colour, both sides played by the same bot.
+function presetRoundRobin(bot, n, firstSeed) {
+  const names = Object.keys(PRESETS), out = [];
+  seed = firstSeed;
+  for (let i = 0; i < names.length; i++)
+    for (let j = i + 1; j < names.length; j++)
+      for (let k = 0; k < n; k++) {
+        const [w, b] = k % 2 ? [names[j], names[i]] : [names[i], names[j]];
+        out.push({ tag: `${names[i]} v ${names[j]}`, a: k % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, randomOpening: 2, maxPlies: 1000,
+          whiteFormation: PRESETS[w], blackFormation: PRESETS[b], labels: { w, b } });
       }
   return out;
 }
@@ -199,6 +213,24 @@ export const EXPERIMENTS = {
       }
     return out;
   },
+  // 10e. Is a preset's mirror image as strong as the preset? Each preset, and its mirror image, plays
+  // all seven presets, 40 games each (20 with each colour). A formation against its own mirror image
+  // would prove nothing: the board is the same seen in a mirror, so that's a fair fight by symmetry.
+  mirrorCheck: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, out = [];
+    seed = 1200000;
+    for (const [name, f] of Object.entries(PRESETS))
+      for (const [tag, fa] of [[name, f], [`${name} mirrored`, mirrorFiles(f)]])
+        for (const [opp, fb] of Object.entries(PRESETS))
+          for (let k = 0; k < 40 * s; k++)
+            out.push({ tag, opp, a: k % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, randomOpening: 2, maxPlies: 1000,
+              whiteFormation: k % 2 ? fb : fa, blackFormation: k % 2 ? fa : fb });
+    return out;
+  },
+  // 10f. The seven presets in a round robin, 60 games per pair, played by the strongest bot (Deep 20k)
+  // and, for comparison, by the search's bot (Deep 2k): does the ranking hold with stronger play?
+  presets20k: s => presetRoundRobin({ type: 'deep', nodes: 20000, weights: 'tuned' }, 60 * s, 1300000),
+  presets2k: s => presetRoundRobin({ type: 'deep', nodes: 2000, weights: 'tuned' }, 60 * s, 1400000),
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.
   // a. Deep 2k with naive values (every piece worth 1) against itself, to learn values from.
   chessSelfplay: s => Array.from({ length: 4000 * s }, (_, i) => ({

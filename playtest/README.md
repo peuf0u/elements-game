@@ -24,11 +24,12 @@ check.mjs ──▶ spike-rules.mjs ──▶ spike/index.html    the spike's ru
 | `rating.mjs` | **Ratings** on the chess Elo scale from a round robin, with uncertainty ranges. |
 | `tune.mjs` | **Learns piece values** from finished games: which values best predict who went on to win ("Texel tuning"). |
 | `chess/` | **Chess, for calibration**: chess rules (`rules.mjs`, checked by `perft.mjs` against the published totals), the chess adapter for Deep (`players.mjs`), a game loop (`game.mjs`) and value learning (`tune.mjs`). The same tests on a game whose answers are known show how far the Elements results can be trusted (FINDINGS §12). |
-| `formations.mjs` | **Starting setups**: your default formation, random ones, two Earth fortresses, two good ones from the formation search (Fire forward), the Earth shield, and "minus one piece" for the handicap test. |
+| `formations.mjs` | **Starting setups**: your default formation, the engine's presets, mirror images, small random changes (`mutate`), random ones, two Earth fortresses, two good ones from the formation search (Fire forward), the Earth shield, and "minus one piece" for the handicap test. |
 | `game.mjs` | Plays **one game** and records every move, capture and combine. It can also play the first few moves at random, so the deeper players don't replay the same game. |
 | `pool.mjs` | Spreads games over all processor cores. |
 | `experiments.mjs` | The **experiments from the plan**, each a list of games. |
-| `search.mjs` | The **formation search**: tries many formations against the default, keeps the best, varies them for a few rounds, then plays the finalists against each other. Writes `results/formation-search.json`. |
+| `search.mjs` | The **formation search**: tries many formations against the default, keeps the best, varies them for a few rounds, then plays the finalists against each other. Second version: a league played by Deep 2k, keeping formations that differ from each other. Writes `results/formation-search-deep.json` (the first version's results are in `formation-search.json`). |
+| `formation-study.mjs` | **What makes a formation strong**: plays about 550 varied formations against the seven presets, then fits which features of a formation go with a higher score (FINDINGS §14). Writes `results/formation-study.json`. |
 | `run.mjs` | Runs one experiment and writes `results/<name>.summary.json` (kept) and `results/<name>.json` (every game, not committed). |
 | `stats.mjs` | Win rates with their uncertainty, endings, game length, piece activity. |
 | `board.mjs` | Board diagrams for FINDINGS.md and replaying a recorded game. |
@@ -52,6 +53,10 @@ node tune.mjs selfplay      # learn piece values from the self-play games
 node chess/perft.mjs        # the chess rules match the published perft totals
 node run.mjs chessRecheck   # the key tests on chess, for calibration
 node search.mjs             # the formation search (about 8 minutes on 14 cores)
+node formation-study.mjs collect   # what makes a formation strong: the games (about 25 minutes)
+node formation-study.mjs fit       # ...and the features that predict a formation's score
+node run.mjs mirrorCheck    # are the presets' mirror images as strong?
+node run.mjs presets20k     # the presets' round robin with the strongest bot (about 20 minutes)
 ```
 
 The players don't play the placement phase: games start from finished formations.
