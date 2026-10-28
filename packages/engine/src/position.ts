@@ -10,10 +10,13 @@ export interface RulesConfig {
   exactRange: boolean;           // §3: pieces move exactly N squares
   noWaterEdge: boolean;          // §3: Water can't slide along the board edge
   waterStraightCapture: boolean; // §3: Water's capturing step must be a straight flow
+  waterRiver: boolean;           // open question 10: Water banks only around an Earth right in front of or behind it
+  waterStraightSteps: boolean;   // open question 10: no diagonal Water steps, also when banking
   quietMoveLimit: number;        // §6: moves each without a capture or combine before a draw (75); 0 = no limit
 }
 export const DEFAULT_CONFIG: Readonly<RulesConfig> = Object.freeze({
-  exactRange: false, noWaterEdge: false, waterStraightCapture: false, quietMoveLimit: 75,
+  exactRange: false, noWaterEdge: false, waterStraightCapture: false, waterRiver: false, waterStraightSteps: false,
+  quietMoveLimit: 75,
 });
 
 // A move is (from, to), packed into one number: from + to * 256. The board decides whether it
@@ -38,6 +41,8 @@ export class Position {
   readonly exact: boolean;
   readonly noEdge: boolean;
   readonly straight: boolean;
+  readonly river: boolean;
+  readonly straightSteps: boolean;
   readonly config: Readonly<RulesConfig>;
   private readonly undo = new Int32Array(MAX_PLIES * 4);
   private sp = 0;
@@ -47,6 +52,8 @@ export class Position {
     this.exact = config.exactRange;
     this.noEdge = config.noWaterEdge;
     this.straight = config.waterStraightCapture;
+    this.river = config.waterRiver;
+    this.straightSteps = config.waterStraightSteps;
   }
 
   static from(board: ArrayLike<number>, side: number, config?: Readonly<RulesConfig>): Position {

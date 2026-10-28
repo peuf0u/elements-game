@@ -22,8 +22,8 @@ export const hasCapturers = (board, o) => board.some(p => p && p.o === o && isCa
 let config = E.DEFAULT_CONFIG;
 // quietMoveLimit: moves each without a capture or combine before a draw (0 = no limit). 75 since
 // 2026-10-28; games recorded before that were played with 50, the chess rule.
-export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, quietMoveLimit = 75 } = {}) {
-  config = { exactRange, noWaterEdge, waterStraightCapture, quietMoveLimit };
+export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, quietMoveLimit = 75 } = {}) {
+  config = { exactRange, noWaterEdge, waterStraightCapture, waterRiver, waterStraightSteps, quietMoveLimit };
 }
 
 // A formation is { square: [element, size] | 'wizard' } as White sees it (rows 1–3).
@@ -31,6 +31,9 @@ export function setVariant({ exactRange = false, noWaterEdge = false, waterStrai
 // which every earlier experiment refers to; the app's new default is the engine's DEFAULT_FORMATION.
 export const DEFAULT_FORMATION = Object.fromEntries(Object.entries(E.PRESETS.original)
   .map(([s, v]) => [s, v === 'wizard' ? v : [v.element, v.size]]));
+// The engine's presets (the app's default "Wind 3 held back" and the others) in the same form.
+export const PRESETS = Object.fromEntries(Object.entries(E.PRESETS).map(([k, f]) => [k,
+  Object.fromEntries(Object.entries(f).map(([s, v]) => [s, v === 'wizard' ? v : [v.element, v.size]]))]));
 const toEngine = f => Object.fromEntries(Object.entries(f).map(([s, v]) => [s, v === 'wizard' ? v : { element: v[0], size: v[1] }]));
 
 const readable = p => (!p ? null : p.kind === 'wizard' ? { o: p.owner[0], wiz: true }

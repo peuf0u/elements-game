@@ -151,6 +151,13 @@ button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-c
     <label class="toggle"><input id="orientTurn" type="radio" name="orient" value="turn"><span>Turn to the player to move</span><small>Black's turn shows the board from Black's side. For passing the iPad back and forth.</small></label>
     <label class="toggle"><input id="orientFace" type="radio" name="orient" value="face"><span>Face to face</span><small>Board stays fixed, Black's tray faces Black. For two players on opposite sides of the iPad.</small></label>
   </fieldset>
+  <fieldset class="choice">
+    <legend class="menu-label">Water movement (trial)</legend>
+    <label class="toggle"><input type="radio" name="water" value="normal"><span>As now</span><small>Water bends around any Earth it touches, diagonal steps allowed.</small></label>
+    <label class="toggle"><input type="radio" name="water" value="river"><span>River</span><small>Water bends only around an Earth right in front of it or right behind it in its own column.</small></label>
+    <label class="toggle"><input type="radio" name="water" value="straight"><span>Straight steps</span><small>Water never steps diagonally, also when going around Earth.</small></label>
+    <label class="toggle"><input type="radio" name="water" value="both"><span>River + straight steps</span><small>Both rules together. The edge slide stays in every version.</small></label>
+  </fieldset>
   <div class="menu-row">
     <button id="drawBtn" type="button">Agree to a draw</button>
     <button id="editBtn" type="button">Set up a position (debug)</button>
@@ -175,8 +182,9 @@ var Rules = (() => {
   const ORTH = [[1, 0], [-1, 0], [0, 1], [0, -1]];
   const DIAG = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
   const ALL = ORTH.concat(DIAG);
-  // Variant toggles. noWaterEdge / waterStraightCapture are Water experiments from playtest/ (GAME_SPEC open question 6).
-  const variant = { exact: false, noWaterEdge: false, waterStraightCapture: false };
+  // Variant toggles. noWaterEdge / waterStraightCapture are Water experiments from playtest/ (GAME_SPEC open question 6);
+  // waterRiver / waterStraightSteps are the designer's candidates from open question 10.
+  const variant = { exact: false, noWaterEdge: false, waterStraightCapture: false, waterRiver: false, waterStraightSteps: false };
 
   const sq = (x, y) => y * N + x;
   const X = s => s % N;
@@ -205,23 +213,29 @@ var Rules = (() => {
     a.o === b.o && !a.wiz && !b.wiz && a.els.length === 1 && b.els.length === 1 && a.els[0].e !== b.els[0].e;
   const combine = (a, b) => ({ o: a.o, els: a.els.concat(b.els) });
 
-  // Water: the squares one step can reach from c (§3 "Water movement rule").
-  function waterSteps(board, c) {
-    const x = X(c), y = Y(c), out = new Set();
-    for (const dy of [1, -1]) if (onBoard(x, y + dy)) out.add(sq(x, y + dy)); // flow
+  // Water: the squares one step can reach from c (§3 "Water movement rule"), each with the set of
+  // Earths that step banks around. `around` is that set for the step before.
+  //   waterRiver: bank only around an Earth right in front of or behind c in its column, or keep
+  //     going around an Earth it's already going around.
+  //   waterStraightSteps: no diagonal steps, also when banking.
+  function waterSteps(board, c, around = new Set()) {
+    const x = X(c), y = Y(c), out = new Map();
+    const put = (n, e) => { if (!out.has(n)) out.set(n, new Set()); if (e >= 0) out.get(n).add(e); };
+    for (const dy of [1, -1]) if (onBoard(x, y + dy)) put(sq(x, y + dy), -1); // flow
     for (const [dx, dy] of ALL) { // bank around a plain Earth touching c
       const ex = x + dx, ey = y + dy;
       if (!onBoard(ex, ey)) continue;
-      const e = board[sq(ex, ey)];
+      const es = sq(ex, ey), e = board[es];
       if (!e || !isPlainEarth(e)) continue;
-      for (const [ax, ay] of ALL) {
+      if (variant.waterRiver && dx !== 0 && !around.has(es)) continue;
+      for (const [ax, ay] of variant.waterStraightSteps ? ORTH : ALL) {
         const nx = x + ax, ny = y + ay;
-        if (onBoard(nx, ny) && Math.max(Math.abs(nx - ex), Math.abs(ny - ey)) === 1) out.add(sq(nx, ny));
+        if (onBoard(nx, ny) && Math.max(Math.abs(nx - ex), Math.abs(ny - ey)) === 1) put(sq(nx, ny), es);
       }
     }
     if (!variant.noWaterEdge && onEdge(x, y)) for (const [dx, dy] of ORTH) { // bank along the edge
       const nx = x + dx, ny = y + dy;
-      if (onBoard(nx, ny) && onEdge(nx, ny)) out.add(sq(nx, ny));
+      if (onBoard(nx, ny) && onEdge(nx, ny)) put(sq(nx, ny), -1);
     }
     return out;
   }
@@ -242,20 +256,20 @@ var Rules = (() => {
     for (const as of moveTypes(p)) {
       if (as === 'water') {
         const visited = new Set([from]), path = [from];
-        const walk = (c, k) => {
-          for (const n of waterSteps(board, c)) {
+        const walk = (c, k, around) => {
+          for (const [n, e] of waterSteps(board, c, around)) {
             if (visited.has(n)) continue;
             const t = board[n], steps = k + 1, ok = !exact || steps === R;
             path.push(n);
             if (!t) {
               if (ok) add(n, path.slice(), as);
-              if (steps < R) { visited.add(n); walk(n, steps); visited.delete(n); }
+              if (steps < R) { visited.add(n); walk(n, steps, e); visited.delete(n); }
             } else if (ok && landable(t, as) && (!variant.waterStraightCapture || t.o === p.o || X(n) === X(c)))
               add(n, path.slice(), as); // waterStraightCapture: the capturing step must be a straight flow
             path.pop();
           }
         };
-        walk(from, 0);
+        walk(from, 0, new Set());
         continue;
       }
       const dirs = as === 'fire' ? ORTH : as === 'wind' ? DIAG : ALL;
@@ -427,9 +441,9 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ----- app state -----
 let history = [R.newGame()];
-let settings = { orient: 'fixed', opponent: 'medium', side: 'w' };
+let settings = { orient: 'fixed', opponent: 'medium', side: 'w', water: 'normal' };
 // orient: 'fixed' | 'turn' | 'face' (two players only); opponent: 'easy' | 'medium' | 'hard' | 'human';
-// side: the colour you play against the computer
+// side: the colour you play against the computer; water: 'normal' | 'river' | 'straight' | 'both'
 let sel = null;          // {type:'board', sq} | {type:'tray', idx} | {type:'palette', piece} | {type:'remove'}
 let targets = new Map(); // square -> move (board) or true (placement)
 let peek = null;         // {sq, moves} opponent piece being inspected
@@ -442,8 +456,18 @@ const view = () => (editing ? { ...cur(), board: editing.board, phase: 'edit', t
 
 try { Object.assign(settings, JSON.parse(localStorage.getItem('elements-spike-settings') || '{}')); } catch (e) {}
 // older versions stored a rotate on/off switch
-const migrate = s => { if (!s.orient) s.orient = s.rotate ? 'turn' : 'fixed'; delete s.rotate; };
+const migrate = s => { if (!s.orient) s.orient = s.rotate ? 'turn' : 'fixed'; delete s.rotate; if (!s.water) s.water = 'normal'; };
+// The Water movement trial (GAME_SPEC open question 10): sets the rules' two Water switches.
+const applyWater = () => {
+  R.variant.waterRiver = settings.water === 'river' || settings.water === 'both';
+  R.variant.waterStraightSteps = settings.water === 'straight' || settings.water === 'both';
+};
 migrate(settings);
+// a link can pick the Water rule: ?water=normal | river | straight | both
+try {
+  const w = new URLSearchParams(location.search).get('water');
+  if (['normal', 'river', 'straight', 'both'].includes(w)) settings.water = w;
+} catch (e) {}
 const saveSettings = () => { try { localStorage.setItem('elements-spike-settings', JSON.stringify(settings)); } catch (e) {} };
 
 // ----- Pixi -----
@@ -456,6 +480,7 @@ async function boot(data) {
   if (data && data.history && data.history.length) history = data.history;
   if (data && data.settings) { Object.assign(settings, data.settings); migrate(settings); }
   R.variant.exact = false; // the exact-range variant isn't offered (GAME_SPEC §3)
+  applyWater();
   await app.init({
     resizeTo: stageEl, antialias: true, autoDensity: true, backgroundAlpha: 0,
     resolution: Math.min(window.devicePixelRatio || 1, 3),
@@ -818,7 +843,7 @@ function playLine() {
   while (i > 0 && history[i].last && history[i].last.from !== undefined) i--;
   const start = history[i];
   return {
-    start: start.board.flatMap((p, s) => (p ? [[s, p]] : [])), toMove: start.turn,
+    start: start.board.flatMap((p, s) => (p ? [[s, p]] : [])), startToMove: start.turn,
     moves: history.slice(i + 1).map(h => ({ from: h.last.from, to: h.last.to })),
   };
 }
@@ -838,7 +863,8 @@ function scheduleBot() {
       doPlace(pl.idx, pl.sq);
       return;
     }
-    bot.postMessage({ id: ask, level: settings.opponent, ...playLine() });
+    const config = { waterRiver: R.variant.waterRiver, waterStraightSteps: R.variant.waterStraightSteps };
+    bot.postMessage({ id: ask, level: settings.opponent, config, board: st.board, toMove: st.turn, ...playLine() });
   }, wait);
 }
 function botReply({ data }) {
@@ -1091,6 +1117,7 @@ function updateUi(st) {
   for (const b of document.querySelectorAll('#sideChoice button')) b.setAttribute('aria-pressed', String(b.dataset.side === settings.side));
   $('sideChoice').hidden = !vsBot();
   $('orientChoice').hidden = vsBot();
+  for (const r of document.querySelectorAll('input[name="water"]')) r.checked = r.value === settings.water;
   if (editing) {
     $('eTurnW').setAttribute('aria-pressed', String(editing.turn === 'w'));
     $('eTurnB').setAttribute('aria-pressed', String(editing.turn === 'b'));
@@ -1140,6 +1167,9 @@ function bindUi() {
   });
   for (const b of document.querySelectorAll('#sideChoice button')) b.addEventListener('click', () => {
     settings.side = b.dataset.side; settingsChanged();
+  });
+  for (const r of document.querySelectorAll('input[name="water"]')) r.addEventListener('change', e => {
+    settings.water = e.target.value; applyWater(); settingsChanged();
   });
   $('drawBtn').addEventListener('click', () => {
     const st = cur();
