@@ -1,6 +1,6 @@
 // Checks that the engine (packages/engine) plays exactly the same game as the spike's rules: on
 // every move of many random games, under each variant, the same legal moves in the same order and
-// the same result. The spike still has the chess 50-move rule, so the engine is set to 50 here.
+// the same result, including the 75-move rule.
 // Run: node check.mjs
 import { Spike, setSpikeVariant } from './spike-rules.mjs';
 import * as E from '../packages/engine/src/index.ts';
@@ -25,7 +25,7 @@ for (const v of VARIANTS) {
         board[s] = val === 'wizard' ? { o, wiz: true } : { o, els: [{ e: val[0], s: val[1] }] };
         pieces.push([s, toPiece(o === 'w' ? 'white' : 'black', val)]);
       }
-    let a = Spike.fromPosition(board, 'w'), b = E.startFromPosition(pieces, { config: { ...v, quietMoveLimit: 50 } });
+    let a = Spike.fromPosition(board, 'w'), b = E.startFromPosition(pieces, { config: v });
     while (a.phase === 'play') {
       positions++;
       const ma = Spike.legalMoves(a), mb = E.legalActions(b);

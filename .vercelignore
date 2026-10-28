@@ -1,0 +1,8 @@
+# Only what spike/build.mjs needs goes to Vercel: spike/, playtest/*.mjs, packages/engine
+source/
+docs/
+playtest/results/
+playtest/chess/
+*.md
+*.html
+!spike/index.html

@@ -1,4 +1,4 @@
-<title>Elements Spike</title>
+<title>Elements</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,6 +40,10 @@ button {
   font: inherit; font-weight: 600; color: var(--ink); background: var(--panel-2);
   border: 1px solid #3c484e; border-radius: 10px; padding: 10px 14px; min-height: 44px;
   touch-action: manipulation; cursor: pointer;
+}
+select {
+  font: inherit; font-weight: 600; color: var(--ink); background: var(--panel-2);
+  border: 1px solid var(--brass); border-radius: 10px; padding: 10px 12px; min-height: 44px; max-width: 220px;
 }
 button:disabled { opacity: 0.4; cursor: default; }
 button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
@@ -88,10 +92,19 @@ button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-c
 </style>
 
 <header>
-  <div class="brand">Elements<small>spike</small></div>
+  <div class="brand">Elements<small>prototype</small></div>
   <div id="status" aria-live="polite"></div>
   <div class="actions">
-    <button id="presetBtn" type="button" hidden>Default formation</button>
+    <select id="presetSel" aria-label="Use a preset formation" hidden>
+      <option value="">Preset formation…</option>
+      <option value="windHeldBack">Wind 3 held back (default)</option>
+      <option value="mirrored">Mirrored and reshaped</option>
+      <option value="fireBeforeWizard">Fire in front of the Wizard</option>
+      <option value="fireOneInFront">Fire 1 in front</option>
+      <option value="lowWinds">Low Winds, Earth forward</option>
+      <option value="wizardForward">Wizard forward</option>
+      <option value="original">Original</option>
+    </select>
     <button id="undoBtn" type="button">Undo</button>
     <button id="newBtn" type="button">New game</button>
     <button id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">Options</button>
@@ -119,12 +132,25 @@ button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-c
 </div>
 <div id="menu" hidden>
   <fieldset class="choice">
+    <legend class="menu-label">Opponent</legend>
+    <label class="toggle"><input type="radio" name="opponent" value="easy"><span>Computer · Easy</span><small>Looks two moves ahead.</small></label>
+    <label class="toggle"><input type="radio" name="opponent" value="medium"><span>Computer · Medium</span><small>Looks further ahead, with piece values learned from thousands of games.</small></label>
+    <label class="toggle"><input type="radio" name="opponent" value="hard"><span>Computer · Hard</span><small>The strongest bot from the playtests.</small></label>
+    <label class="toggle"><input type="radio" name="opponent" value="human"><span>Another person</span><small>Two players on this device.</small></label>
+  </fieldset>
+  <fieldset class="choice" id="sideChoice">
+    <legend class="menu-label">You play</legend>
+    <div class="menu-row">
+      <button type="button" data-side="w" aria-pressed="true">White (moves first)</button>
+      <button type="button" data-side="b" aria-pressed="false">Black</button>
+    </div>
+  </fieldset>
+  <fieldset class="choice" id="orientChoice">
     <legend class="menu-label">Board orientation</legend>
     <label class="toggle"><input id="orientFixed" type="radio" name="orient" value="fixed"><span>Fixed</span><small>White at the bottom, always.</small></label>
     <label class="toggle"><input id="orientTurn" type="radio" name="orient" value="turn"><span>Turn to the player to move</span><small>Black's turn shows the board from Black's side. For passing the iPad back and forth.</small></label>
     <label class="toggle"><input id="orientFace" type="radio" name="orient" value="face"><span>Face to face</span><small>Board stays fixed, Black's tray faces Black. For two players on opposite sides of the iPad.</small></label>
   </fieldset>
-  <label class="toggle"><input id="optExact" type="checkbox"><span>Exact range (variant)</span><small>Every piece moves exactly its size, captures included. Water's route has exactly N steps. A combined piece moves exactly its larger size.</small></label>
   <div class="menu-row">
     <button id="drawBtn" type="button">Agree to a draw</button>
     <button id="editBtn" type="button">Set up a position (debug)</button>
@@ -295,21 +321,42 @@ var Rules = (() => {
       last: null, clock: 0, reps: {}, result: null, ply: 0,
     };
   }
-  // The designer's own formation (video [12:44]–[13:10]), as White sees it.
-  // Black gets the same formation from their side of the table (rotated 180°).
-  const DEFAULT_FORMATION = {
-    b3: ['wind', 3], c3: ['earth', 1], e3: ['earth', 3], g3: ['earth', 2], h3: ['wind', 2],
-    c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['fire', 1], g2: ['water', 3],
-    d1: ['fire', 3], e1: 'wizard', f1: ['fire', 2],
+  // Preset formations (GAME_SPEC §6), as White sees them; copied from PRESETS in
+  // packages/engine/src/formation.ts. Black gets the same formation from their side of the table
+  // (rotated 180°). The default is windHeldBack; original is the designer's own formation.
+  const PRESETS = {
+    windHeldBack: { e3: ['earth', 3], g3: ['earth', 2], h3: ['fire', 1], c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['wind', 2], g2: ['water', 3], b1: ['earth', 1], c1: ['wind', 3], d1: ['fire', 3], e1: 'wizard', f1: ['fire', 2] },
+    mirrored: { b3: ['fire', 2], c3: ['earth', 1], e3: ['earth', 3], g3: ['wind', 3], h3: ['earth', 2], b2: ['water', 2], d2: ['water', 3], e2: ['fire', 1], f2: ['wind', 1], g2: ['water', 1], d1: ['wind', 2], e1: 'wizard', f1: ['fire', 3] },
+    fireBeforeWizard: { c3: ['earth', 1], h3: ['wind', 2], i3: ['earth', 2], c2: ['water', 1], d2: ['wind', 1], e2: ['fire', 2], f2: ['earth', 3], g2: ['water', 3], h2: ['fire', 1], b1: ['wind', 3], d1: ['fire', 3], e1: 'wizard', f1: ['water', 2] },
+    fireOneInFront: { e3: ['fire', 1], g3: ['earth', 2], h3: ['fire', 2], c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['earth', 3], g2: ['water', 3], b1: ['earth', 1], c1: ['wind', 3], d1: ['fire', 3], e1: 'wizard', f1: ['wind', 2] },
+    lowWinds: { e3: ['earth', 1], g3: ['earth', 3], h3: ['fire', 2], d2: ['wind', 1], e2: ['water', 2], f2: ['earth', 2], g2: ['water', 3], h2: ['water', 1], b1: ['fire', 1], c1: ['wind', 3], d1: ['fire', 3], e1: 'wizard', f1: ['wind', 2] },
+    wizardForward: { a3: ['earth', 1], b3: ['earth', 2], c3: ['wind', 1], d3: ['fire', 1], f3: 'wizard', g3: ['fire', 3], e2: ['earth', 3], g2: ['water', 1], h2: ['water', 3], b1: ['wind', 2], c1: ['fire', 2], d1: ['water', 2], f1: ['wind', 3] },
+    original: { b3: ['wind', 3], c3: ['earth', 1], e3: ['earth', 3], g3: ['earth', 2], h3: ['wind', 2], c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['fire', 1], g2: ['water', 3], d1: ['fire', 3], e1: 'wizard', f1: ['fire', 2] },
   };
-  function defaultFormation() {
+  const DEFAULT_PRESET = 'windHeldBack';
+  // White's square for a preset square, seen from owner o's side
+  const ownSq = (o, t) => { const s = parse(t); return o === 'w' ? s : sq(N - 1 - X(s), N - 1 - Y(s)); };
+  const presetPiece = (o, v) => (v === 'wizard' ? { o, wiz: true } : { o, els: [{ e: v[0], s: v[1] }] });
+  // Both formations on one board: White's preset and Black's preset.
+  function presetBoard(white = DEFAULT_PRESET, black = white) {
     const board = Array(N * N).fill(null);
-    for (const [t, v] of Object.entries(DEFAULT_FORMATION)) {
-      const s = parse(t);
-      for (const [o, at] of [['w', s], ['b', sq(N - 1 - X(s), N - 1 - Y(s))]])
-        board[at] = v === 'wizard' ? { o, wiz: true } : { o, els: [{ e: v[0], s: v[1] }] };
-    }
+    for (const [o, name] of [['w', white], ['b', black]])
+      for (const [t, v] of Object.entries(PRESETS[name])) board[ownSq(o, t)] = presetPiece(o, v);
     return board;
+  }
+  // The next placement for a player following a preset during the formation phase (Wizard first,
+  // then the rest in the preset's order), or null if that preset's squares are taken.
+  function presetPlacement(st, name = DEFAULT_PRESET) {
+    const o = st.turn, r = st.reserve[o];
+    const entries = Object.entries(PRESETS[name]).sort(([, a], [, b]) => (b === 'wizard') - (a === 'wizard'));
+    for (const [t, v] of entries) {
+      const s = ownSq(o, t);
+      if (st.board[s] && st.board[s].o === o) continue; // placed already
+      const idx = r.findIndex(p => (v === 'wizard' ? p.wiz : !p.wiz && p.els[0].e === v[0] && p.els[0].s === v[1]));
+      if (idx < 0 || st.board[s]) continue;
+      return { idx, sq: s };
+    }
+    return null;
   }
   function fromPosition(board, turn) {
     const st = { ...newGame(), board: board.slice(), phase: 'play', turn, reserve: { w: [], b: [] } };
@@ -351,13 +398,13 @@ var Rules = (() => {
     if (!replies.length && check) return end(mover, 'checkmate');
     if (!replies.length) return end(null, 'stalemate');
     if (ns.reps[key] >= 3) return end(null, 'repetition');
-    if (ns.clock >= 100) return end(null, 'fifty');
+    if (ns.clock >= 150) return end(null, 'fifty'); // 75 moves each (GAME_SPEC §6)
     return ns;
   }
 
   return {
     N, ELS, variant, sq, X, Y, name, parse, other, inZone, isCapturer, canCombine, combine, range,
-    pseudoMoves, legalFrom, legalMoves, inCheck, wizardSq, newGame, fromPosition, defaultFormation, canPick, placeTargets,
+    pseudoMoves, legalFrom, legalMoves, inCheck, wizardSq, newGame, fromPosition, presetBoard, presetPlacement, canPick, placeTargets,
     place, makeMove, reserveFor,
   };
 })();
@@ -380,7 +427,9 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ----- app state -----
 let history = [R.newGame()];
-let settings = { orient: 'fixed', exact: false }; // orient: 'fixed' | 'turn' | 'face'
+let settings = { orient: 'fixed', opponent: 'medium', side: 'w' };
+// orient: 'fixed' | 'turn' | 'face' (two players only); opponent: 'easy' | 'medium' | 'hard' | 'human';
+// side: the colour you play against the computer
 let sel = null;          // {type:'board', sq} | {type:'tray', idx} | {type:'palette', piece} | {type:'remove'}
 let targets = new Map(); // square -> move (board) or true (placement)
 let peek = null;         // {sq, moves} opponent piece being inspected
@@ -406,7 +455,7 @@ let boardKey = '';
 async function boot(data) {
   if (data && data.history && data.history.length) history = data.history;
   if (data && data.settings) { Object.assign(settings, data.settings); migrate(settings); }
-  R.variant.exact = !!settings.exact;
+  R.variant.exact = false; // the exact-range variant isn't offered (GAME_SPEC §3)
   await app.init({
     resizeTo: stageEl, antialias: true, autoDensity: true, backgroundAlpha: 0,
     resolution: Math.min(window.devicePixelRatio || 1, 3),
@@ -419,11 +468,17 @@ async function boot(data) {
   bindUi();
   flip = wantFlip();
   render();
+  scheduleBot();
   if (document.fonts) document.fonts.ready.then(() => { boardKey = ''; render(); });
   window.claude?.hot?.snapshot?.(() => ({ history, settings }));
 }
 
-const wantFlip = () => settings.orient === 'turn' && !editing && cur().phase !== 'over' && cur().turn === 'b';
+const vsBot = () => settings.opponent !== 'human';
+const botSide = () => (vsBot() ? R.other(settings.side) : null);
+const botTurn = () => !editing && cur().phase !== 'over' && cur().turn === botSide();
+// against the computer your side is always at the bottom
+const wantFlip = () => (vsBot() ? !editing && settings.side === 'b'
+  : settings.orient === 'turn' && !editing && cur().phase !== 'over' && cur().turn === 'b');
 
 // the board is three stone plates (one per 3-row zone) with a gap of PLATE_GAP squares between them
 const PLATE_GAP = 0.15, HF = 1 + 2 * PLATE_GAP / 9;  // HF: board height / width
@@ -453,7 +508,7 @@ function computeLayout() {
   const q = B / 9, pg = q * PLATE_GAP;
   const bottomOwner = flip ? 'b' : 'w';
   // face to face: the top player's tray is turned 180° to read from their side
-  if (settings.orient === 'face') top.turned = true;
+  if (settings.orient === 'face' && !vsBot()) top.turned = true;
   return { bx, by, B, BH: B * HF, q, pg, topOwner: R.other(bottomOwner), trays: { [bottomOwner]: bottom, [R.other(bottomOwner)]: top } };
 }
 
@@ -748,6 +803,51 @@ function scheduleFlip(delay) {
   flipTimer = setTimeout(() => { flip = wantFlip(); boardKey = ''; render(); }, delay);
 }
 
+// ----- the computer opponent -----
+// bot.js is a Web Worker built from spike/bot.mjs: the playtest's players on the real rules engine.
+let bot = null, botBroken = false, botAsk = 0, botTimer = null; // botAsk: the one request still wanted
+try {
+  bot = new Worker('bot.js');
+  bot.onmessage = botReply;
+  bot.onerror = () => { botBroken = true; render(); };
+} catch (e) { botBroken = true; }
+
+// The board when play began and the moves since, so the engine sees the same game (repetitions, move count).
+function playLine() {
+  let i = history.length - 1;
+  while (i > 0 && history[i].last && history[i].last.from !== undefined) i--;
+  const start = history[i];
+  return {
+    start: start.board.flatMap((p, s) => (p ? [[s, p]] : [])), toMove: start.turn,
+    moves: history.slice(i + 1).map(h => ({ from: h.last.from, to: h.last.to })),
+  };
+}
+// Call after every change to the game or the settings: asks for a move if it's the computer's turn.
+function scheduleBot() {
+  clearTimeout(botTimer);
+  const ask = ++botAsk;
+  if (!botTurn() || botBroken) return;
+  const st = cur();
+  // wait for the last move's animation, then a moment, so its moves don't land instantly
+  const wait = (anim ? anim.dur : 0) + (st.phase === 'setup' ? 220 : 500);
+  botTimer = setTimeout(() => {
+    if (ask !== botAsk) return;
+    if (st.phase === 'setup') { // places its default formation, one piece per turn like a player
+      const pl = R.presetPlacement(st) || { idx: R.canPick(st, 0) ? 0 : st.reserve[st.turn].findIndex(p => p.wiz), sq: -1 };
+      if (pl.sq < 0) pl.sq = R.placeTargets(st, pl.idx)[0];
+      doPlace(pl.idx, pl.sq);
+      return;
+    }
+    bot.postMessage({ id: ask, level: settings.opponent, ...playLine() });
+  }, wait);
+}
+function botReply({ data }) {
+  if (data.id !== botAsk) return; // the game moved on meanwhile (undo, new game, settings)
+  const m = !data.error && R.legalMoves(cur()).find(x => x.from === data.move.from && x.to === data.move.to);
+  if (!m) { console.error('bot:', data.error || data.move); botBroken = true; render(); return; }
+  doMove(m, true);
+}
+
 // ----- actions -----
 function push(st) {
   history.push(st);
@@ -758,19 +858,24 @@ function doMove(m, animate) {
   if (animate) startAnim(m);
   render();
   scheduleFlip(animate && anim ? anim.dur + 450 : 450);
+  scheduleBot();
 }
 function doPlace(idx, s) {
   push(R.place(cur(), idx, s));
   render();
   scheduleFlip(450);
+  scheduleBot();
 }
 function undo() {
   if (editing || history.length < 2) return;
   endAnim();
   history.pop();
+  // against the computer, go back to your own turn
+  while (vsBot() && history.length > 1 && cur().phase !== 'over' && cur().turn === botSide()) history.pop();
   sel = null; targets = new Map(); peek = null; bannerHidden = false;
   clearTimeout(flipTimer); flip = wantFlip(); boardKey = '';
   render();
+  scheduleBot();
 }
 function newGame() {
   endAnim();
@@ -778,6 +883,7 @@ function newGame() {
   sel = null; targets = new Map(); peek = null; editing = null; bannerHidden = false;
   clearTimeout(flipTimer); flip = wantFlip(); boardKey = '';
   render();
+  scheduleBot();
 }
 function selectBoard(s) {
   const st = cur();
@@ -814,7 +920,7 @@ function localPoint(e) {
 }
 function draggableSrc(h) {
   const st = cur();
-  if (editing || !h || st.phase === 'over' || anim) return null;
+  if (editing || !h || st.phase === 'over' || anim || botTurn()) return null;
   if (st.phase === 'setup' && h.type === 'slot' && h.o === st.turn && h.on) return { type: 'tray', idx: h.i };
   if (st.phase === 'play' && h.type === 'sq' && st.board[h.sq] && st.board[h.sq].o === st.turn) return { type: 'board', sq: h.sq };
   return null;
@@ -829,7 +935,7 @@ function bindInput() {
     const h = hit(p.x, p.y);
     // on touch, lift the dragged piece away from the finger, toward the far side from the player
     const src = draggableSrc(h);
-    const facesTop = settings.orient === 'face' && cur().turn === L.topOwner;
+    const facesTop = settings.orient === 'face' && !vsBot() && cur().turn === L.topOwner;
     const lift = e.pointerType === 'touch' ? L.q * 0.45 : 0;
     drag = { id: e.pointerId, x0: p.x, y0: p.y, x: p.x, y: p.y, active: false, h, src, offY: facesTop ? lift : -lift };
     cv.setPointerCapture(e.pointerId);
@@ -879,7 +985,7 @@ function tap(h) {
     render();
     return;
   }
-  if (st.phase === 'over' || !h) { deselect(); render(); return; }
+  if (st.phase === 'over' || !h || botTurn()) { deselect(); render(); return; }
   if (h.type === 'sq' && targets.has(h.sq)) {
     if (sel.type === 'tray') doPlace(sel.idx, h.sq);
     else doMove(targets.get(h.sq), true);
@@ -933,44 +1039,58 @@ function drawDrag() {
 
 // ----- HTML UI -----
 const reasonText = {
-  elimination: (w, l) => `${l} has no capturing pieces left.`,
+  elimination: (w, l) => `${who(l)} ${has(l)} no capturing pieces left.`,
   checkmate: () => 'Checkmate.',
-  stalemate: (w, l, t) => `${t} has no legal move (stalemate).`,
+  stalemate: (w, l, t) => `${who(t)} ${has(t)} no legal move (stalemate).`,
   repetition: () => 'The same position came up three times.',
-  fifty: () => '50 moves each without a capture or a combine.',
+  fifty: () => '75 moves each without a capture or a combine.',
   agreement: () => 'Both players agreed to a draw.',
 };
 const nameOf = o => (o === 'w' ? 'White' : 'Black');
+// against the computer: "You" and "The computer" instead of the colours
+const who = o => (!vsBot() ? nameOf(o) : o === settings.side ? 'You' : 'The computer');
+const has = o => (who(o) === 'You' ? 'have' : 'has');
 
 function updateUi(st) {
   const status = $('status');
   if (editing) status.textContent = 'Debug: place any pieces, then play from here';
-  else if (st.phase === 'setup') {
+  else if (botBroken && vsBot()) status.textContent = 'The computer opponent didn\u2019t load. Choose \u201cAnother person\u201d in Options.';
+  else if (botTurn()) status.textContent = st.phase === 'setup' ? 'The computer is placing its pieces' : 'The computer is thinking\u2026';
+  else if (st.phase === 'setup' && vsBot()) {
+    const left = st.reserve[st.turn].length;
+    status.textContent = st.reserve[st.turn].some(p => p.wiz)
+      ? 'Place your Wizard in your 3 rows, or pick a preset'
+      : `Place a piece (${left} left)`;
+  } else if (st.phase === 'setup') {
     const left = st.reserve[st.turn].length;
     status.textContent = st.reserve[st.turn].some(p => p.wiz)
       ? `${nameOf(st.turn)}: place your Wizard in your 3 rows`
       : `${nameOf(st.turn)}: place a piece (${left} left)`;
   } else if (st.phase === 'play') {
     const check = R.inCheck(st.board, st.turn);
-    status.innerHTML = `${nameOf(st.turn)} to move${check ? ' · <span class="check">Check!</span>' : ''}`;
+    status.innerHTML = `${vsBot() ? 'Your move' : `${nameOf(st.turn)} to move`}${check ? ' · <span class="check">Check!</span>' : ''}`;
   } else {
     const r = st.result;
-    status.textContent = r.winner ? `${nameOf(r.winner)} wins` : 'Draw';
+    status.textContent = r.winner ? `${who(r.winner)} ${vsBot() && r.winner === settings.side ? 'win' : 'wins'}` : 'Draw';
   }
   const over = !editing && st.phase === 'over';
   $('banner').hidden = !over || bannerHidden;
   if (over) {
     const r = st.result, w = r.winner, l = w && R.other(w);
-    $('bannerTitle').textContent = w ? `${nameOf(w)} wins` : 'Draw';
-    $('bannerText').textContent = reasonText[r.reason](nameOf(w), nameOf(l), nameOf(st.turn));
+    $('bannerTitle').textContent = w ? `${who(w)} ${vsBot() && w === settings.side ? 'win' : 'wins'}` : 'Draw';
+    $('bannerText').textContent = reasonText[r.reason](w, l, st.turn);
   }
-  $('presetBtn').hidden = !!editing || st.phase !== 'setup';
+  $('presetSel').hidden = !!editing || st.phase !== 'setup' || botTurn();
   $('undoBtn').disabled = !!editing || history.length < 2;
   $('drawBtn').disabled = !!editing || st.phase !== 'play';
+  $('drawBtn').hidden = vsBot();
   $('editBtn').disabled = !!editing;
   $('editbar').hidden = !editing;
   for (const r of document.querySelectorAll('input[name="orient"]')) r.checked = r.value === settings.orient;
-  $('optExact').checked = settings.exact;
+  for (const r of document.querySelectorAll('input[name="opponent"]')) r.checked = r.value === settings.opponent;
+  for (const b of document.querySelectorAll('#sideChoice button')) b.setAttribute('aria-pressed', String(b.dataset.side === settings.side));
+  $('sideChoice').hidden = !vsBot();
+  $('orientChoice').hidden = vsBot();
   if (editing) {
     $('eTurnW').setAttribute('aria-pressed', String(editing.turn === 'w'));
     $('eTurnB').setAttribute('aria-pressed', String(editing.turn === 'b'));
@@ -984,12 +1104,18 @@ function bindUi() {
   menuBtn.addEventListener('click', () => setMenu(menu.hidden));
   document.addEventListener('pointerdown', e => { if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) setMenu(false); });
   $('undoBtn').addEventListener('click', undo);
-  // fills both formations at once and starts play; Undo goes back to placing by hand
-  $('presetBtn').addEventListener('click', () => {
+  // fills both formations at once and starts play; Undo goes back to placing by hand.
+  // Two players both take the preset; against the computer, you take it and the computer its default.
+  $('presetSel').addEventListener('change', e => {
+    const name = e.target.value;
+    e.target.value = '';
+    if (!name || cur().phase !== 'setup') return;
     endAnim();
-    push(R.fromPosition(R.defaultFormation(), 'w'));
+    const mine = vsBot() ? settings.side : null;
+    push(R.fromPosition(R.presetBoard(mine === 'b' ? undefined : name, mine === 'w' ? undefined : name), 'w'));
     clearTimeout(flipTimer); flip = wantFlip(); boardKey = '';
     render();
+    scheduleBot();
   });
   let armed = null;
   const newBtn = $('newBtn');
@@ -1006,11 +1132,14 @@ function bindUi() {
   for (const r of document.querySelectorAll('input[name="orient"]')) r.addEventListener('change', e => {
     settings.orient = e.target.value; saveSettings(); clearTimeout(flipTimer); flip = wantFlip(); boardKey = ''; render();
   });
-  $('optExact').addEventListener('change', e => {
-    settings.exact = e.target.checked; R.variant.exact = settings.exact; saveSettings();
-    if (sel && sel.type === 'board') selectBoard(sel.sq);
-    if (peek) peek.moves = R.pseudoMoves(cur().board, peek.sq);
-    render();
+  const settingsChanged = () => {
+    saveSettings(); deselect(); clearTimeout(flipTimer); flip = wantFlip(); boardKey = ''; render(); scheduleBot();
+  };
+  for (const r of document.querySelectorAll('input[name="opponent"]')) r.addEventListener('change', e => {
+    settings.opponent = e.target.value; settingsChanged();
+  });
+  for (const b of document.querySelectorAll('#sideChoice button')) b.addEventListener('click', () => {
+    settings.side = b.dataset.side; settingsChanged();
   });
   $('drawBtn').addEventListener('click', () => {
     const st = cur();
@@ -1021,7 +1150,7 @@ function bindUi() {
   $('editBtn').addEventListener('click', () => {
     const st = cur();
     editing = { board: st.phase === 'setup' ? Array(81).fill(null) : st.board.slice(), turn: st.phase === 'play' ? st.turn : 'w' };
-    deselect(); setMenu(false); clearTimeout(flipTimer); flip = false; boardKey = ''; render();
+    deselect(); setMenu(false); clearTimeout(flipTimer); flip = false; boardKey = ''; render(); scheduleBot();
   });
   $('eRemove').addEventListener('click', () => { sel = sel && sel.type === 'remove' ? null : { type: 'remove' }; render(); });
   $('eClear').addEventListener('click', () => { editing.board = Array(81).fill(null); render(); });
@@ -1029,16 +1158,16 @@ function bindUi() {
   $('eTurnB').addEventListener('click', () => { editing.turn = 'b'; render(); });
   $('ePlay').addEventListener('click', () => {
     history = [R.fromPosition(editing.board, editing.turn)];
-    editing = null; deselect(); flip = wantFlip(); boardKey = ''; render();
+    editing = null; deselect(); flip = wantFlip(); boardKey = ''; render(); scheduleBot();
   });
-  $('eCancel').addEventListener('click', () => { editing = null; deselect(); flip = wantFlip(); boardKey = ''; render(); });
+  $('eCancel').addEventListener('click', () => { editing = null; deselect(); flip = wantFlip(); boardKey = ''; render(); scheduleBot(); });
   $('bNew').addEventListener('click', newGame);
   $('bUndo').addEventListener('click', undo);
   $('bView').addEventListener('click', () => { bannerHidden = true; render(); });
 }
 
 // for poking at the spike from the browser console
-window.spike = { Rules: R, cur, push: st => { push(st); render(); }, sqPos: s => sqPos(s), sqAt: (x, y) => sqAt(x, y), layout: () => L, anim: () => anim && anim.gfx && { x: anim.gfx.x, y: anim.gfx.y, t: anim.t } };
+window.spike = { Rules: R, cur, push: st => { push(st); render(); }, move: m => doMove(m, false), place: (i, s) => doPlace(i, s), undo, sqPos: s => sqPos(s), sqAt: (x, y) => sqAt(x, y), layout: () => L, anim: () => anim && anim.gfx && { x: anim.gfx.x, y: anim.gfx.y, t: anim.t } };
 
 const hot = window.claude?.hot;
 if (hot?.ready) hot.ready(boot); else boot(hot?.data ?? {});

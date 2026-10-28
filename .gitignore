@@ -26,3 +26,7 @@ playtest/results/*.json
 !playtest/results/formation-search.json
 !playtest/results/formation-search-deep.json
 playtest/results/*.log
+
+# Vercel project link (local)
+.vercel/
+.vercel
