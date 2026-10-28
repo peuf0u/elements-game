@@ -19,3 +19,9 @@ source/video.mp4
 source/audio.wav
 source/clip_*.wav
 source/frames/
+
+# Playtest game records: large, re-created by playtest/run.mjs (summaries are kept)
+playtest/results/*.json
+!playtest/results/*.summary.json
+!playtest/results/formation-search.json
+playtest/results/*.log

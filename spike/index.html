@@ -149,7 +149,8 @@ var Rules = (() => {
   const ORTH = [[1, 0], [-1, 0], [0, 1], [0, -1]];
   const DIAG = [[1, 1], [1, -1], [-1, 1], [-1, -1]];
   const ALL = ORTH.concat(DIAG);
-  const variant = { exact: false };
+  // Variant toggles. noWaterEdge / waterStraightCapture are Water experiments from playtest/ (GAME_SPEC open question 6).
+  const variant = { exact: false, noWaterEdge: false, waterStraightCapture: false };
 
   const sq = (x, y) => y * N + x;
   const X = s => s % N;
@@ -192,7 +193,7 @@ var Rules = (() => {
         if (onBoard(nx, ny) && Math.max(Math.abs(nx - ex), Math.abs(ny - ey)) === 1) out.add(sq(nx, ny));
       }
     }
-    if (onEdge(x, y)) for (const [dx, dy] of ORTH) { // bank along the edge
+    if (!variant.noWaterEdge && onEdge(x, y)) for (const [dx, dy] of ORTH) { // bank along the edge
       const nx = x + dx, ny = y + dy;
       if (onBoard(nx, ny) && onEdge(nx, ny)) out.add(sq(nx, ny));
     }
@@ -223,7 +224,8 @@ var Rules = (() => {
             if (!t) {
               if (ok) add(n, path.slice(), as);
               if (steps < R) { visited.add(n); walk(n, steps); visited.delete(n); }
-            } else if (ok && landable(t, as)) add(n, path.slice(), as);
+            } else if (ok && landable(t, as) && (!variant.waterStraightCapture || t.o === p.o || X(n) === X(c)))
+              add(n, path.slice(), as); // waterStraightCapture: the capturing step must be a straight flow
             path.pop();
           }
         };

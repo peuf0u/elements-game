@@ -110,4 +110,23 @@ expect('White places only in rows 1–3', R.placeTargets(st, 0).length, 27);
 for (let i = 0; i < 26; i++) { const o = st.turn; st = R.place(st, 0, R.placeTargets(st, 0)[0]); }
 expect('after 26 placements play starts with White', [st.phase, st.turn], ['play', 'w']);
 
+// --- Water variants (playtest experiments, GAME_SPEC open question 6) ---
+// Black Water on g1, White piece on e1, f1 empty: normally the edge slide g1 → f1 → e1 captures.
+b = board({ g1: P('b', 'water', 3), e1: P('w', 'fire', 1) });
+expect('normal: Water slides along the edge and captures e1', dests(b, 'g1').includes('e1(capture)'), true);
+R.variant.noWaterEdge = true;
+expect('noWaterEdge: no slide along the edge', dests(b, 'g1').filter(t => t.endsWith('1')).length, 0);
+b = board({ b2: P('w', 'water', 3), c3: P('w', 'earth', 1) });
+expect('noWaterEdge: corner square a2 no longer reachable', dests(b, 'b2').includes('a2'), false);
+expect('noWaterEdge: bending around Earth still works', dests(b, 'b2').includes('d3'), true);
+R.variant.noWaterEdge = false;
+R.variant.waterStraightCapture = true;
+b = board({ g1: P('b', 'water', 3), e1: P('w', 'fire', 1) });
+expect('waterStraightCapture: edge slide may move but not capture', [dests(b, 'g1').includes('f1'), dests(b, 'g1').includes('e1(capture)')], [true, false]);
+b = board({ d3: P('w', 'water', 3), e4: P('b', 'earth', 1), e5: P('b', 'fire', 2) });
+expect('waterStraightCapture: bending around enemy Earth no longer captures Fire e5', dests(b, 'd3').includes('e5(capture)'), false);
+b = board({ d2: P('w', 'water', 3), d4: P('b', 'fire', 2) });
+expect('waterStraightCapture: straight flow still captures', dests(b, 'd2').includes('d4(capture)'), true);
+R.variant.waterStraightCapture = false;
+
 console.log(ok ? '\nALL PASS' : '\nSOME FAILED');
