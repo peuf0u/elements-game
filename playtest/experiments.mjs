@@ -152,6 +152,36 @@ export const EXPERIMENTS = {
       ]),
     ];
   },
+  // 11. Chess calibration (chess/): the same pipeline on a game with known answers.
+  // a. Deep 2k with naive values (every piece worth 1) against itself, to learn values from.
+  chessSelfplay: s => Array.from({ length: 4000 * s }, (_, i) => ({
+    game: 'chess', tag: 'chess: deep 2k naive', a: 'w', seed: 500000 + i, randomOpening: 2,
+    white: { type: 'deep', nodes: 2000, values: 'naive' }, black: { type: 'deep', nodes: 2000, values: 'naive' },
+  })),
+  // a2. The same with the round-1 learned values, for a second round of learning.
+  chessSelfplayTuned: s => Array.from({ length: 4000 * s }, (_, i) => ({
+    game: 'chess', tag: 'chess: deep 2k tuned', a: 'w', seed: 700000 + i, randomOpening: 2,
+    white: { type: 'deep', nodes: 2000, values: 'tuned' }, black: { type: 'deep', nodes: 2000, values: 'tuned' },
+  })),
+  // b. The key tests on chess with the learned values: White against Black, and the handicap test
+  // (one side without its queen, a rook, a bishop, a knight or a pawn), like Elements in recheck.
+  chessRecheck: s => {
+    const bot = { type: 'deep', nodes: 2000, values: 'tuned' }, chess = { game: 'chess', randomOpening: 2 };
+    seed = 600000;
+    return [
+      ...mirror('chess: colours', bot, 400 * s, chess),
+      ...[['queen', 'd1'], ['rook', 'a1'], ['bishop', 'c1'], ['knight', 'b1'], ['pawn', 'f2']].flatMap(([piece, square]) =>
+        Array.from({ length: 200 * s }, (_, i) => {
+          const a = i % 2 ? 'b' : 'w';
+          return { tag: `chess: without ${piece} (${square})`, a, seed: seed++, white: bot, black: bot, remove: { side: a, squares: [square] }, ...chess };
+        })),
+    ];
+  },
+  // c. How much learned values help in chess, compared with Elements (§10 of FINDINGS).
+  chessRating: s => roundRobin('chess rating', {
+    'deep 2k naive': { type: 'deep', nodes: 2000, values: 'naive' }, 'deep 2k classic': { type: 'deep', nodes: 2000, values: 'classic' },
+    'deep 2k tuned': { type: 'deep', nodes: 2000, values: 'tuned' }, 'deep 20k tuned': { type: 'deep', nodes: 20000, values: 'tuned' },
+  }, 100 * s, { game: 'chess' }),
   // 7. Formations against the default one.
   formations: s => [
     ...both('random formation v default', careful, careful, 200 * s, { fa: 'random' }),

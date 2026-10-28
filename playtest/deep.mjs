@@ -28,7 +28,8 @@
 //
 // The search doesn't know which game it plays: everything game-specific comes from a "game
 // adapter" (legal moves, captures, check, the position score). elementsGame() below is the one for
-// Elements, scoring positions with the same evaluate() as Careful and Thinker.
+// Elements, scoring positions with the same evaluate() as Careful and Thinker; chess/players.mjs
+// has one for chess, so the same search can be calibrated on chess.
 import { positionOf } from './engine.mjs';
 import { legalMoves, pseudoMoves, inCheck, OWNER } from '../packages/engine/src/core.ts';
 import { evaluate, codeValues, SCORE_DEFAULTS } from './evaluate.mjs';

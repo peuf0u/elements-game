@@ -1,0 +1,56 @@
+{
+ "experiment": "chessSelfplay",
+ "scale": 1,
+ "seconds": 703,
+ "matchups": {
+  "chess: deep 2k naive": {
+   "games": 4000,
+   "aScore": 43,
+   "aScoreRange": [
+    42,
+    45
+   ],
+   "aWins": 41,
+   "bWins": 55,
+   "draws": 5,
+   "whiteWins": 41,
+   "blackWins": 55,
+   "whiteOfDecisive": 43,
+   "whiteOfDecisiveRange": [
+    41,
+    44
+   ],
+   "endings": {
+    "checkmate": 95,
+    "draw:fifty": 3,
+    "draw:material": 1,
+    "draw:repetition": 1,
+    "draw:stalemate": 0
+   },
+   "movesPerPlayer": {
+    "median": 38,
+    "shortest": 3.5,
+    "longest": 195.5
+   },
+   "combinesPerGame": 0,
+   "capturesPerGame": 18.7
+  }
+ },
+ "pieces": {
+  "takenPerGame": {
+   "P": 9.33,
+   "B": 2.87,
+   "N": 2.85,
+   "R": 2.14,
+   "Q": 1.53
+  },
+  "capturesMadePerGame": {
+   "P": 4,
+   "R": 3.67,
+   "Q": 3.41,
+   "B": 3.27,
+   "N": 3,
+   "K": 1.37
+  }
+ }
+}

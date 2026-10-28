@@ -3,8 +3,9 @@ import { Worker, isMainThread, parentPort } from 'node:worker_threads';
 import os from 'node:os';
 
 if (!isMainThread) {
-  const { playGame } = await import('./game.mjs');
-  parentPort.on('message', ({ i, config }) => parentPort.postMessage({ i, rec: { ...playGame(config), config } }));
+  // config.game picks the game: Elements by default, or 'chess' for the calibration (chess/).
+  const play = { elements: (await import('./game.mjs')).playGame, chess: (await import('./chess/game.mjs')).playChessGame };
+  parentPort.on('message', ({ i, config }) => parentPort.postMessage({ i, rec: { ...play[config.game ?? 'elements'](config), config } }));
 }
 
 export function runGames(configs, { workers = os.availableParallelism(), onProgress } = {}) {

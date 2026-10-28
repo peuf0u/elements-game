@@ -1,0 +1,232 @@
+{
+ "experiment": "chessRating",
+ "scale": 1,
+ "seconds": 142,
+ "matchups": {
+  "chess rating: deep 2k naive v deep 2k classic": {
+   "games": 100,
+   "aScore": 8,
+   "aScoreRange": [
+    4,
+    14
+   ],
+   "aWins": 7,
+   "bWins": 92,
+   "draws": 1,
+   "whiteWins": 47,
+   "blackWins": 52,
+   "whiteOfDecisive": 47,
+   "whiteOfDecisiveRange": [
+    38,
+    57
+   ],
+   "endings": {
+    "checkmate": 99,
+    "draw:fifty": 1
+   },
+   "movesPerPlayer": {
+    "median": 27,
+    "shortest": 5.5,
+    "longest": 117
+   },
+   "combinesPerGame": 0,
+   "capturesPerGame": 14.9
+  },
+  "chess rating: deep 2k naive v deep 2k tuned": {
+   "games": 100,
+   "aScore": 4,
+   "aScoreRange": [
+    2,
+    10
+   ],
+   "aWins": 4,
+   "bWins": 96,
+   "draws": 0,
+   "whiteWins": 50,
+   "blackWins": 50,
+   "whiteOfDecisive": 50,
+   "whiteOfDecisiveRange": [
+    40,
+    60
+   ],
+   "endings": {
+    "checkmate": 100
+   },
+   "movesPerPlayer": {
+    "median": 28,
+    "shortest": 2.5,
+    "longest": 142.5
+   },
+   "combinesPerGame": 0,
+   "capturesPerGame": 14.6
+  },
+  "chess rating: deep 2k naive v deep 20k tuned": {
+   "games": 100,
+   "aScore": 4,
+   "aScoreRange": [
+    2,
+    10
+   ],
+   "aWins": 4,
+   "bWins": 96,
+   "draws": 0,
+   "whiteWins": 52,
+   "blackWins": 48,
+   "whiteOfDecisive": 52,
+   "whiteOfDecisiveRange": [
+    42,
+    62
+   ],
+   "endings": {
+    "checkmate": 100
+   },
+   "movesPerPlayer": {
+    "median": 27.5,
+    "shortest": 5.5,
+    "longest": 145.5
+   },
+   "combinesPerGame": 0,
+   "capturesPerGame": 14.1
+  },
+  "chess rating: deep 2k classic v deep 2k tuned": {
+   "games": 100,
+   "aScore": 36,
+   "aScoreRange": [
+    27,
+    45
+   ],
+   "aWins": 31,
+   "bWins": 60,
+   "draws": 9,
+   "whiteWins": 43,
+   "blackWins": 48,
+   "whiteOfDecisive": 47,
+   "whiteOfDecisiveRange": [
+    37,
+    57
+   ],
+   "endings": {
+    "checkmate": 91,
+    "draw:fifty": 4,
+    "draw:material": 4,
+    "draw:repetition": 1
+   },
+   "movesPerPlayer": {
+    "median": 52,
+    "shortest": 9.5,
+    "longest": 193
+   },
+   "combinesPerGame": 0,
+   "capturesPerGame": 19.6
+  },
+  "chess rating: deep 2k classic v deep 20k tuned": {
+   "games": 100,
+   "aScore": 42,
+   "aScoreRange": [
+    33,
+    52
+   ],
+   "aWins": 37,
+   "bWins": 53,
+   "draws": 10,
+   "whiteWins": 48,
+   "blackWins": 42,
+   "whiteOfDecisive": 53,
+   "whiteOfDecisiveRange": [
+    43,
+    63
+   ],
+   "endings": {
+    "checkmate": 90,
+    "draw:fifty": 6,
+    "draw:repetition": 3,
+    "draw:material": 1
+   },
+   "movesPerPlayer": {
+    "median": 42,
+    "shortest": 7,
+    "longest": 172
+   },
+   "combinesPerGame": 0,
+   "capturesPerGame": 17.7
+  },
+  "chess rating: deep 2k tuned v deep 20k tuned": {
+   "games": 100,
+   "aScore": 44,
+   "aScoreRange": [
+    35,
+    54
+   ],
+   "aWins": 41,
+   "bWins": 53,
+   "draws": 6,
+   "whiteWins": 57,
+   "blackWins": 37,
+   "whiteOfDecisive": 61,
+   "whiteOfDecisiveRange": [
+    51,
+    70
+   ],
+   "endings": {
+    "checkmate": 94,
+    "draw:fifty": 4,
+    "draw:material": 1,
+    "draw:repetition": 1
+   },
+   "movesPerPlayer": {
+    "median": 47.5,
+    "shortest": 6.5,
+    "longest": 163.5
+   },
+   "combinesPerGame": 0,
+   "capturesPerGame": 18.2
+  }
+ },
+ "pieces": {
+  "takenPerGame": {
+   "P": 8.09,
+   "B": 2.64,
+   "N": 2.6,
+   "R": 1.89,
+   "Q": 1.28
+  },
+  "capturesMadePerGame": {
+   "P": 3.86,
+   "Q": 3.44,
+   "B": 2.97,
+   "N": 2.72,
+   "R": 2.52,
+   "K": 1
+  }
+ },
+ "ratings": {
+  "deep 20k tuned": {
+   "rating": 1543,
+   "range": [
+    1456,
+    1660
+   ]
+  },
+  "deep 2k tuned": {
+   "rating": 1531,
+   "range": [
+    1440,
+    1648
+   ]
+  },
+  "deep 2k classic": {
+   "rating": 1455,
+   "range": [
+    1373,
+    1575
+   ]
+  },
+  "deep 2k naive": {
+   "rating": 1000,
+   "range": [
+    1000,
+    1000
+   ]
+  }
+ }
+}
