@@ -8,7 +8,12 @@ import { randomFormation, DEFAULT_FORMATION } from './formations.mjs';
 import { rngFrom } from './game.mjs';
 
 const VARIANTS = [{}, { exactRange: true }, { noWaterEdge: true }, { waterStraightCapture: true },
-  { exactRange: true, noWaterEdge: true, waterStraightCapture: true }];
+  { exactRange: true, noWaterEdge: true, waterStraightCapture: true },
+  { waterRiver: true }, { waterStraightSteps: true }, { waterRiver: true, waterStraightSteps: true },
+  { waterRiver: true, waterStraightSteps: true, exactRange: true, waterStraightCapture: true }, { waterRiver: true, noWaterEdge: true },
+  { waterDiagonalBends: true }, { waterRiver: true, waterDiagonalBends: true },
+  { waterOneWay: true }, { waterDiagonalBends: true, waterOneWay: true }, { waterRiver: true, waterDiagonalBends: true, waterOneWay: true },
+  { waterStraightSteps: true, waterOneWay: true, exactRange: true }];
 const toPiece = (owner, v) => (v === 'wizard' ? { owner, kind: 'wizard' } : { owner, kind: 'element', units: [{ element: v[0], size: v[1] }] });
 const result = r => (r ? `${r.winner ?? 'draw'} ${r.reason}` : '');
 

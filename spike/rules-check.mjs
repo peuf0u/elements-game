@@ -129,4 +129,21 @@ b = board({ d2: P('w', 'water', 3), d4: P('b', 'fire', 2) });
 expect('waterStraightCapture: straight flow still captures', dests(b, 'd2').includes('d4(capture)'), true);
 R.variant.waterStraightCapture = false;
 
+// --- Water movement candidates (GAME_SPEC open question 10) ---
+// Water 3 on d3 with an Earth right in front (d4), and on d2 with an Earth diagonal (e3), edge slide kept.
+const inFront = board({ d3: P('w', 'water', 3), d4: P('w', 'earth', 1) }), diagonal = board({ d2: P('w', 'water', 3), e3: P('w', 'earth', 1) });
+const count = (b, from) => dests(b, from).filter(t => !t.endsWith('(combine)')).length; // squares it can move to
+expect('normal: 16 squares with Earth in front, 15 with Earth diagonal', [count(inFront, 'd3'), count(diagonal, 'd2')], [16, 15]);
+R.variant.waterRiver = true;
+expect('waterRiver: Earth in its column still bends it (16), Earth diagonal doesn\'t (10)', [count(inFront, 'd3'), count(diagonal, 'd2')], [16, 10]);
+expect('waterRiver: still steps past the Earth to d5', dests(inFront, 'd3').includes('d5'), true);
+expect('waterRiver: no bend around the diagonal Earth to f3', dests(diagonal, 'd2').includes('f3'), false);
+R.variant.waterStraightSteps = true;
+expect('both: 12 and 10 squares', [count(inFront, 'd3'), count(diagonal, 'd2')], [12, 10]);
+expect('both: can\'t get past the Earth to d5, but alongside it to c5', [dests(inFront, 'd3').includes('d5'), dests(inFront, 'd3').includes('c5')], [false, true]);
+expect('both: route to c5 goes sideways, then up', route(inFront, 'd3', 'c5'), 'd3→c3→c4→c5');
+R.variant.waterRiver = false;
+expect('waterStraightSteps: 12 and 13 squares', [count(inFront, 'd3'), count(diagonal, 'd2')], [12, 13]);
+R.variant.waterStraightSteps = false;
+
 console.log(ok ? '\nALL PASS' : '\nSOME FAILED');

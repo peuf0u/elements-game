@@ -4,18 +4,19 @@
 import { NEIGHBOR, RAY, BANK_DIRS, EDGE_DIRS, UP, DOWN, fileOf } from './squares.ts';
 import { OWNER, RANGE, PLAIN_EARTH, MOVES, canCombine, MOVE_FIRE, MOVE_WIND, MOVE_WATER, MOVE_EARTH, MOVE_WIZARD } from './pieces.ts';
 import type { Position } from './position.ts';
+import { bankable, stillAround } from './movegen.ts';
+import { rankOf } from './squares.ts';
 
 export type Way = 'fire' | 'wind' | 'water' | 'earth' | 'wizard';
 const WAYS: Way[] = ['fire', 'wind', 'water', 'earth', 'wizard'];
 
-function waterNext(pos: Position, c: number): number[] {
+// Water's next squares from c, in movegen's order; `earths` are the Earths it may bank around.
+function waterNext(pos: Position, c: number, earths: number): number[] {
   const out: number[] = [];
   const push = (d: number) => { const n = NEIGHBOR[c * 8 + d]; if (n >= 0 && !out.includes(n)) out.push(n); };
   push(UP); push(DOWN);
-  for (let d = 0; d < 8; d++) {
-    const e = NEIGHBOR[c * 8 + d];
-    if (e >= 0 && PLAIN_EARTH[pos.board[e]]) BANK_DIRS[d].forEach(push);
-  }
+  for (let d = 0; d < 8; d++) if (earths & (1 << d))
+    for (const a of BANK_DIRS[d]) if (pos.straightSteps ? a < 4 : !pos.diagonalBends || a >= 4) push(a);
   if (!pos.noEdge) EDGE_DIRS[c].forEach(push);
   return out;
 }
@@ -32,18 +33,20 @@ export function route(pos: Position, from: number, to: number): { way: Way; path
     if (way < 0) break;
     if (way === MOVE_WATER) {
       const path = [from];
-      const walk = (c: number) => {
-        for (const n of waterNext(pos, c)) {
-          if (path.includes(n)) continue;
+      const walk = (c: number, around: number, dir: number) => {
+        const earths = bankable(pos, c, around);
+        for (const n of waterNext(pos, c, earths)) {
+          const rise = Math.sign(rankOf(n) - rankOf(c));
+          if (path.includes(n) || (pos.oneWay && dir !== 0 && rise === -dir)) continue;
           const t = b[n], ok = !pos.exact || path.length === range;
           path.push(n);
           if (n === to && ok && (!t || (landable(p, t, way) && (!pos.straight || OWNER[t] === OWNER[p] || fileOf(n) === fileOf(c)))))
             { if (!best || path.length < best.path.length) best = { way: 'water', path: path.slice() }; }
-          else if (!t && path.length <= range) walk(n);
+          else if (!t && path.length <= range) walk(n, pos.river ? stillAround(pos, c, n, earths) : 0, dir || rise);
           path.pop();
         }
       };
-      walk(from);
+      walk(from, 0, 0);
       continue;
     }
     const d0 = way === MOVE_WIND ? 4 : 0, d1 = way === MOVE_FIRE ? 4 : 8, max = way === MOVE_WIZARD ? 1 : range;

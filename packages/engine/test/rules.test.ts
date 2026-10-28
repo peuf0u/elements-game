@@ -34,6 +34,20 @@ test('§3 Straight captures: Water may bend to move, but must capture with a str
   assert.deepEqual(['b4', 'd3'].filter(s => dests(at(text, { waterStraightCapture: true }), 'b2').includes(s)), ['b4']);
 });
 
+test('Open question 10: the river rule and straight steps', () => {
+  // Water 3 on d3 with an Earth right in front on d4, and Water 3 on d2 with an Earth diagonal on e3.
+  const inFront = '4z4/9/9/9/8Z/3E15/3R35/9/9 w', diagonal = '4z4/9/9/9/8Z/9/4E14/3R35/9 w';
+  const reach = (text: string, from: string, config: Partial<RulesConfig>) => dests(at(text, config), from);
+  // River: the Earth in its column still lets it past (d3 → c4 → d5); the diagonal Earth gives no turn.
+  assert.ok(reach(inFront, 'd3', { waterRiver: true }).includes('d5'));
+  assert.ok(reach(diagonal, 'd2', {}).includes('f3'));
+  assert.ok(!reach(diagonal, 'd2', { waterRiver: true }).includes('f3'));
+  // Straight steps: no diagonal step past the Earth, so d5 is 4 steps away; c5 is 3 (d3 → c3 → c4 → c5).
+  const both = reach(inFront, 'd3', { waterRiver: true, waterStraightSteps: true });
+  assert.ok(!both.includes('d5') && both.includes('c5'));
+  assert.ok(reach(diagonal, 'd2', { waterStraightSteps: true }).includes('f3'), 'straight steps alone still bend around any Earth');
+});
+
 test('§3 Exact range: pieces move exactly N squares', () => {
   const d = dests(at('4z4/9/9/9/4F34/9/9/9/Z8 w', { exactRange: true }), 'e5');
   assert.deepEqual(d, ['b5', 'e2', 'e8', 'h5']);
