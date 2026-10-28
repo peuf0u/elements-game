@@ -231,6 +231,54 @@ export const EXPERIMENTS = {
   // and, for comparison, by the search's bot (Deep 2k): does the ranking hold with stronger play?
   presets20k: s => presetRoundRobin({ type: 'deep', nodes: 20000, weights: 'tuned' }, 60 * s, 1300000),
   presets2k: s => presetRoundRobin({ type: 'deep', nodes: 2000, weights: 'tuned' }, 60 * s, 1400000),
+  // 10g. Is neglecting Water early worse than neglecting another element? One side may not move any
+  // piece holding the element during its first 10 moves; both sides are Deep 2k with learned values.
+  neglect: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' };
+    seed = 1500000;
+    return ['original', 'windHeldBack'].flatMap(f => ['water', 'fire', 'wind', 'earth'].flatMap(element =>
+      both(`${f}: no ${element} moves for the first 10 moves`, { ...bot, avoid: { element, moves: 10 } }, bot, 200 * s,
+        { fa: PRESETS[f], fb: PRESETS[f], randomOpening: 2, maxPlies: 1000 })));
+  },
+  // 10h. The designer's Water movement candidates (GAME_SPEC open question 10), edge slide kept:
+  // equal games from the default formation (Wind 3 held back), and the handicap test, one side
+  // without Water 3, Fire 3 or Wind 3.
+  waterRules: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000 };
+    seed = 1600000;
+    return [['today', {}], ['river', { waterRiver: true }], ['straight steps', { waterStraightSteps: true }],
+      ['river + straight steps', { waterRiver: true, waterStraightSteps: true }]].flatMap(([name, v]) => [
+      ...Array.from({ length: 400 * s }, () => ({ tag: `${name}: equal`, a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro, ...v })),
+      ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
+        both(`${name}: without ${piece} (${square})`, bot, bot, 150 * s, { fa: without(f, square), fb: f, ...ro, ...v })),
+    ]);
+  },
+  // 10i. The same for "when it bends, it bends diagonally", alone and with the river rule.
+  waterBends: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000 };
+    seed = 1700000;
+    return [['diagonal bends', { waterDiagonalBends: true }], ['river + diagonal bends', { waterRiver: true, waterDiagonalBends: true }]].flatMap(([name, v]) => [
+      ...Array.from({ length: 400 * s }, () => ({ tag: `${name}: equal`, a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro, ...v })),
+      ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
+        both(`${name}: without ${piece} (${square})`, bot, bot, 150 * s, { fa: without(f, square), fb: f, ...ro, ...v })),
+    ]);
+  },
+  // 10j. One way per move (the designer: "the river should only flow forward or backwards in one
+  // turn"), alone and with the other candidates.
+  waterOneWay: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000 };
+    seed = 1800000;
+    return [['one way', { waterOneWay: true }], ['diagonal bends, one way', { waterDiagonalBends: true, waterOneWay: true }],
+      ['river + diagonal bends, one way', { waterRiver: true, waterDiagonalBends: true, waterOneWay: true }],
+      ['straight steps, one way', { waterStraightSteps: true, waterOneWay: true }]].flatMap(([name, v]) => [
+      ...Array.from({ length: 400 * s }, () => ({ tag: `${name}: equal`, a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro, ...v })),
+      ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
+        both(`${name}: without ${piece} (${square})`, bot, bot, 150 * s, { fa: without(f, square), fb: f, ...ro, ...v })),
+    ]);
+  },
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.
   // a. Deep 2k with naive values (every piece worth 1) against itself, to learn values from.
   chessSelfplay: s => Array.from({ length: 4000 * s }, (_, i) => ({

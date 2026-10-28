@@ -266,3 +266,56 @@ From computer playtesting (2026-10-28, [playtest/FINDINGS.md](playtest/FINDINGS.
    - Under `waterStraightCapture`, elimination decides 36% of Thinker games, more than checkmate (31%).
    - Rechecked with a much stronger bot (§11): elimination decides 24–32% of games under normal rules, against 39–52% checkmate. Between strong players it's a real second way to win.
 9. ~~**The `exactRange` variant** is just as fair in computer play, but games get twice as long and draws rise from about 1 in 4 to about half. It stays off by default. Is it still worth trying at the table?~~ No: the designer doesn't want exact range ✅ *(designer, playtest 2026-10-28)*. It's dropped from the app, and the engine keeps the switch for playtests only.
+10. **Water's movement: hard to see and a long reach.** Playing the prototype against a bot, the designer found Water overpowered: its attacks are hard to see, and its reach is large ✅ *(designer, prototype 2026-10-28)*. The computer agrees on both counts. Two in three Water checkmates come along a bent route or an edge slide. In real positions from strong-bot games a single Water has 9.3 moves on average, against 3.7 for Fire and 2.6 for Wind. Neglecting Water early loses, but neglecting Fire loses just as much, so early Water play isn't special (`node run.mjs neglect`: one side may not move that element for its first 10 moves; with Wind 3 held back it scores 26% without Water moves and 23% without Fire moves). The designer is considering changing how Water moves:
+    - **Keep the edge slide** ✅ *(designer, 2026-10-28)*.
+    - **No ban on moving backwards** ✅ *(designer, 2026-10-28)*.
+    - **Candidates the designer likes** ✅ *(designer, 2026-10-28)*:
+      - **River rule:** Water goes around only an Earth that stands right in its column, ahead or behind, the way a river flows around a rock in its path. An Earth beside or diagonal to it gives no turn.
+      - **Straight steps:** every step is forward, backward or sideways, never diagonal, also when going around Earth.
+      - **One way per move**: within one move, Water goes only forward or only backward. The first forward or backward step sets the direction, and sideways steps are always fine (`waterOneWay`). It was first dropped, because under today's rule it removes only the rare "come back" move. Then diagonal bends turned out to allow zigzags: d3 → e4 → e3, up diagonally around one Earth and back down. So the designer brought it back: "the river should only flow forward or backwards in one turn" ✅ *(designer, 2026-10-28)*.
+    - Measured on 18,000 Water pieces in positions from strong-bot games, with the edge slide kept. Moves are per Water; "corner captures" are captures at the end of a route that left the Water's column.
+
+      | Rule | Moves | Captures | Corner captures |
+      |---|---|---|---|
+      | Today | 11.4 | 0.23 | 0.19 |
+      | One way per move | 10.8 | 0.22 | 0.18 |
+      | Straight steps | 7.8 | 0.13 | 0.08 |
+      | River | 7.2 | 0.14 | 0.09 |
+      | River + straight steps | 5.9 | 0.09 | 0.04 |
+      | River + straight steps + one way | 5.7 | 0.09 | 0.04 |
+    - The designer's candidates are **the river rule and straight steps, with the edge slide** ✅ *(designer, 2026-10-28)*. They are rule switches in the engine (`waterRiver`, `waterStraightSteps`, and `waterDiagonalBends` below) and in the prototype's menu ("Water movement (trial)").
+    - Tested in whole games (2026-10-28, `node run.mjs waterRules`): Deep 2k with learned values, from Wind 3 held back on both sides, 400 equal games per rule plus 150 games each without Water 3, Fire 3 or Wind 3.
+
+      | | Today | River | Straight steps | River + straight | Diagonal bends | River + diagonal |
+      |---|---|---|---|---|---|---|
+      | White's score | 50% | 54% | 55% | 54% | 53% | 54% |
+      | Draws | 24% | 23% | 29% | 47% | 16% | 28% |
+      | Typical game (moves each) | 46 | 55 | 59 | 100 | 45 | 64 |
+      | Checkmates given by Water | 78% | 76% | 67% | 54% | 68% | 65% |
+      | Captures per game, Water / Fire / Wind | 3.4 / 1.8 / 2.3 | 3.1 / 1.9 / 2.6 | 2.3 / 2.0 / 2.5 | 2.1 / 2.0 / 2.5 | 3.2 / 1.8 / 2.4 | 2.8 / 2.0 / 2.5 |
+      | Score without Water 3 / Fire 3 / Wind 3 | 13 / 15 / 14% | 16 / 23 / 12% | 19 / 19 / 14% | 23 / 26 / 21% | 11 / 18 / 13% | 24 / 31 / 15% |
+
+      Comparison page with charts and boards: [playtest/WATER-RULES.html](playtest/WATER-RULES.html).
+
+      One way per move with the other rules (`node run.mjs waterOneWay`, same design):
+
+      | | One way | Diagonal bends, one way | River + diagonal bends, one way | Straight steps, one way |
+      |---|---|---|---|---|
+      | White's score | 54% | 51% | 49% | 56% |
+      | Draws | 24% | 21% | 42% | 29% |
+      | Typical game (moves each) | 45 | 51 | 74 | 65 |
+      | Checkmates given by Water | 69% | 69% | 69% | 54% |
+      | Captures per game, Water / Fire / Wind | 3.5 / 1.8 / 2.3 | 2.8 / 1.8 / 2.4 | 2.6 / 2.0 / 2.5 | 2.3 / 2.0 / 2.5 |
+      | Score without Water 3 / Fire 3 / Wind 3 | 11 / 16 / 12% | 17 / 24 / 14% | 22 / 25 / 15% | 22 / 21 / 14% |
+
+      - Diagonal bends + one way keeps the game decisive (21% draws, 5 moves longer than today). It removes the zigzags, and Water captures less (2.8 per game instead of 3.4).
+      - Straight steps + one way evens the elements out most, and Water no longer gives most of the checkmates. Games are about 19 moves longer.
+
+      "Diagonal bends" was the designer's next idea ✅ *(designer, 2026-10-28)*: Water flows straight and slides along the edge as before, but its steps around Earth must be diagonal (`waterDiagonalBends`, `node run.mjs waterBends`). It is the only candidate that makes games more decisive: 16% draws at the same length. Water still captures the most.
+
+      - River alone makes Water easier to read but hardly weaker.
+      - Straight steps alone evens the elements out, for a few more draws and longer games.
+      - River + straight steps stalls the game: Water is what breaks Earth walls, and with both limits the walls hold.
+      - Diagonal bends cuts draws and Water's share of checkmates a little, without slowing the game.
+      - River + diagonal bends weakens Water clearly (losing Water 3 costs about as much as losing Wind 3), with a few more draws.
+      - Not decided yet. The bots read every route perfectly, so readability has to be judged at the table.
