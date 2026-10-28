@@ -22,6 +22,9 @@ export const hasCapturers = (board, o) => board.some(p => p && p.o === o && isCa
 let config = E.DEFAULT_CONFIG;
 // quietMoveLimit: moves each without a capture or combine before a draw (0 = no limit). 75 since
 // 2026-10-28; games recorded before that were played with 50, the chess rule.
+// The Water switches default to the v0.2 rule here, so every earlier experiment replays exactly;
+// experiments of the v0.3 game (the engine's default) pass V03 below.
+export const V03 = Object.freeze({ waterDiagonalBends: true, waterOneWay: true });
 export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, waterDiagonalBends = false, waterOneWay = false, quietMoveLimit = 75 } = {}) {
   config = { exactRange, noWaterEdge, waterStraightCapture, waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay, quietMoveLimit };
 }

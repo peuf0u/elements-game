@@ -8,7 +8,7 @@ import { type Piece, type Side, OWNER, pieceCode, decodePiece, sideIndex, sideNa
 import { Position, type RulesConfig, DEFAULT_CONFIG, moveOf } from './position.ts';
 import { legalMoves, hasLegalMove, inCheck } from './movegen.ts';
 
-export const RULES_VERSION = '0.2';
+export const RULES_VERSION = '0.3';
 
 export type Action = { from: number; to: number };
 export type MoveKind = 'move' | 'capture' | 'combine';

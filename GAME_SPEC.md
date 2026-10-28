@@ -1,4 +1,4 @@
-# Elements — Game Spec (v0.2)
+# Elements — Game Spec (v0.3)
 
 Extracted from the designer's 18-minute video walkthrough of the game (not public).
 Timestamps like `[07:28]` point into that video.
@@ -78,45 +78,52 @@ Fire and Wind are the two "very offensive" pieces. ✅ `[03:33]`
 ### Water — the river
 - Flows forward and backward along its column, freely at any time. ✅ `[03:48]` `[04:35]` + *(designer, review: the designer remembered backward being allowed only after reaching the far end, but the video says it is free, and free was chosen)*
 - Can **bend around any Earth piece — your own or your opponent's**. ✅ `[04:48]`–`[04:53]` `[09:45]`
-- Moves straight by default, but **whenever it is next to an Earth piece it may choose to turn**. ✅ `[09:50]`
+- Moves straight by default, but **whenever it is next to an Earth piece it may choose to turn**. ✅ `[09:50]` Since v0.3 the turn is a diagonal step ✅ *(designer, 2026-10-28)*.
 - Can go forward, wrap around an Earth piece, and continue forward again within one move. ✅ `[05:08]`–`[05:18]`
-- Can even move "around" an Earth piece and come back. ✅ `[10:14]`–`[10:17]`
+- ~~Can even move "around" an Earth piece and come back.~~ `[10:14]`–`[10:17]` Not since v0.3: in one move the river flows only forward or only backward ✅ *(designer, 2026-10-28)*.
 - **Water can move along the borders of the board.** ✅ `[04:42]` + *(designer, Q&A)*
 
-#### Water movement rule (v0.2 — confirmed in Q&A)
+#### Water movement rule (v0.3)
+
+The designer changed Water's movement on 2026-10-28 after playing the prototype: Water's attacks were hard to see, and its reach too large ✅ *(designer, 2026-10-28)*. The computer compared ten versions (open question 10, [playtest/WATER-RULES.html](playtest/WATER-RULES.html)), and the designer chose **diagonal bends with one way per move**. The v0.2 rule stays in the engine as a playtest switch.
 
 A Water move is a path of **1 to N single steps** (N = size). Each step must be one of:
 
-1. **Flow** — one square straight **forward or backward** along its column (backward is always allowed).
-2. **Bank around Earth** — from a square touching an Earth piece to a neighbouring square (any of 8 directions) **that touches the same Earth piece**. In other words, Water circles around the Earth through the ring of 8 squares surrounding it. "Touching" = any of the 8 surrounding squares. Works with **any** Earth, yours or your opponent's.
-3. **Bank along edge** — from a square on the board edge to an orthogonally adjacent square **that is also on the edge** (slide along the border, turning at corners). No diagonal turns on the edge.
+1. **Flow**: one square straight **forward or backward** along its column.
+2. **Bend around Earth**: a **diagonal** step from a square touching an Earth piece to a square **that touches the same Earth piece**. "Touching" means any of the 8 surrounding squares. Works with **any** Earth, yours or your opponent's. Sideways steps around Earth aren't allowed ✅ *(designer, 2026-10-28)*.
+3. **Slide along the edge**: from a square on the board edge to an orthogonally adjacent square **that is also on the edge** (along the border, turning at corners).
+
+**One way per move** ✅ *(designer, 2026-10-28)*: "the river should only flow forward or backwards in one turn". The first step that goes forward or backward sets the move's direction, and no later step may go the other way. Steps that go neither way, sliding sideways along the edge, are always fine.
 
 Further rules:
-- Every step counts toward the range, including steps spent around Earth or along the edge. ✅
-- Once it is no longer next to Earth or on the edge, it can only flow forward or backward. ✅
+- Every step counts toward the range, including steps around Earth or along the edge. ✅
+- Once it is no longer next to Earth or on the edge, it can only flow along its column. ✅
 - No square is visited twice in one move, and Water can't end where it started. 🟡 (a full loop would need more range than the maximum of 3)
-- Every square on the path must be empty; the **last** step may land on an enemy piece to capture it (not on Earth). 🟡 (chess-like, same as the other pieces) Still open: the designer wants the computer to compare both versions first (open question 6). ✅ *(designer, playtest 2026-10-28)*
-- Two Water variants for computer playtesting, both **off by default** ✅ *(designer, playtest 2026-10-28)*:
-  - 🔧 **"No edge slide":** Water can't slide along the board edge (step 3 above is gone). Bending around Earth still works.
-  - 🔧 **"Straight captures":** Water may bend and slide to move, but its capturing step must be a straight flow up or down its column. Combining at the end of a bent route is still allowed.
+- Every square on the path must be empty; the **last** step may land on an enemy piece to capture it (not on Earth). 🟡 (chess-like, same as the other pieces)
+- Playtest switches in the engine, none of them in the app ✅ *(designer, playtest 2026-10-28)*:
+  - 🔧 **"No edge slide"** (`noWaterEdge`): step 3 is gone.
+  - 🔧 **"Straight captures"** (`waterStraightCapture`): the capturing step must be a flow along the column.
+  - 🔧 **The v0.2 rule** (`waterDiagonalBends` and `waterOneWay` off): bends may also be sideways, and a move may go forward and then back.
+  - 🔧 The other candidates from open question 10: `waterRiver`, `waterStraightSteps`.
 
-Example: Water size 3 (W) at b2, Earth (E) at c3. Ring around E = ○.
+Example: Water size 3 (R) at b2, Earth (E) at c3, in the corner of the board. ○ = reachable.
 
 ```
- 5  ·  ·  ·  ·  ·
- 4  ·  ○  ○  ○  ·
- 3  ·  ○  E  ○  ·
- 2  ·  W  ○  ○  ·
- 1  ·  ·  ·  ·  ·
+ 5  ·  ○  ○  ·  ·
+ 4  ·  ○  ○  ·  ·
+ 3  ·  ○  E  ·  ·
+ 2  ·  R  ·  ·  ·
+ 1  ○  ○  ○  ○  ·
     a  b  c  d  e
 ```
-- b2 → b3 → b4 → b5 — flow, bank, flow (or simply flowing forward the whole way)
-- b2 → c2 → d2 — banking along the bottom of the ring, ending sideways
-- b2 → c2 → d3 — banking around the corner, ending diagonally
-- b2 → b3 → c4 — banking up and over the Earth
-- b2 → c2 → d2 → d1 — around the corner, then flowing **backward** down column d (the "come back" move from `[10:14]`)
-- ✗ b2 → a2 — a2 does not touch E, so this sideways step isn't allowed
-  - The ✗ is about that single step. Because this example sits in the real board corner, a2 *is* still reachable along the edge: b2 → b1 → a1 → a2 (flow, edge, edge). The same goes for a1, b1 and c1. ✅ *(designer, spike 2026-10-27)*
+- b2 → b3 → b4 → b5: flowing forward.
+- b2 → b3 → c4: flowing forward, then bending diagonally around the Earth.
+- b2 → b3 → c4 → c5: and flowing on.
+- b2 → b1 → c1 → d1, and b2 → b1 → a1: flowing back to the edge, then sliding along it.
+- ✗ b2 → c2: a sideways step around the Earth. Bends are diagonal now.
+- ✗ b2 → b3 → c4 → d4: also sideways.
+- ✗ b2 → b1 → c1 → c2: forward after going backward, against one way per move.
+- Under v0.2 the same Water reached 14 squares, including c2, d2, d3, d4 and a2.
 - Tactical example ✅ `[10:19]`–`[10:47]`: the opponent blocks a Wind attack on their Fire by placing an Earth piece; that Earth now gives my Water a bend point, so my Water can capture the Fire, which would not have been possible without the Earth there.
 
 ### Wizard
@@ -229,6 +236,7 @@ Example: a move that removes the opponent's last capturing piece **and** leaves 
 - The rules engine should be written with variants in mind from day one. Known toggles so far:
   - `exactRange`: pieces must move exactly N squares (§3). Playtest only, not offered in the app ✅ *(designer, playtest 2026-10-28)*
   - `noWaterEdge`, `waterStraightCapture`: the two Water experiments (§3)
+  - `waterDiagonalBends`, `waterOneWay`: v0.3 Water, **on by default**; turning both off gives the v0.2 rule. `waterRiver`, `waterStraightSteps`: the other Water candidates (open question 10)
   - `hiddenSetup`: simultaneous secret formation (§6)
   - later: `hiddenElement`, `castle`, `windDiagonalSwitch`, `turnTimer` (§7)
 
@@ -283,7 +291,8 @@ From computer playtesting (2026-10-28, [playtest/FINDINGS.md](playtest/FINDINGS.
       | River | 7.2 | 0.14 | 0.09 |
       | River + straight steps | 5.9 | 0.09 | 0.04 |
       | River + straight steps + one way | 5.7 | 0.09 | 0.04 |
-    - The designer's candidates are **the river rule and straight steps, with the edge slide** ✅ *(designer, 2026-10-28)*. They are rule switches in the engine (`waterRiver`, `waterStraightSteps`, and `waterDiagonalBends` below) and in the prototype's menu ("Water movement (trial)").
+    - **Decided: diagonal bends + one way per move, with the edge slide**, the default from rules v0.3 ✅ *(designer, 2026-10-28)*. §3 has the rule.
+    - The designer's candidates were **the river rule and straight steps, with the edge slide** ✅ *(designer, 2026-10-28)*. They are rule switches in the engine (`waterRiver`, `waterStraightSteps`, and `waterDiagonalBends` below) and in the prototype's menu ("Water movement (trial)").
     - Tested in whole games (2026-10-28, `node run.mjs waterRules`): Deep 2k with learned values, from Wind 3 held back on both sides, 400 equal games per rule plus 150 games each without Water 3, Fire 3 or Wind 3.
 
       | | Today | River | Straight steps | River + straight | Diagonal bends | River + diagonal |
