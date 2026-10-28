@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   fromPositionText, legalActions, apply, status, pieceAt, parseSquare, squareName, parseAction, positionText,
-  type GameState, type RulesConfig,
+  PRESETS, DEFAULT_FORMATION, startFromFormations, type GameState, type RulesConfig,
 } from '../src/index.ts';
 
 const at = (text: string, config: Partial<RulesConfig> = {}) => fromPositionText(text, config);
@@ -128,6 +128,16 @@ test('§6 A capture or combine resets the move count', () => {
   const next = apply(st, parseAction('a1-a2')).state;
   assert.equal(next.clock, 0);
   assert.equal(next.result, null);
+});
+
+test('§6 Every preset formation is complete, inside its zone, and starts a playable game', () => {
+  for (const [name, f] of Object.entries(PRESETS)) {
+    assert.equal(Object.keys(f).length, 13, `${name}: 13 pieces`);
+    assert.equal(Object.values(f).filter(v => v === 'wizard').length, 1, `${name}: one Wizard`);
+    const st = startFromFormations(f);
+    assert.ok(legalActions(st).length > 0 && !status(st).inCheck, `${name}: White can move and isn't in check`);
+  }
+  assert.equal(DEFAULT_FORMATION, PRESETS.windHeldBack);
 });
 
 test('Position text round-trips', () => {

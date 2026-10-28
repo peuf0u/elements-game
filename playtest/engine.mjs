@@ -27,8 +27,9 @@ export function setVariant({ exactRange = false, noWaterEdge = false, waterStrai
 }
 
 // A formation is { square: [element, size] | 'wizard' } as White sees it (rows 1–3).
-// Black gets it rotated 180°.
-export const DEFAULT_FORMATION = Object.fromEntries(Object.entries(E.DEFAULT_FORMATION)
+// Black gets it rotated 180°. The playtest's "default" stays the designer's original formation,
+// which every earlier experiment refers to; the app's new default is the engine's DEFAULT_FORMATION.
+export const DEFAULT_FORMATION = Object.fromEntries(Object.entries(E.PRESETS.original)
   .map(([s, v]) => [s, v === 'wizard' ? v : [v.element, v.size]]));
 const toEngine = f => Object.fromEntries(Object.entries(f).map(([s, v]) => [s, v === 'wizard' ? v : { element: v[0], size: v[1] }]));
 

@@ -1,4 +1,5 @@
 // The experiments from the plan. Each one is a list of games to play; run.mjs plays them.
+import fs from 'node:fs';
 import { DEFAULT_FORMATION, without } from './formations.mjs';
 
 let seed = 1;
@@ -167,6 +168,36 @@ export const EXPERIMENTS = {
         })),
       ];
     });
+  },
+  // 10c. Every pairing of the formations found by search.mjs (plus the default): each one as White
+  // against each one as Black, itself included. Do mixed formations change balance, draws, length
+  // or how games end? labels lets rating.mjs rate the formations too.
+  formationMatrix: s => {
+    const found = JSON.parse(fs.readFileSync(new URL('./results/formation-search-deep.json', import.meta.url)));
+    const set = { default: DEFAULT_FORMATION };
+    found.roundRobin.formations.slice(1).forEach((f, i) => { set[`#${i + 1}`] = f; });
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' };
+    seed = 1000000;
+    return Object.entries(set).flatMap(([w, wf]) => Object.entries(set).flatMap(([b, bf]) =>
+      Array.from({ length: 40 * s }, () => ({
+        tag: `${w} v ${b}`, a: 'w', seed: seed++, white: bot, black: bot, whiteFormation: wf, blackFormation: bf,
+        randomOpening: 2, maxPlies: 1000, labels: { w, b },
+      }))));
+  },
+  // 10d. The three best formations from formationMatrix against each other, 200 games per pair, to
+  // see whether one of them is really the best.
+  topThree: s => {
+    const f = JSON.parse(fs.readFileSync(new URL('./results/formation-search-deep.json', import.meta.url))).roundRobin.formations;
+    const set = { 'mirrored and reshaped': f[3], 'wind 3 held back': f[1], 'fire in front of the wizard': f[2] };
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, names = Object.keys(set), out = [];
+    seed = 1100000;
+    for (let i = 0; i < 3; i++) for (let j = i + 1; j < 3; j++)
+      for (let k = 0; k < 200 * s; k++) {
+        const [w, b] = k % 2 ? [names[j], names[i]] : [names[i], names[j]];
+        out.push({ tag: `${names[i]} v ${names[j]}`, a: k % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot,
+          whiteFormation: set[w], blackFormation: set[b], randomOpening: 2, maxPlies: 1000, labels: { w, b } });
+      }
+    return out;
   },
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.
   // a. Deep 2k with naive values (every piece worth 1) against itself, to learn values from.

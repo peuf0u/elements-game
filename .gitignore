@@ -24,4 +24,5 @@ source/frames/
 playtest/results/*.json
 !playtest/results/*.summary.json
 !playtest/results/formation-search.json
+!playtest/results/formation-search-deep.json
 playtest/results/*.log

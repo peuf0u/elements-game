@@ -158,6 +158,14 @@ Example: Water size 3 (W) at b2, Earth (E) at c3. Ring around E = ○.
 - 🧪 Later: the Wizard gets its own, more restricted starting area (likely tied to the Castle idea in §7).
 - For beginners, the rulebook could suggest preset formations. 🧪 `[12:13]`–`[12:28]`
   - **Default formation:** the designer's own formation `[12:44]`–`[13:10]` is the default preset in the spike. ✅ *(designer, spike 2026-10-27)* The squares and sizes were read off the video. 🟡 Shown for White; Black uses the same formation from their side of the table (rotated 180°: White's b3 is Black's h7).
+  - The designer's formation isn't a thought-through one, just one that was nice to play with; it may be replaced by better formations ✅ *(designer, playtest 2026-10-28)*. In computer play with strong bots it came last of nine strong formations (43% against the others), and drew most often. See [playtest/FORMATIONS.html](playtest/FORMATIONS.html). 
+  - **New default and presets** ✅ *(designer, playtest 2026-10-28)*. The default is **"Wind 3 held back"**, the strongest formation the search found. It moves only four of the designer's pieces: Wind 3 to c1 with Earth 1 beside it, Wind 2 to f2, Fire 1 to h3. Five presets go with it: "Mirrored and reshaped", "Fire in front of the Wizard", "Fire 1 in front", "Low Winds, Earth forward" and "Wizard forward". The designer's own formation stays available as "Original". Boards and results: [playtest/FORMATIONS.html](playtest/FORMATIONS.html); squares: `PRESETS` in `packages/engine/src/formation.ts`.
+    ```
+     3  ·  ·  ·  ·  E3 ·  E2 F1 ·
+     2  ·  ·  R1 W1 R2 W2 R3 ·  ·
+     1  ·  E1 W3 F3 Z  F2 ·  ·  ·
+        a  b  c  d  e  f  g  h  i
+    ```
     ```
      3  ·  W3 E1 ·  E3 ·  E2 W2 ·       W = Wind  E = Earth  R = Water  F = Fire
      2  ·  ·  R1 W1 R2 F1 R3 ·  ·       Z = Wizard, number = size

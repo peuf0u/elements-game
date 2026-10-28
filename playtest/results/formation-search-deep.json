@@ -1,0 +1,5719 @@
+{
+ "scale": 1,
+ "bot": {
+  "type": "deep",
+  "nodes": 2000,
+  "weights": "tuned"
+ },
+ "rounds": [
+  [
+   {
+    "name": "fire forward 2 (first search)",
+    "score": 68,
+    "games": 40,
+    "apartFromDefault": 4,
+    "movesPerGame": 51,
+    "fireCapturesPerGame": 2,
+    "waterCapturesPerGame": 2.13,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 56,
+    "games": 40,
+    "apartFromDefault": 1,
+    "movesPerGame": 50,
+    "fireCapturesPerGame": 1.32,
+    "waterCapturesPerGame": 2.6,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search)",
+    "score": 56,
+    "games": 40,
+    "apartFromDefault": 4,
+    "movesPerGame": 68,
+    "fireCapturesPerGame": 2.42,
+    "waterCapturesPerGame": 2.3,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ]
+    }
+   },
+   {
+    "name": "random",
+    "score": 55,
+    "games": 40,
+    "apartFromDefault": 9,
+    "movesPerGame": 54,
+    "fireCapturesPerGame": 1.63,
+    "waterCapturesPerGame": 2.02,
+    "formation": {
+     "g2": "wizard",
+     "d2": [
+      "fire",
+      3
+     ],
+     "h3": [
+      "fire",
+      2
+     ],
+     "a2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "wind",
+      3
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "d3": [
+      "wind",
+      1
+     ],
+     "e3": [
+      "water",
+      3
+     ],
+     "f1": [
+      "water",
+      2
+     ],
+     "c1": [
+      "water",
+      1
+     ],
+     "i1": [
+      "earth",
+      3
+     ],
+     "g1": [
+      "earth",
+      2
+     ],
+     "c3": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "random",
+    "score": 50,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 60,
+    "fireCapturesPerGame": 1.98,
+    "waterCapturesPerGame": 2,
+    "formation": {
+     "a1": "wizard",
+     "h1": [
+      "fire",
+      3
+     ],
+     "e3": [
+      "fire",
+      2
+     ],
+     "c2": [
+      "fire",
+      1
+     ],
+     "b2": [
+      "wind",
+      3
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": [
+      "wind",
+      1
+     ],
+     "e1": [
+      "water",
+      3
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "g1": [
+      "water",
+      1
+     ],
+     "a2": [
+      "earth",
+      3
+     ],
+     "h3": [
+      "earth",
+      2
+     ],
+     "h2": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "random",
+    "score": 49,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 53,
+    "fireCapturesPerGame": 1.35,
+    "waterCapturesPerGame": 2.13,
+    "formation": {
+     "d2": "wizard",
+     "g3": [
+      "fire",
+      3
+     ],
+     "c1": [
+      "fire",
+      2
+     ],
+     "d3": [
+      "fire",
+      1
+     ],
+     "f1": [
+      "wind",
+      3
+     ],
+     "a1": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "wind",
+      1
+     ],
+     "h2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "water",
+      2
+     ],
+     "c3": [
+      "water",
+      1
+     ],
+     "e2": [
+      "earth",
+      3
+     ],
+     "b3": [
+      "earth",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 48,
+    "games": 40,
+    "apartFromDefault": 9,
+    "movesPerGame": 49,
+    "fireCapturesPerGame": 1.7,
+    "waterCapturesPerGame": 2.2,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "fire",
+      1
+     ],
+     "c3": [
+      "earth",
+      2
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "d2": [
+      "earth",
+      3
+     ],
+     "c2": "wizard",
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 46,
+    "games": 40,
+    "apartFromDefault": 3,
+    "movesPerGame": 47,
+    "fireCapturesPerGame": 2,
+    "waterCapturesPerGame": 1.9,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "fire",
+      2
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "earth",
+      3
+     ],
+     "a1": [
+      "water",
+      1
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 45,
+    "games": 40,
+    "apartFromDefault": 2,
+    "movesPerGame": 67,
+    "fireCapturesPerGame": 1.6,
+    "waterCapturesPerGame": 1.98,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "fire",
+      3
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "earth",
+      1
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored",
+    "score": 45,
+    "games": 40,
+    "apartFromDefault": 7,
+    "movesPerGame": 63,
+    "fireCapturesPerGame": 1.65,
+    "waterCapturesPerGame": 2.63,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      2
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "d2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 45,
+    "games": 40,
+    "apartFromDefault": 7,
+    "movesPerGame": 64,
+    "fireCapturesPerGame": 2.02,
+    "waterCapturesPerGame": 2.1,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      2
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "fire",
+      2
+     ],
+     "g1": [
+      "water",
+      1
+     ],
+     "d3": [
+      "fire",
+      1
+     ]
+    }
+   },
+   {
+    "name": "random",
+    "score": 45,
+    "games": 40,
+    "apartFromDefault": 9,
+    "movesPerGame": 56,
+    "fireCapturesPerGame": 2.27,
+    "waterCapturesPerGame": 1.9,
+    "formation": {
+     "a2": "wizard",
+     "c2": [
+      "fire",
+      3
+     ],
+     "d1": [
+      "fire",
+      2
+     ],
+     "b2": [
+      "fire",
+      1
+     ],
+     "d2": [
+      "wind",
+      3
+     ],
+     "a3": [
+      "wind",
+      2
+     ],
+     "e1": [
+      "wind",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "i3": [
+      "water",
+      2
+     ],
+     "c1": [
+      "water",
+      1
+     ],
+     "g3": [
+      "earth",
+      3
+     ],
+     "i2": [
+      "earth",
+      2
+     ],
+     "h1": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 44,
+    "games": 40,
+    "apartFromDefault": 2,
+    "movesPerGame": 66,
+    "fireCapturesPerGame": 2.02,
+    "waterCapturesPerGame": 2.65,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ],
+     "g1": [
+      "wind",
+      1
+     ],
+     "i2": [
+      "fire",
+      3
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 43,
+    "games": 40,
+    "apartFromDefault": 1,
+    "movesPerGame": 70,
+    "fireCapturesPerGame": 1.25,
+    "waterCapturesPerGame": 2.23,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "f1": [
+      "fire",
+      2
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "e1": "wizard"
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 40,
+    "games": 40,
+    "apartFromDefault": 4,
+    "movesPerGame": 56,
+    "fireCapturesPerGame": 2.35,
+    "waterCapturesPerGame": 2.02,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "fire",
+      3
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "earth",
+      2
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ]
+    }
+   }
+  ],
+  [
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 65,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 46,
+    "fireCapturesPerGame": 2.27,
+    "waterCapturesPerGame": 1.95,
+    "formation": {
+     "c3": [
+      "earth",
+      1
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "i3": [
+      "earth",
+      2
+     ],
+     "b1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward 2 (first search)",
+    "score": 61,
+    "games": 80,
+    "apartFromDefault": 4,
+    "movesPerGame": 56,
+    "fireCapturesPerGame": 1.88,
+    "waterCapturesPerGame": 2.21,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 59,
+    "games": 40,
+    "apartFromDefault": 2,
+    "movesPerGame": 56,
+    "fireCapturesPerGame": 1.95,
+    "waterCapturesPerGame": 2.23,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 59,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 61,
+    "fireCapturesPerGame": 2.1,
+    "waterCapturesPerGame": 2.23,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ],
+     "d3": [
+      "wind",
+      3
+     ],
+     "i2": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "random, varied",
+    "score": 57,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 58,
+    "fireCapturesPerGame": 2.15,
+    "waterCapturesPerGame": 1.98,
+    "formation": {
+     "d2": "wizard",
+     "g3": [
+      "fire",
+      3
+     ],
+     "c1": [
+      "fire",
+      2
+     ],
+     "d3": [
+      "fire",
+      1
+     ],
+     "f1": [
+      "wind",
+      3
+     ],
+     "g2": [
+      "wind",
+      1
+     ],
+     "h2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "water",
+      2
+     ],
+     "c3": [
+      "water",
+      1
+     ],
+     "e2": [
+      "earth",
+      3
+     ],
+     "b3": [
+      "earth",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ],
+     "b1": [
+      "wind",
+      2
+     ]
+    }
+   },
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 56,
+    "games": 40,
+    "apartFromDefault": 5,
+    "movesPerGame": 50,
+    "fireCapturesPerGame": 2.23,
+    "waterCapturesPerGame": 1.73,
+    "formation": {
+     "b3": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ]
+    }
+   },
+   {
+    "name": "random, varied",
+    "score": 54,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 51,
+    "fireCapturesPerGame": 2.2,
+    "waterCapturesPerGame": 2.3,
+    "formation": {
+     "a1": "wizard",
+     "h1": [
+      "fire",
+      3
+     ],
+     "e3": [
+      "fire",
+      2
+     ],
+     "c2": [
+      "fire",
+      1
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": [
+      "wind",
+      1
+     ],
+     "e1": [
+      "water",
+      3
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "g1": [
+      "water",
+      1
+     ],
+     "a2": [
+      "earth",
+      3
+     ],
+     "h2": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 54,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 54,
+    "fireCapturesPerGame": 1.8,
+    "waterCapturesPerGame": 2.33,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "random",
+    "score": 53,
+    "games": 80,
+    "apartFromDefault": 10,
+    "movesPerGame": 55,
+    "fireCapturesPerGame": 2,
+    "waterCapturesPerGame": 2.02,
+    "formation": {
+     "a1": "wizard",
+     "h1": [
+      "fire",
+      3
+     ],
+     "e3": [
+      "fire",
+      2
+     ],
+     "c2": [
+      "fire",
+      1
+     ],
+     "b2": [
+      "wind",
+      3
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": [
+      "wind",
+      1
+     ],
+     "e1": [
+      "water",
+      3
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "g1": [
+      "water",
+      1
+     ],
+     "a2": [
+      "earth",
+      3
+     ],
+     "h3": [
+      "earth",
+      2
+     ],
+     "h2": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 53,
+    "games": 40,
+    "apartFromDefault": 4,
+    "movesPerGame": 69,
+    "fireCapturesPerGame": 1.52,
+    "waterCapturesPerGame": 2.45,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "a3": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 53,
+    "games": 40,
+    "apartFromDefault": 3,
+    "movesPerGame": 42,
+    "fireCapturesPerGame": 2.35,
+    "waterCapturesPerGame": 2.17,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored",
+    "score": 51,
+    "games": 80,
+    "apartFromDefault": 7,
+    "movesPerGame": 60,
+    "fireCapturesPerGame": 1.64,
+    "waterCapturesPerGame": 2.55,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      2
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "d2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search)",
+    "score": 51,
+    "games": 80,
+    "apartFromDefault": 4,
+    "movesPerGame": 63,
+    "fireCapturesPerGame": 2.25,
+    "waterCapturesPerGame": 2.4,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 50,
+    "games": 40,
+    "apartFromDefault": 5,
+    "movesPerGame": 62,
+    "fireCapturesPerGame": 2.2,
+    "waterCapturesPerGame": 2.6,
+    "formation": {
+     "b3": [
+      "wind",
+      3
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ],
+     "d3": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "random, varied",
+    "score": 50,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 53,
+    "fireCapturesPerGame": 2.2,
+    "waterCapturesPerGame": 2.3,
+    "formation": {
+     "a1": "wizard",
+     "h1": [
+      "fire",
+      3
+     ],
+     "e3": [
+      "fire",
+      2
+     ],
+     "c2": [
+      "fire",
+      1
+     ],
+     "b2": [
+      "wind",
+      3
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": [
+      "wind",
+      1
+     ],
+     "e1": [
+      "water",
+      3
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "g1": [
+      "water",
+      1
+     ],
+     "h3": [
+      "earth",
+      2
+     ],
+     "h2": [
+      "earth",
+      1
+     ],
+     "i1": [
+      "earth",
+      3
+     ]
+    }
+   }
+  ],
+  [
+   {
+    "name": "random, varied",
+    "score": 65,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 47,
+    "fireCapturesPerGame": 2.02,
+    "waterCapturesPerGame": 1.68,
+    "formation": {
+     "g3": [
+      "fire",
+      3
+     ],
+     "c1": [
+      "fire",
+      2
+     ],
+     "d3": [
+      "fire",
+      1
+     ],
+     "f1": [
+      "wind",
+      3
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "h2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "water",
+      2
+     ],
+     "c3": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "earth",
+      3
+     ],
+     "b3": [
+      "earth",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": "wizard"
+    }
+   },
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 61,
+    "games": 80,
+    "apartFromDefault": 6,
+    "movesPerGame": 49,
+    "fireCapturesPerGame": 2.01,
+    "waterCapturesPerGame": 1.99,
+    "formation": {
+     "c3": [
+      "earth",
+      1
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "i3": [
+      "earth",
+      2
+     ],
+     "b1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 61,
+    "games": 40,
+    "apartFromDefault": 7,
+    "movesPerGame": 59,
+    "fireCapturesPerGame": 1.93,
+    "waterCapturesPerGame": 2.52,
+    "formation": {
+     "c3": [
+      "earth",
+      1
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ],
+     "i3": [
+      "earth",
+      2
+     ],
+     "b1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 60,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 66,
+    "fireCapturesPerGame": 2.3,
+    "waterCapturesPerGame": 2.4,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "b3": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "wind",
+      2
+     ],
+     "b2": [
+      "water",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 59,
+    "games": 80,
+    "apartFromDefault": 2,
+    "movesPerGame": 55,
+    "fireCapturesPerGame": 2.02,
+    "waterCapturesPerGame": 2.2,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 55,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 53,
+    "fireCapturesPerGame": 2.08,
+    "waterCapturesPerGame": 2.35,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ],
+     "i2": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 54,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 47,
+    "fireCapturesPerGame": 2.15,
+    "waterCapturesPerGame": 1.68,
+    "formation": {
+     "c3": [
+      "earth",
+      1
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "i3": [
+      "earth",
+      2
+     ],
+     "b1": [
+      "wind",
+      3
+     ],
+     "h1": [
+      "water",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 53,
+    "games": 80,
+    "apartFromDefault": 6,
+    "movesPerGame": 57,
+    "fireCapturesPerGame": 1.94,
+    "waterCapturesPerGame": 2.05,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ],
+     "d3": [
+      "wind",
+      3
+     ],
+     "i2": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 51,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 49,
+    "fireCapturesPerGame": 1.95,
+    "waterCapturesPerGame": 2.52,
+    "formation": {
+     "e3": [
+      "fire",
+      1
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "fire",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 51,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 43,
+    "fireCapturesPerGame": 1.93,
+    "waterCapturesPerGame": 2.4,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ],
+     "d3": [
+      "wind",
+      3
+     ],
+     "i2": [
+      "earth",
+      1
+     ],
+     "i1": [
+      "wind",
+      2
+     ],
+     "f3": [
+      "water",
+      1
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored",
+    "score": 50,
+    "games": 120,
+    "apartFromDefault": 7,
+    "movesPerGame": 58,
+    "fireCapturesPerGame": 1.74,
+    "waterCapturesPerGame": 2.48,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      2
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "d2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "random, varied",
+    "score": 50,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 60,
+    "fireCapturesPerGame": 2.17,
+    "waterCapturesPerGame": 2.23,
+    "formation": {
+     "a1": "wizard",
+     "h1": [
+      "fire",
+      3
+     ],
+     "e3": [
+      "fire",
+      2
+     ],
+     "c2": [
+      "fire",
+      1
+     ],
+     "b2": [
+      "earth",
+      3
+     ],
+     "b1": [
+      "water",
+      2
+     ],
+     "f3": [
+      "wind",
+      1
+     ],
+     "e1": [
+      "water",
+      3
+     ],
+     "d2": [
+      "wind",
+      2
+     ],
+     "g1": [
+      "water",
+      1
+     ],
+     "h3": [
+      "earth",
+      2
+     ],
+     "h2": [
+      "earth",
+      1
+     ],
+     "i1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 49,
+    "games": 40,
+    "apartFromDefault": 7,
+    "movesPerGame": 43,
+    "fireCapturesPerGame": 1.85,
+    "waterCapturesPerGame": 2.05,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ],
+     "d3": [
+      "wind",
+      3
+     ],
+     "i2": [
+      "earth",
+      1
+     ],
+     "b2": [
+      "earth",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 49,
+    "games": 40,
+    "apartFromDefault": 8,
+    "movesPerGame": 57,
+    "fireCapturesPerGame": 1.95,
+    "waterCapturesPerGame": 2.13,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      1
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      2
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "d2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "fire",
+      3
+     ],
+     "f1": [
+      "water",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "water",
+      2
+     ]
+    }
+   },
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 48,
+    "games": 80,
+    "apartFromDefault": 5,
+    "movesPerGame": 52,
+    "fireCapturesPerGame": 2.27,
+    "waterCapturesPerGame": 1.64,
+    "formation": {
+     "b3": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ]
+    }
+   }
+  ],
+  [
+   {
+    "name": "default, varied",
+    "score": 66,
+    "games": 40,
+    "apartFromDefault": 4,
+    "movesPerGame": 51,
+    "fireCapturesPerGame": 1.77,
+    "waterCapturesPerGame": 2.4,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 62,
+    "games": 120,
+    "apartFromDefault": 6,
+    "movesPerGame": 52,
+    "fireCapturesPerGame": 1.84,
+    "waterCapturesPerGame": 2.14,
+    "formation": {
+     "c3": [
+      "earth",
+      1
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "i3": [
+      "earth",
+      2
+     ],
+     "b1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "random, varied",
+    "score": 61,
+    "games": 80,
+    "apartFromDefault": 10,
+    "movesPerGame": 52,
+    "fireCapturesPerGame": 1.93,
+    "waterCapturesPerGame": 1.73,
+    "formation": {
+     "g3": [
+      "fire",
+      3
+     ],
+     "c1": [
+      "fire",
+      2
+     ],
+     "d3": [
+      "fire",
+      1
+     ],
+     "f1": [
+      "wind",
+      3
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "h2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "water",
+      2
+     ],
+     "c3": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "earth",
+      3
+     ],
+     "b3": [
+      "earth",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": "wizard"
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 59,
+    "games": 40,
+    "apartFromDefault": 8,
+    "movesPerGame": 60,
+    "fireCapturesPerGame": 1.95,
+    "waterCapturesPerGame": 2.27,
+    "formation": {
+     "e3": [
+      "fire",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "earth",
+      3
+     ],
+     "e1": "wizard",
+     "i2": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ],
+     "f3": [
+      "wind",
+      1
+     ]
+    }
+   },
+   {
+    "name": "random, varied",
+    "score": 57,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 60,
+    "fireCapturesPerGame": 2.13,
+    "waterCapturesPerGame": 1.82,
+    "formation": {
+     "g3": [
+      "fire",
+      3
+     ],
+     "c1": [
+      "fire",
+      2
+     ],
+     "d3": [
+      "fire",
+      1
+     ],
+     "f1": [
+      "wind",
+      3
+     ],
+     "g2": [
+      "earth",
+      3
+     ],
+     "h2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "water",
+      2
+     ],
+     "c3": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      1
+     ],
+     "b3": [
+      "earth",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": "wizard"
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 57,
+    "games": 40,
+    "apartFromDefault": 7,
+    "movesPerGame": 54,
+    "fireCapturesPerGame": 1.75,
+    "waterCapturesPerGame": 1.88,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      2
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "d2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "fire",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 55,
+    "games": 120,
+    "apartFromDefault": 2,
+    "movesPerGame": 55,
+    "fireCapturesPerGame": 1.92,
+    "waterCapturesPerGame": 2.23,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 54,
+    "games": 80,
+    "apartFromDefault": 6,
+    "movesPerGame": 58,
+    "fireCapturesPerGame": 2.02,
+    "waterCapturesPerGame": 2.25,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "b3": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "wind",
+      2
+     ],
+     "b2": [
+      "water",
+      2
+     ]
+    }
+   },
+   {
+    "name": "random, varied",
+    "score": 54,
+    "games": 40,
+    "apartFromDefault": 10,
+    "movesPerGame": 46,
+    "fireCapturesPerGame": 1.88,
+    "waterCapturesPerGame": 1.43,
+    "formation": {
+     "g3": [
+      "fire",
+      3
+     ],
+     "d3": [
+      "fire",
+      1
+     ],
+     "f1": [
+      "wind",
+      3
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "h2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "water",
+      2
+     ],
+     "c3": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "earth",
+      3
+     ],
+     "b3": [
+      "earth",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": "wizard",
+     "g1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 54,
+    "games": 40,
+    "apartFromDefault": 3,
+    "movesPerGame": 63,
+    "fireCapturesPerGame": 1.75,
+    "waterCapturesPerGame": 2.23,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ],
+     "i1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 51,
+    "games": 80,
+    "apartFromDefault": 6,
+    "movesPerGame": 52,
+    "fireCapturesPerGame": 1.77,
+    "waterCapturesPerGame": 2.51,
+    "formation": {
+     "e3": [
+      "fire",
+      1
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "fire",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 51,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 47,
+    "fireCapturesPerGame": 2.05,
+    "waterCapturesPerGame": 2.25,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "b3": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "e2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "wind",
+      2
+     ],
+     "b2": [
+      "water",
+      2
+     ],
+     "a3": [
+      "wind",
+      1
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 51,
+    "games": 40,
+    "apartFromDefault": 5,
+    "movesPerGame": 62,
+    "fireCapturesPerGame": 1.88,
+    "waterCapturesPerGame": 2.15,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "i2": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 51,
+    "games": 40,
+    "apartFromDefault": 8,
+    "movesPerGame": 58,
+    "fireCapturesPerGame": 2.15,
+    "waterCapturesPerGame": 2.05,
+    "formation": {
+     "e3": [
+      "fire",
+      1
+     ],
+     "g3": [
+      "earth",
+      3
+     ],
+     "h3": [
+      "fire",
+      2
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "earth",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ],
+     "h2": [
+      "water",
+      1
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 51,
+    "games": 80,
+    "apartFromDefault": 6,
+    "movesPerGame": 45,
+    "fireCapturesPerGame": 1.8,
+    "waterCapturesPerGame": 2.41,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      1
+     ],
+     "d3": [
+      "wind",
+      3
+     ],
+     "i2": [
+      "earth",
+      1
+     ],
+     "i1": [
+      "wind",
+      2
+     ],
+     "f3": [
+      "water",
+      1
+     ]
+    }
+   }
+  ],
+  [
+   {
+    "name": "default, varied",
+    "score": 64,
+    "games": 80,
+    "apartFromDefault": 4,
+    "movesPerGame": 51,
+    "fireCapturesPerGame": 1.81,
+    "waterCapturesPerGame": 2.42,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 61,
+    "games": 40,
+    "apartFromDefault": 7,
+    "movesPerGame": 42,
+    "fireCapturesPerGame": 2.1,
+    "waterCapturesPerGame": 2.05,
+    "formation": {
+     "h3": [
+      "earth",
+      2
+     ],
+     "g3": [
+      "wind",
+      3
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "b3": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      1
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "wind",
+      2
+     ],
+     "b2": [
+      "water",
+      2
+     ],
+     "d2": [
+      "water",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward 2 (first search), varied",
+    "score": 60,
+    "games": 160,
+    "apartFromDefault": 6,
+    "movesPerGame": 52,
+    "fireCapturesPerGame": 1.78,
+    "waterCapturesPerGame": 2.13,
+    "formation": {
+     "c3": [
+      "earth",
+      1
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "i3": [
+      "earth",
+      2
+     ],
+     "b1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "random, varied",
+    "score": 57,
+    "games": 120,
+    "apartFromDefault": 10,
+    "movesPerGame": 50,
+    "fireCapturesPerGame": 1.87,
+    "waterCapturesPerGame": 1.6,
+    "formation": {
+     "g3": [
+      "fire",
+      3
+     ],
+     "c1": [
+      "fire",
+      2
+     ],
+     "d3": [
+      "fire",
+      1
+     ],
+     "f1": [
+      "wind",
+      3
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "h2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "water",
+      2
+     ],
+     "c3": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "earth",
+      3
+     ],
+     "b3": [
+      "earth",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ],
+     "b1": [
+      "wind",
+      2
+     ],
+     "f3": "wizard"
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 56,
+    "games": 80,
+    "apartFromDefault": 7,
+    "movesPerGame": 58,
+    "fireCapturesPerGame": 1.8,
+    "waterCapturesPerGame": 2.15,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      2
+     ],
+     "b3": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "d2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "fire",
+      2
+     ],
+     "a3": [
+      "earth",
+      1
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 55,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 47,
+    "fireCapturesPerGame": 1.43,
+    "waterCapturesPerGame": 2.15,
+    "formation": {
+     "g3": [
+      "earth",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "i2": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ],
+     "i3": [
+      "wind",
+      2
+     ],
+     "g1": [
+      "earth",
+      3
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 55,
+    "games": 40,
+    "apartFromDefault": 8,
+    "movesPerGame": 45,
+    "fireCapturesPerGame": 2.27,
+    "waterCapturesPerGame": 2.25,
+    "formation": {
+     "e3": [
+      "earth",
+      1
+     ],
+     "g3": [
+      "earth",
+      3
+     ],
+     "h3": [
+      "fire",
+      2
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "earth",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      2
+     ],
+     "b1": [
+      "fire",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ],
+     "h2": [
+      "water",
+      1
+     ]
+    }
+   },
+   {
+    "name": "default, mirrored, varied",
+    "score": 53,
+    "games": 120,
+    "apartFromDefault": 6,
+    "movesPerGame": 57,
+    "fireCapturesPerGame": 1.97,
+    "waterCapturesPerGame": 2.17,
+    "formation": {
+     "h3": [
+      "wind",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "e3": [
+      "earth",
+      3
+     ],
+     "c3": [
+      "earth",
+      1
+     ],
+     "b3": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      1
+     ],
+     "f2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      1
+     ],
+     "c2": [
+      "water",
+      3
+     ],
+     "f1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "d1": [
+      "wind",
+      2
+     ],
+     "b2": [
+      "water",
+      2
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 51,
+    "games": 120,
+    "apartFromDefault": 6,
+    "movesPerGame": 52,
+    "fireCapturesPerGame": 1.99,
+    "waterCapturesPerGame": 2.44,
+    "formation": {
+     "e3": [
+      "fire",
+      1
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "fire",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "earth",
+      3
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "wind",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 49,
+    "games": 80,
+    "apartFromDefault": 3,
+    "movesPerGame": 63,
+    "fireCapturesPerGame": 1.64,
+    "waterCapturesPerGame": 2.33,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "water",
+      2
+     ],
+     "f2": [
+      "fire",
+      1
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "wind",
+      3
+     ],
+     "i1": [
+      "fire",
+      2
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 48,
+    "games": 80,
+    "apartFromDefault": 8,
+    "movesPerGame": 56,
+    "fireCapturesPerGame": 2.15,
+    "waterCapturesPerGame": 2.02,
+    "formation": {
+     "e3": [
+      "fire",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "water",
+      2
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "earth",
+      3
+     ],
+     "e1": "wizard",
+     "i2": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ],
+     "f3": [
+      "wind",
+      1
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 47,
+    "games": 80,
+    "apartFromDefault": 5,
+    "movesPerGame": 65,
+    "fireCapturesPerGame": 1.98,
+    "waterCapturesPerGame": 2.06,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "water",
+      2
+     ],
+     "i2": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 46,
+    "games": 40,
+    "apartFromDefault": 6,
+    "movesPerGame": 54,
+    "fireCapturesPerGame": 2.02,
+    "waterCapturesPerGame": 1.68,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": [
+      "water",
+      2
+     ],
+     "f1": "wizard",
+     "i2": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ]
+    }
+   },
+   {
+    "name": "fire forward (first search), varied",
+    "score": 45,
+    "games": 40,
+    "apartFromDefault": 8,
+    "movesPerGame": 57,
+    "fireCapturesPerGame": 1.93,
+    "waterCapturesPerGame": 2.27,
+    "formation": {
+     "e3": [
+      "fire",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "wind",
+      2
+     ],
+     "c2": [
+      "water",
+      1
+     ],
+     "d2": [
+      "earth",
+      3
+     ],
+     "e2": [
+      "fire",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "h2": [
+      "fire",
+      1
+     ],
+     "d1": [
+      "water",
+      2
+     ],
+     "e1": "wizard",
+     "i2": [
+      "earth",
+      1
+     ],
+     "c3": [
+      "wind",
+      3
+     ],
+     "f3": [
+      "wind",
+      1
+     ]
+    }
+   },
+   {
+    "name": "default, varied",
+    "score": 44,
+    "games": 40,
+    "apartFromDefault": 4,
+    "movesPerGame": 56,
+    "fireCapturesPerGame": 1.88,
+    "waterCapturesPerGame": 2.15,
+    "formation": {
+     "e3": [
+      "earth",
+      3
+     ],
+     "g3": [
+      "earth",
+      2
+     ],
+     "h3": [
+      "water",
+      2
+     ],
+     "c2": [
+      "wind",
+      3
+     ],
+     "d2": [
+      "wind",
+      1
+     ],
+     "e2": [
+      "fire",
+      1
+     ],
+     "f2": [
+      "wind",
+      2
+     ],
+     "g2": [
+      "water",
+      3
+     ],
+     "d1": [
+      "fire",
+      3
+     ],
+     "e1": "wizard",
+     "f1": [
+      "fire",
+      2
+     ],
+     "b1": [
+      "earth",
+      1
+     ],
+     "c1": [
+      "water",
+      1
+     ]
+    }
+   }
+  ]
+ ],
+ "finalists": [
+  {
+   "name": "default, varied",
+   "score": 61,
+   "games": 200,
+   "apartFromDefault": 4,
+   "movesPerGame": 54,
+   "fireCapturesPerGame": 1.79,
+   "waterCapturesPerGame": 2.43,
+   "formation": {
+    "e3": [
+     "earth",
+     3
+    ],
+    "g3": [
+     "earth",
+     2
+    ],
+    "h3": [
+     "fire",
+     1
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "f2": [
+     "wind",
+     2
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "fire",
+     2
+    ],
+    "b1": [
+     "earth",
+     1
+    ],
+    "c1": [
+     "wind",
+     3
+    ]
+   }
+  },
+  {
+   "name": "fire forward 2 (first search), varied",
+   "score": 61,
+   "games": 200,
+   "apartFromDefault": 6,
+   "movesPerGame": 53,
+   "fireCapturesPerGame": 1.85,
+   "waterCapturesPerGame": 2.15,
+   "formation": {
+    "c3": [
+     "earth",
+     1
+    ],
+    "h3": [
+     "wind",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "fire",
+     2
+    ],
+    "f2": [
+     "earth",
+     3
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "h2": [
+     "fire",
+     1
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "water",
+     2
+    ],
+    "i3": [
+     "earth",
+     2
+    ],
+    "b1": [
+     "wind",
+     3
+    ]
+   }
+  },
+  {
+   "name": "default, mirrored, varied",
+   "score": 58,
+   "games": 200,
+   "apartFromDefault": 7,
+   "movesPerGame": 52,
+   "fireCapturesPerGame": 2.19,
+   "waterCapturesPerGame": 2.1,
+   "formation": {
+    "h3": [
+     "earth",
+     2
+    ],
+    "g3": [
+     "wind",
+     3
+    ],
+    "e3": [
+     "earth",
+     3
+    ],
+    "c3": [
+     "earth",
+     1
+    ],
+    "b3": [
+     "fire",
+     2
+    ],
+    "g2": [
+     "water",
+     1
+    ],
+    "f2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "fire",
+     1
+    ],
+    "f1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "d1": [
+     "wind",
+     2
+    ],
+    "b2": [
+     "water",
+     2
+    ],
+    "d2": [
+     "water",
+     3
+    ]
+   }
+  },
+  {
+   "name": "default, varied",
+   "score": 52,
+   "games": 200,
+   "apartFromDefault": 6,
+   "movesPerGame": 52,
+   "fireCapturesPerGame": 1.93,
+   "waterCapturesPerGame": 2.27,
+   "formation": {
+    "e3": [
+     "fire",
+     1
+    ],
+    "g3": [
+     "earth",
+     2
+    ],
+    "h3": [
+     "fire",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "f2": [
+     "earth",
+     3
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "wind",
+     2
+    ],
+    "b1": [
+     "earth",
+     1
+    ],
+    "c1": [
+     "wind",
+     3
+    ]
+   }
+  },
+  {
+   "name": "default, varied",
+   "score": 51,
+   "games": 200,
+   "apartFromDefault": 8,
+   "movesPerGame": 54,
+   "fireCapturesPerGame": 2.07,
+   "waterCapturesPerGame": 2.24,
+   "formation": {
+    "e3": [
+     "earth",
+     1
+    ],
+    "g3": [
+     "earth",
+     3
+    ],
+    "h3": [
+     "fire",
+     2
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "f2": [
+     "earth",
+     2
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "wind",
+     2
+    ],
+    "b1": [
+     "fire",
+     1
+    ],
+    "c1": [
+     "wind",
+     3
+    ],
+    "h2": [
+     "water",
+     1
+    ]
+   }
+  },
+  {
+   "name": "random, varied",
+   "score": 50,
+   "games": 200,
+   "apartFromDefault": 10,
+   "movesPerGame": 48,
+   "fireCapturesPerGame": 1.84,
+   "waterCapturesPerGame": 1.66,
+   "formation": {
+    "g3": [
+     "fire",
+     3
+    ],
+    "c1": [
+     "fire",
+     2
+    ],
+    "d3": [
+     "fire",
+     1
+    ],
+    "f1": [
+     "wind",
+     3
+    ],
+    "g2": [
+     "water",
+     1
+    ],
+    "h2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "water",
+     2
+    ],
+    "c3": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "earth",
+     3
+    ],
+    "b3": [
+     "earth",
+     2
+    ],
+    "a3": [
+     "earth",
+     1
+    ],
+    "b1": [
+     "wind",
+     2
+    ],
+    "f3": "wizard"
+   }
+  },
+  {
+   "name": "default, mirrored, varied",
+   "score": 48,
+   "games": 200,
+   "apartFromDefault": 7,
+   "movesPerGame": 58,
+   "fireCapturesPerGame": 1.73,
+   "waterCapturesPerGame": 2.19,
+   "formation": {
+    "h3": [
+     "wind",
+     3
+    ],
+    "e3": [
+     "earth",
+     3
+    ],
+    "c3": [
+     "earth",
+     2
+    ],
+    "b3": [
+     "wind",
+     2
+    ],
+    "g2": [
+     "water",
+     1
+    ],
+    "f2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "d2": [
+     "fire",
+     1
+    ],
+    "c2": [
+     "water",
+     3
+    ],
+    "f1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "d1": [
+     "fire",
+     2
+    ],
+    "a3": [
+     "earth",
+     1
+    ]
+   }
+  },
+  {
+   "name": "fire forward (first search), varied",
+   "score": 47,
+   "games": 200,
+   "apartFromDefault": 6,
+   "movesPerGame": 53,
+   "fireCapturesPerGame": 1.58,
+   "waterCapturesPerGame": 2.08,
+   "formation": {
+    "g3": [
+     "earth",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "fire",
+     2
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "h2": [
+     "fire",
+     1
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "water",
+     2
+    ],
+    "i2": [
+     "earth",
+     1
+    ],
+    "c3": [
+     "wind",
+     3
+    ],
+    "i3": [
+     "wind",
+     2
+    ],
+    "g1": [
+     "earth",
+     3
+    ]
+   }
+  },
+  {
+   "name": "fire forward (first search), varied",
+   "score": 46,
+   "games": 200,
+   "apartFromDefault": 8,
+   "movesPerGame": 55,
+   "fireCapturesPerGame": 2.06,
+   "waterCapturesPerGame": 2.05,
+   "formation": {
+    "e3": [
+     "fire",
+     3
+    ],
+    "g3": [
+     "earth",
+     2
+    ],
+    "h3": [
+     "wind",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "water",
+     2
+    ],
+    "e2": [
+     "fire",
+     2
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "h2": [
+     "fire",
+     1
+    ],
+    "d1": [
+     "earth",
+     3
+    ],
+    "e1": "wizard",
+    "i2": [
+     "earth",
+     1
+    ],
+    "c3": [
+     "wind",
+     3
+    ],
+    "f3": [
+     "wind",
+     1
+    ]
+   }
+  },
+  {
+   "name": "default, varied",
+   "score": 43,
+   "games": 200,
+   "apartFromDefault": 3,
+   "movesPerGame": 57,
+   "fireCapturesPerGame": 1.69,
+   "waterCapturesPerGame": 2.29,
+   "formation": {
+    "e3": [
+     "earth",
+     3
+    ],
+    "g3": [
+     "earth",
+     2
+    ],
+    "h3": [
+     "wind",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "f2": [
+     "fire",
+     1
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "b1": [
+     "earth",
+     1
+    ],
+    "c1": [
+     "wind",
+     3
+    ],
+    "i1": [
+     "fire",
+     2
+    ]
+   }
+  }
+ ],
+ "roundRobin": {
+  "names": [
+   "default",
+   "#1 default, varied",
+   "#2 fire forward 2 (first search), varied",
+   "#3 default, mirrored, varied",
+   "#4 default, varied",
+   "#5 default, varied",
+   "#6 random, varied",
+   "#7 default, mirrored, varied",
+   "#8 fire forward (first search), varied"
+  ],
+  "formations": [
+   {
+    "b3": [
+     "wind",
+     3
+    ],
+    "c3": [
+     "earth",
+     1
+    ],
+    "e3": [
+     "earth",
+     3
+    ],
+    "g3": [
+     "earth",
+     2
+    ],
+    "h3": [
+     "wind",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "f2": [
+     "fire",
+     1
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "fire",
+     2
+    ]
+   },
+   {
+    "e3": [
+     "earth",
+     3
+    ],
+    "g3": [
+     "earth",
+     2
+    ],
+    "h3": [
+     "fire",
+     1
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "f2": [
+     "wind",
+     2
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "fire",
+     2
+    ],
+    "b1": [
+     "earth",
+     1
+    ],
+    "c1": [
+     "wind",
+     3
+    ]
+   },
+   {
+    "c3": [
+     "earth",
+     1
+    ],
+    "h3": [
+     "wind",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "fire",
+     2
+    ],
+    "f2": [
+     "earth",
+     3
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "h2": [
+     "fire",
+     1
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "water",
+     2
+    ],
+    "i3": [
+     "earth",
+     2
+    ],
+    "b1": [
+     "wind",
+     3
+    ]
+   },
+   {
+    "h3": [
+     "earth",
+     2
+    ],
+    "g3": [
+     "wind",
+     3
+    ],
+    "e3": [
+     "earth",
+     3
+    ],
+    "c3": [
+     "earth",
+     1
+    ],
+    "b3": [
+     "fire",
+     2
+    ],
+    "g2": [
+     "water",
+     1
+    ],
+    "f2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "fire",
+     1
+    ],
+    "f1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "d1": [
+     "wind",
+     2
+    ],
+    "b2": [
+     "water",
+     2
+    ],
+    "d2": [
+     "water",
+     3
+    ]
+   },
+   {
+    "e3": [
+     "fire",
+     1
+    ],
+    "g3": [
+     "earth",
+     2
+    ],
+    "h3": [
+     "fire",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "f2": [
+     "earth",
+     3
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "wind",
+     2
+    ],
+    "b1": [
+     "earth",
+     1
+    ],
+    "c1": [
+     "wind",
+     3
+    ]
+   },
+   {
+    "e3": [
+     "earth",
+     1
+    ],
+    "g3": [
+     "earth",
+     3
+    ],
+    "h3": [
+     "fire",
+     2
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "f2": [
+     "earth",
+     2
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "wind",
+     2
+    ],
+    "b1": [
+     "fire",
+     1
+    ],
+    "c1": [
+     "wind",
+     3
+    ],
+    "h2": [
+     "water",
+     1
+    ]
+   },
+   {
+    "g3": [
+     "fire",
+     3
+    ],
+    "c1": [
+     "fire",
+     2
+    ],
+    "d3": [
+     "fire",
+     1
+    ],
+    "f1": [
+     "wind",
+     3
+    ],
+    "g2": [
+     "water",
+     1
+    ],
+    "h2": [
+     "water",
+     3
+    ],
+    "d1": [
+     "water",
+     2
+    ],
+    "c3": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "earth",
+     3
+    ],
+    "b3": [
+     "earth",
+     2
+    ],
+    "a3": [
+     "earth",
+     1
+    ],
+    "b1": [
+     "wind",
+     2
+    ],
+    "f3": "wizard"
+   },
+   {
+    "h3": [
+     "wind",
+     3
+    ],
+    "e3": [
+     "earth",
+     3
+    ],
+    "c3": [
+     "earth",
+     2
+    ],
+    "b3": [
+     "wind",
+     2
+    ],
+    "g2": [
+     "water",
+     1
+    ],
+    "f2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "water",
+     2
+    ],
+    "d2": [
+     "fire",
+     1
+    ],
+    "c2": [
+     "water",
+     3
+    ],
+    "f1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "d1": [
+     "fire",
+     2
+    ],
+    "a3": [
+     "earth",
+     1
+    ]
+   },
+   {
+    "g3": [
+     "earth",
+     2
+    ],
+    "c2": [
+     "water",
+     1
+    ],
+    "d2": [
+     "wind",
+     1
+    ],
+    "e2": [
+     "fire",
+     2
+    ],
+    "g2": [
+     "water",
+     3
+    ],
+    "h2": [
+     "fire",
+     1
+    ],
+    "d1": [
+     "fire",
+     3
+    ],
+    "e1": "wizard",
+    "f1": [
+     "water",
+     2
+    ],
+    "i2": [
+     "earth",
+     1
+    ],
+    "c3": [
+     "wind",
+     3
+    ],
+    "i3": [
+     "wind",
+     2
+    ],
+    "g1": [
+     "earth",
+     3
+    ]
+   }
+  ],
+  "table": [
+   [
+    null,
+    29,
+    46,
+    40,
+    44,
+    38,
+    50,
+    43,
+    48
+   ],
+   [
+    71,
+    null,
+    64,
+    50,
+    60,
+    67,
+    50,
+    71,
+    50
+   ],
+   [
+    54,
+    36,
+    null,
+    54,
+    54,
+    41,
+    61,
+    48,
+    55
+   ],
+   [
+    60,
+    50,
+    46,
+    null,
+    58,
+    59,
+    50,
+    55,
+    53
+   ],
+   [
+    56,
+    40,
+    46,
+    43,
+    null,
+    45,
+    46,
+    56,
+    58
+   ],
+   [
+    62,
+    33,
+    59,
+    41,
+    55,
+    null,
+    40,
+    52,
+    52
+   ],
+   [
+    50,
+    50,
+    39,
+    50,
+    54,
+    60,
+    null,
+    38,
+    53
+   ],
+   [
+    58,
+    29,
+    53,
+    45,
+    44,
+    48,
+    63,
+    null,
+    50
+   ],
+   [
+    53,
+    50,
+    45,
+    48,
+    43,
+    48,
+    47,
+    50,
+    null
+   ]
+  ],
+  "overall": [
+   42,
+   60,
+   50,
+   54,
+   49,
+   49,
+   49,
+   49,
+   48
+  ],
+  "games": [
+   480,
+   480,
+   480,
+   480,
+   480,
+   480,
+   480,
+   480,
+   480
+  ]
+ }
+}

@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Elements Formations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: the methods page's reading column; findings as verdict rows, then sections with drawn boards. */
+:root {
+  --ground: #eef0ee; --plate: #fbfcfa; --ink: #1d2422; --muted: #5b6662; --rule: #d5dad6; --link: #24618a;
+  --fire: #c2412d; --wind: #b8860b; --water: #2f6f9f; --earth: #8a6a48; --mark: #e4ebe6;
+  --tile: #e6dccb; --tile-mid: #efe8dc; --route: #2f6f9f;
+  --ok: #2e7d4f; --ok-bg: #e2f1e7; --warn: #a15c00; --warn-bg: #fbecd6;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Literata", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #151a19; --plate: #1d2422; --ink: #e5ebe7; --muted: #9aa6a1; --rule: #33403c; --link: #7fb6dc;
+    --fire: #e9735e; --wind: #e0b33f; --water: #6aa8d6; --earth: #c29b72; --mark: #26302d;
+    --tile: #3a342b; --tile-mid: #302b24; --route: #6aa8d6;
+    --ok: #7bd3a0; --ok-bg: #1d3328; --warn: #f0b35a; --warn-bg: #3a2c16; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #151a19; --plate: #1d2422; --ink: #e5ebe7; --muted: #9aa6a1; --rule: #33403c; --link: #7fb6dc;
+  --fire: #e9735e; --wind: #e0b33f; --water: #6aa8d6; --earth: #c29b72; --mark: #26302d;
+  --tile: #3a342b; --tile-mid: #302b24; --route: #6aa8d6;
+  --ok: #7bd3a0; --ok-bg: #1d3328; --warn: #f0b35a; --warn-bg: #3a2c16; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--ground); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 72px; margin: 0;
+}
+.wrap { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 48px; }
+h1, h2, h3 { font-family: var(--display); line-height: 1.15; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 6vw, 2.9rem); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.2rem; font-weight: 500; }
+p { margin: 0; }
+a { color: var(--link); text-underline-offset: 2px; }
+a:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+code { font-family: var(--mono); font-size: 0.82em; background: var(--mark); padding: 0.1em 0.35em; border-radius: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.lede { font-size: 1.15rem; }
+.muted { color: var(--muted); font-size: 0.92rem; }
+ul.plain { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; }
+
+.howto { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 22px; display: flex; flex-direction: column; gap: 8px; font-size: 0.95rem; }
+
+/* Verdicts */
+.verdicts { display: flex; flex-direction: column; border: 1px solid var(--rule); border-radius: 10px; background: var(--plate); overflow: hidden; }
+.verdict { display: grid; grid-template-columns: 1fr 1.4fr auto; gap: 14px; padding: 12px 16px; border-bottom: 1px solid var(--rule); align-items: start; }
+.verdict:last-child { border-bottom: 0; }
+.verdict .q { font-family: var(--display); font-weight: 500; }
+.verdict .a { min-width: 0; font-size: 0.95rem; }
+.pill { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.ok { color: var(--ok); background: var(--ok-bg); }
+.pill.warn { color: var(--warn); background: var(--warn-bg); }
+@media (max-width: 600px) { .verdict { grid-template-columns: 1fr auto; } .verdict .a { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Tables */
+.scroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--plate); }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+th, td { text-align: left; vertical-align: top; padding: 9px 13px; border-bottom: 1px solid var(--rule); }
+th { font-family: var(--display); font-weight: 500; color: var(--muted); font-size: 0.84rem; }
+tr:last-child td { border-bottom: 0; }
+td.n { font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.hi { font-weight: 600; }
+
+/* Bars */
+.bars { display: flex; flex-direction: column; gap: 9px; }
+.bar-row { display: grid; grid-template-columns: 10.5rem 1fr 3.4rem; gap: 12px; align-items: center; font-family: var(--display); font-size: 0.95rem; }
+.bar-row .track { height: 14px; background: var(--mark); border-radius: 3px; position: relative; overflow: hidden; }
+.bar-row .track i { position: absolute; inset: 0 auto 0 0; background: var(--c, var(--water)); border-radius: 3px; }
+.bar-row .track .mid { position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+.bar-row b { text-align: right; font-variant-numeric: tabular-nums; }
+.bar-row small { display: block; font-family: var(--body); color: var(--muted); font-size: 0.78rem; font-weight: 400; }
+@media (max-width: 480px) { .bar-row { grid-template-columns: 7.5rem 1fr 3rem; } }
+
+/* Boards */
+.figure { display: flex; flex-direction: column; gap: 10px; background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; }
+.figure figcaption { font-size: 0.93rem; }
+.boards { display: flex; flex-wrap: wrap; gap: 18px; align-items: flex-start; }
+.bd { display: grid; gap: 2px; font-family: var(--display); }
+.bd .lbl { font-size: 0.68rem; color: var(--muted); display: grid; place-items: center; font-family: var(--mono); }
+.bd .sq { width: var(--cell, 34px); height: var(--cell, 34px); background: var(--tile); border-radius: 3px; display: grid; place-items: center; position: relative; }
+.bd .sq.midz { background: var(--tile-mid); }
+.bd .sq.route { box-shadow: inset 0 0 0 2px var(--route); }
+.bd .sq .step { position: absolute; top: 1px; right: 3px; font-family: var(--mono); font-size: 0.6rem; color: var(--route); font-weight: 500; }
+.bd .sq.num { font-family: var(--mono); font-size: 0.82rem; font-weight: 500; }
+.pc { width: 78%; height: 78%; display: grid; place-items: center; font-size: 0.66rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1; border: 2px solid transparent; }
+.pc.w { color: #1d2422; } .pc.b { color: #fbfcfa; }
+.pc.fire { border-radius: 3px; } .pc.wind { border-radius: 3px; transform: rotate(45deg) scale(0.82); }
+.pc.wind span { transform: rotate(-45deg); }
+.pc.water { border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; } .pc.earth { clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); }
+.pc.wiz { clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); width: 92%; height: 92%; }
+.pc.w.fire { background: #f08a74; } .pc.b.fire { background: #a3301f; }
+.pc.w.wind { background: #f2cf62; } .pc.b.wind { background: #8f6a06; }
+.pc.w.water { background: #8fc0e6; } .pc.b.water { background: #1f5680; }
+.pc.w.earth { background: #d2b28e; } .pc.b.earth { background: #6b4f33; }
+.pc.w.wiz { background: #f4f1e8; border: 0; outline: 1px solid #1d2422; } .pc.b.wiz { background: #1d2422; }
+.pc.w { box-shadow: 0 0 0 1.5px #fbfcfa inset; } .pc.b { box-shadow: 0 0 0 1.5px #1d2422 inset; }
+.pc.stack { outline: 2px dashed var(--ink); outline-offset: 1px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.82rem; color: var(--muted); font-family: var(--display); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend .swatch { width: 14px; height: 14px; display: inline-block; }
+
+.next { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.next ol { margin: 0; padding-left: 1.3em; display: flex; flex-direction: column; gap: 10px; }
+footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Formation cards in a grid: board, name, scores, one line of description. */
+.wrap { max-width: 1080px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 18px; }
+.card { background: var(--plate); border: 1px solid var(--rule); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.card.ref { border-style: dashed; }
+.scores { display: flex; flex-wrap: wrap; gap: 4px 14px; font-family: var(--display); font-size: 0.9rem; color: var(--muted); }
+.scores b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.card p { font-size: 0.93rem; }
+.boardwrap { overflow-x: auto; }
+.narrow { max-width: 760px; display: flex; flex-direction: column; gap: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="stack narrow">
+  <span class="eyebrow">Elements · formations · 28 Oct 2026 · Deep 2k with learned values · 75-move rule</span>
+  <h1>Starting formations that play well</h1>
+  <p class="lede">About 220 formations played a league over five rounds. The eight best, chosen to differ from each other, then played every other one and your default: each as White and as Black, 40 games per pairing, about 3,200 games.</p>
+</header>
+<section class="howto narrow" aria-label="How to read the cards">
+  <p><strong>Against the others</strong> is the score against the other eight formations, 640 games each, uncertain by about ±4 points. A win counts 1 and a draw ½. <strong>Against your default</strong> comes from 80 games, so it's uncertain by about ±11. Boards show rows 1–3 from White's side; Black uses the same formation rotated.</p>
+  <div class="legend" aria-label="Piece legend">
+    <span><i class="swatch pc w fire" style="width:14px;height:14px"></i>Fire</span>
+    <span><i class="swatch pc w wind" style="width:12px;height:12px"></i>Wind</span>
+    <span><i class="swatch pc w water" style="width:14px;height:14px"></i>Water</span>
+    <span><i class="swatch pc w earth" style="width:14px;height:14px"></i>Earth</span>
+    <span>number = size, star = Wizard</span>
+  </div>
+</section>
+<section class="grid" aria-label="Formations">
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="f3"></div></div>
+    <h3>Mirrored and reshaped</h3>
+    <div class="scores"><span>Against the others <b>58%</b></span><span>Against your default <b>59%</b></span><span><b>7</b> pieces moved</span><span>Draws <b>18%</b></span><span>Moves each <b>40</b></span></div>
+    <p>Starts from your default mirrored left to right: Water 3 moves to the centre-left on d2, Wind 3 to g3, Fire 2 forward to b3 and Fire 3 back to f1.</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="f1"></div></div>
+    <h3>Wind 3 held back</h3>
+    <div class="scores"><span>Against the others <b>55%</b></span><span>Against your default <b>61%</b></span><span><b>4</b> pieces moved</span><span>Draws <b>17%</b></span><span>Moves each <b>41</b></span></div>
+    <p>Only four pieces moved from your default: Wind 3 drops from b3 to the back row on c1 with Earth 1 beside it, Wind 2 moves next to the centre on f2, and Fire 1 goes forward to h3.</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="f2"></div></div>
+    <h3>Fire in front of the Wizard</h3>
+    <div class="scores"><span>Against the others <b>54%</b></span><span>Against your default <b>61%</b></span><span><b>6</b> pieces moved</span><span>Draws <b>16%</b></span><span>Moves each <b>38</b></span></div>
+    <p>Fire 2 stands right in front of the Wizard on e2 with Earth 3 beside it, Water 2 joins the back row on f1, Wind 3 waits on b1 and Earth 2 takes the corner on i3.</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="f4"></div></div>
+    <h3>Fire 1 in front</h3>
+    <div class="scores"><span>Against the others <b>52%</b></span><span>Against your default <b>59%</b></span><span><b>6</b> pieces moved</span><span>Draws <b>17%</b></span><span>Moves each <b>39</b></span></div>
+    <p>Like Wind 3 held back, but Fire 1 stands in front of the centre on e3, Earth 3 goes next to the Water on f2, and Wind 2 guards f1.</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="f5"></div></div>
+    <h3>Low Winds, Earth forward</h3>
+    <div class="scores"><span>Against the others <b>50%</b></span><span>Against your default <b>61%</b></span><span><b>8</b> pieces moved</span><span>Draws <b>17%</b></span><span>Moves each <b>41</b></span></div>
+    <p>Eight pieces moved: both Winds and Fire 1 on the back row, Earth 1 and Earth 3 forward on e3 and g3, and Water 1 out on h2.</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="f6"></div></div>
+    <h3>Wizard forward</h3>
+    <div class="scores"><span>Against the others <b>48%</b></span><span>Against your default <b>48%</b></span><span><b>10</b> pieces moved</span><span>Draws <b>14%</b></span><span>Moves each <b>36</b></span></div>
+    <p>The most unusual one: the Wizard stands on the front row (f3) between Fire pieces, the Earths are out on the left, and most attackers wait behind. Its games are the shortest.</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="f7"></div></div>
+    <h3>Earth wall on the left</h3>
+    <div class="scores"><span>Against the others <b>47%</b></span><span>Against your default <b>46%</b></span><span><b>7</b> pieces moved</span><span>Draws <b>18%</b></span><span>Moves each <b>40</b></span></div>
+    <p>Earth 1, Wind 2 and Earth 2 form a wall on the left of the front row, the Waters spread across the middle row, and Wind 3 waits on h3.</p>
+  </article>
+  <article class="card">
+    <div class="boardwrap"><div class="boards" id="f8"></div></div>
+    <h3>Fire forward, Earth on the flank</h3>
+    <div class="scores"><span>Against the others <b>44%</b></span><span>Against your default <b>59%</b></span><span><b>6</b> pieces moved</span><span>Draws <b>18%</b></span><span>Moves each <b>42</b></span></div>
+    <p>From the first search: Fire 2 in front of the Wizard on e2, Fire 1 out on h2, Earth 1 and Earth 3 on the right flank, and Water 2 on the back row.</p>
+  </article>
+  <article class="card ref">
+    <div class="boardwrap"><div class="boards" id="f0"></div></div>
+    <h3>Your default</h3>
+    <div class="scores"><span>Against the others <b>43%</b></span><span>Draws <b>22%</b></span><span>Moves each <b>45</b></span></div>
+    <p>Your own formation. The best one for weak bots; with strong play it draws the most, its games run longest, and most formations here beat it.</p>
+  </article>
+</section>
+<section class="stack narrow">
+  <h2>Mixed formations play better</h2>
+  <div class="scroll"><table>
+    <thead><tr><th></th><th>Both sides with your default</th><th>Both sides with the same formation</th><th>Mixed formations</th></tr></thead>
+    <tbody>
+      <tr><td>Games</td><td class="n">40</td><td class="n">360</td><td class="n">2,880</td></tr>
+      <tr><td>White's score</td><td class="n">58%</td><td class="n">49%</td><td class="n hi">52%</td></tr>
+      <tr><td>Draws</td><td class="n">25%</td><td class="n">22%</td><td class="n hi">17%</td></tr>
+      <tr><td>Typical game (moves each)</td><td class="n">45</td><td class="n">38</td><td class="n hi">40</td></tr>
+      <tr><td>Longest 10% of games</td><td class="n">128+</td><td class="n">110+</td><td class="n hi">108+</td></tr>
+    </tbody>
+  </table></div>
+  <p>When the two players start from different formations, games are more often decided and a little shorter, and White's edge stays small. Your default draws the most of all nine.</p>
+  <h2>The best three, head to head</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>200 games per pair</th><th>Score of the first</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Wind 3 held back</strong> against Mirrored and reshaped</td><td class="n hi">56% (49–62)</td></tr>
+      <tr><td><strong>Wind 3 held back</strong> against Fire in front of the Wizard</td><td class="n hi">62% (55–68)</td></tr>
+      <tr><td>Mirrored and reshaped against Fire in front of the Wizard</td><td class="n">49%</td></tr>
+    </tbody>
+  </table></div>
+  <p><strong>Wind 3 held back is the strongest formation found.</strong> It rates about 60 points above the other two, and it also came first in the search's own round robin. In the pairings above, 80 games had Mirrored and reshaped beating it 65%; with 200 games that turned out to be luck.</p>
+  <h2>No sure win</h2>
+  <p>No pairing is lopsided. The biggest gaps in the pairings were about 65 to 35 in 80 games, and the head-to-head shows such gaps shrink with more games. Choosing a formation matters a little without deciding the game.</p>
+  <h2>What this suggests</h2>
+  <ul class="plain">
+    <li><strong>A new default:</strong> Wind 3 held back. It is the strongest formation found, and it changes only four pieces of yours.</li>
+    <li><strong>A set of presets:</strong> the top six are within about 10 points of each other and look different from one another.</li>
+    <li><strong>Your default's weak spot</strong> is probably Wind 3 standing exposed on b3, which Wind 3 held back tucks away.</li>
+  </ul>
+</section>
+</div>
+<script>
+(function () {
+  const ELEMENT = { F: 'fire', W: 'wind', R: 'water', E: 'earth', Z: 'wiz' };
+  function piece(code) {
+    const white = code === code.toUpperCase();
+    const letters = code.replace(/\d/g, '').toUpperCase();
+    const size = code.replace(/\D/g, '');
+    const el = document.createElement('div');
+    el.className = 'pc ' + (white ? 'w ' : 'b ') + ELEMENT[letters[0]] + (letters.length > 1 ? ' stack' : '');
+    const t = document.createElement('span');
+    t.textContent = letters === 'Z' ? '' : letters + size;
+    el.appendChild(t);
+    return el;
+  }
+  // opts: files 'a'..'i' range, ranks [top, bottom], pieces {sq: code}, route [sq...], numbers {sq: text}, cell px
+  function board(opts) {
+    const files = 'abcdefghi'.slice('abcdefghi'.indexOf(opts.files[0]), 'abcdefghi'.indexOf(opts.files[1]) + 1);
+    const [top, bottom] = opts.ranks;
+    const g = document.createElement('div');
+    g.className = 'bd';
+    g.style.gridTemplateColumns = `14px repeat(${files.length}, var(--cell, 34px))`;
+    if (opts.cell) g.style.setProperty('--cell', opts.cell + 'px');
+    g.setAttribute('role', 'img');
+    g.setAttribute('aria-label', opts.label);
+    for (let r = top; r >= bottom; r--) {
+      const l = document.createElement('div'); l.className = 'lbl'; l.textContent = r; g.appendChild(l);
+      for (const f of files) {
+        const s = f + r, cell = document.createElement('div');
+        cell.className = 'sq' + (r >= 4 && r <= 6 ? ' midz' : '');
+        const ri = (opts.route || []).indexOf(s);
+        if (ri > 0) { cell.classList.add('route'); const st = document.createElement('span'); st.className = 'step'; st.textContent = ri; cell.appendChild(st); }
+        if (opts.numbers && opts.numbers[s]) { cell.classList.add('num'); cell.appendChild(document.createTextNode(opts.numbers[s])); }
+        else if (opts.pieces[s]) cell.appendChild(piece(opts.pieces[s]));
+        g.appendChild(cell);
+      }
+    }
+    g.appendChild(document.createElement('div'));
+    for (const f of files) { const l = document.createElement('div'); l.className = 'lbl'; l.textContent = f; g.appendChild(l); }
+    return g;
+  }
+  const put = (id, ...boards) => { const host = document.getElementById(id); boards.forEach(b => host.appendChild(board(b))); };
+  const parse = rows => { // rows: { rank: 'a b c ... i' tokens, '.' = empty }
+    const out = {};
+    for (const [rank, line] of Object.entries(rows)) line.trim().split(/\s+/).forEach((t, i) => { if (t !== '.') out['abcdefghi'[i] + rank] = t; });
+    return out;
+  };
+  const small = window.matchMedia('(max-width: 480px)').matches ? 28 : 34;
+
+
+  const cell = window.matchMedia('(max-width: 480px)').matches ? 28 : 32;
+  const CARDS = {"0":{"b3":"W3","c3":"E1","e3":"E3","g3":"E2","h3":"W2","c2":"R1","d2":"W1","e2":"R2","f2":"F1","g2":"R3","d1":"F3","e1":"Z","f1":"F2"},"1":{"e3":"E3","g3":"E2","h3":"F1","c2":"R1","d2":"W1","e2":"R2","f2":"W2","g2":"R3","d1":"F3","e1":"Z","f1":"F2","b1":"E1","c1":"W3"},"2":{"c3":"E1","h3":"W2","c2":"R1","d2":"W1","e2":"F2","f2":"E3","g2":"R3","h2":"F1","d1":"F3","e1":"Z","f1":"R2","i3":"E2","b1":"W3"},"3":{"h3":"E2","g3":"W3","e3":"E3","c3":"E1","b3":"F2","g2":"R1","f2":"W1","e2":"F1","f1":"F3","e1":"Z","d1":"W2","b2":"R2","d2":"R3"},"4":{"e3":"F1","g3":"E2","h3":"F2","c2":"R1","d2":"W1","e2":"R2","f2":"E3","g2":"R3","d1":"F3","e1":"Z","f1":"W2","b1":"E1","c1":"W3"},"5":{"e3":"E1","g3":"E3","h3":"F2","d2":"W1","e2":"R2","f2":"E2","g2":"R3","d1":"F3","e1":"Z","f1":"W2","b1":"F1","c1":"W3","h2":"R1"},"6":{"g3":"F3","c1":"F2","d3":"F1","f1":"W3","g2":"R1","h2":"R3","d1":"R2","c3":"W1","e2":"E3","b3":"E2","a3":"E1","b1":"W2","f3":"Z"},"7":{"h3":"W3","e3":"E3","c3":"E2","b3":"W2","g2":"R1","f2":"W1","e2":"R2","d2":"F1","c2":"R3","f1":"F3","e1":"Z","d1":"F2","a3":"E1"},"8":{"g3":"E2","c2":"R1","d2":"W1","e2":"F2","g2":"R3","h2":"F1","d1":"F3","e1":"Z","f1":"R2","i2":"E1","c3":"W3","i3":"W2","g1":"E3"}};
+  for (const [i, pieces] of Object.entries(CARDS))
+    put('f' + i, { files: 'ai', ranks: [3, 1], pieces, cell, label: 'Formation rows 1 to 3' });
+})();
+</script>
+</body>
+</html>
