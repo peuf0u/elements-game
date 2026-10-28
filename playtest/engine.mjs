@@ -22,8 +22,8 @@ export const hasCapturers = (board, o) => board.some(p => p && p.o === o && isCa
 let config = E.DEFAULT_CONFIG;
 // quietMoveLimit: moves each without a capture or combine before a draw (0 = no limit). 75 since
 // 2026-10-28; games recorded before that were played with 50, the chess rule.
-export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, quietMoveLimit = 75 } = {}) {
-  config = { exactRange, noWaterEdge, waterStraightCapture, waterRiver, waterStraightSteps, quietMoveLimit };
+export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, waterDiagonalBends = false, waterOneWay = false, quietMoveLimit = 75 } = {}) {
+  config = { exactRange, noWaterEdge, waterStraightCapture, waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay, quietMoveLimit };
 }
 
 // A formation is { square: [element, size] | 'wizard' } as White sees it (rows 1–3).

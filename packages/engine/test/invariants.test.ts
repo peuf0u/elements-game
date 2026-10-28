@@ -9,7 +9,9 @@ let seed = 1;
 const random = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x80000000; };
 
 const VARIANTS: Array<Partial<RulesConfig>> = [{}, { exactRange: true }, { noWaterEdge: true }, { waterStraightCapture: true },
-  { waterRiver: true }, { waterStraightSteps: true }, { waterRiver: true, waterStraightSteps: true }];
+  { waterRiver: true }, { waterStraightSteps: true }, { waterRiver: true, waterStraightSteps: true },
+  { waterDiagonalBends: true }, { waterRiver: true, waterDiagonalBends: true },
+  { waterOneWay: true }, { waterDiagonalBends: true, waterOneWay: true }];
 
 test('make + unmake restores the position, and the running hash matches a fresh one', () => {
   const moves = new Int32Array(512);
