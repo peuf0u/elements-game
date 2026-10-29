@@ -97,13 +97,6 @@ button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-c
   <div class="actions">
     <select id="presetSel" aria-label="Use a preset formation" hidden>
       <option value="">Preset formation…</option>
-      <option value="windHeldBack">Wind 3 held back (default)</option>
-      <option value="mirrored">Mirrored and reshaped</option>
-      <option value="fireBeforeWizard">Fire in front of the Wizard</option>
-      <option value="fireOneInFront">Fire 1 in front</option>
-      <option value="lowWinds">Low Winds, Earth forward</option>
-      <option value="wizardForward">Wizard forward</option>
-      <option value="original">Original</option>
     </select>
     <button id="undoBtn" type="button">Undo</button>
     <button id="newBtn" type="button">New game</button>
@@ -341,18 +334,10 @@ var Rules = (() => {
       last: null, clock: 0, reps: {}, result: null, ply: 0,
     };
   }
-  // Preset formations (GAME_SPEC §6), as White sees them; copied from PRESETS in
-  // packages/engine/src/formation.ts. Black gets the same formation from their side of the table
-  // (rotated 180°). The default is windHeldBack; original is the designer's own formation.
-  const PRESETS = {
-    windHeldBack: { e3: ['earth', 3], g3: ['earth', 2], h3: ['fire', 1], c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['wind', 2], g2: ['water', 3], b1: ['earth', 1], c1: ['wind', 3], d1: ['fire', 3], e1: 'wizard', f1: ['fire', 2] },
-    mirrored: { b3: ['fire', 2], c3: ['earth', 1], e3: ['earth', 3], g3: ['wind', 3], h3: ['earth', 2], b2: ['water', 2], d2: ['water', 3], e2: ['fire', 1], f2: ['wind', 1], g2: ['water', 1], d1: ['wind', 2], e1: 'wizard', f1: ['fire', 3] },
-    fireBeforeWizard: { c3: ['earth', 1], h3: ['wind', 2], i3: ['earth', 2], c2: ['water', 1], d2: ['wind', 1], e2: ['fire', 2], f2: ['earth', 3], g2: ['water', 3], h2: ['fire', 1], b1: ['wind', 3], d1: ['fire', 3], e1: 'wizard', f1: ['water', 2] },
-    fireOneInFront: { e3: ['fire', 1], g3: ['earth', 2], h3: ['fire', 2], c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['earth', 3], g2: ['water', 3], b1: ['earth', 1], c1: ['wind', 3], d1: ['fire', 3], e1: 'wizard', f1: ['wind', 2] },
-    lowWinds: { e3: ['earth', 1], g3: ['earth', 3], h3: ['fire', 2], d2: ['wind', 1], e2: ['water', 2], f2: ['earth', 2], g2: ['water', 3], h2: ['water', 1], b1: ['fire', 1], c1: ['wind', 3], d1: ['fire', 3], e1: 'wizard', f1: ['wind', 2] },
-    wizardForward: { a3: ['earth', 1], b3: ['earth', 2], c3: ['wind', 1], d3: ['fire', 1], f3: 'wizard', g3: ['fire', 3], e2: ['earth', 3], g2: ['water', 1], h2: ['water', 3], b1: ['wind', 2], c1: ['fire', 2], d1: ['water', 2], f1: ['wind', 3] },
-    original: { b3: ['wind', 3], c3: ['earth', 1], e3: ['earth', 3], g3: ['earth', 2], h3: ['wind', 2], c2: ['water', 1], d2: ['wind', 1], e2: ['water', 2], f2: ['fire', 1], g2: ['water', 3], d1: ['fire', 3], e1: 'wizard', f1: ['fire', 2] },
-  };
+  // Preset formations (GAME_SPEC §6), as White sees them. build.mjs fills them in from PRESETS in
+  // packages/engine/src/formation.ts, so there's no copy to keep in step. Black gets the same
+  // formation from their side of the table (rotated 180°). The default is windHeldBack.
+  const PRESETS = globalThis.ELEMENTS_PRESETS || {};
   const DEFAULT_PRESET = 'windHeldBack';
   // White's square for a preset square, seen from owner o's side
   const ownSq = (o, t) => { const s = parse(t); return o === 'w' ? s : sq(N - 1 - X(s), N - 1 - Y(s)); };
@@ -424,7 +409,7 @@ var Rules = (() => {
 
   return {
     N, ELS, variant, sq, X, Y, name, parse, other, inZone, isCapturer, canCombine, combine, range,
-    pseudoMoves, legalFrom, legalMoves, inCheck, wizardSq, newGame, fromPosition, presetBoard, presetPlacement, canPick, placeTargets,
+    pseudoMoves, legalFrom, legalMoves, inCheck, wizardSq, newGame, fromPosition, presets: Object.keys(PRESETS), presetBoard, presetPlacement, canPick, placeTargets,
     place, makeMove, reserveFor,
   };
 })();
@@ -1147,6 +1132,13 @@ function bindUi() {
   menuBtn.addEventListener('click', () => setMenu(menu.hidden));
   document.addEventListener('pointerdown', e => { if (!menu.hidden && !menu.contains(e.target) && e.target !== menuBtn) setMenu(false); });
   $('undoBtn').addEventListener('click', undo);
+  // The preset menu, in the engine's order; a preset without a name here shows its engine name.
+  const PRESET_NAMES = {
+    windHeldBack: 'Wind 3 held back (default)', mirrored: 'Mirrored and reshaped', fireBeforeWizard: 'Fire in front of the Wizard',
+    fireOneInFront: 'Fire 1 in front', lowWinds: 'Low Winds, Earth forward', wizardForward: 'Wizard forward', fireForward: 'Fire forward',
+    original: 'Original',
+  };
+  for (const name of R.presets) $('presetSel').append(new Option(PRESET_NAMES[name] || name, name));
   // fills both formations at once and starts play; Undo goes back to placing by hand.
   // Two players both take the preset; against the computer, you take it and the computer its default.
   $('presetSel').addEventListener('change', e => {

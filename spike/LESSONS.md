@@ -6,12 +6,12 @@ The spike from `spike/BRIEF.md`, built and played on 2026-10-27. Code like this 
 
 | Page | Link | File |
 |---|---|---|
-| The game | https://claude.ai/artifact/PUaVxRSY45MR2KAh2pE9JU | `index.html` |
+| The game (until 2026-10-29; now a link to the public version below) | https://claude.ai/artifact/PUaVxRSY45MR2KAh2pE9JU | `index.html` |
 | Piece shapes sketch | https://claude.ai/artifact/MXmZ6s5XrFXhTGndQBPRYj | `shapes.html` |
 | Board look sketch | https://claude.ai/artifact/X4UJZtgfMvpASGFE6a6XPZ | `board.html` |
 | Owner colours sketch | https://claude.ai/artifact/EkFbsMvRLBxReQpmWTH67x | `owner.html` |
 
-**Public version** (anyone with the link, PRODUCT_BRIEF D14): https://elements-game-kappa.vercel.app. It's the same `index.html` plus a computer opponent: `bot.mjs` runs the playtest's bots on `packages/engine` in a Web Worker, and `build.mjs` bundles both into `spike/dist/`, which Vercel serves. Publish a change with `vercel deploy --prod` from the repo root.
+**Public version** (anyone with the link, PRODUCT_BRIEF D14): https://elements-game-kappa.vercel.app. It's the same `index.html` plus a computer opponent: `bot.mjs` runs the playtest's bots on `packages/engine` in a Web Worker, and `build.mjs` bundles both into `spike/dist/`, which Vercel serves. Publish a change with `vercel deploy --prod` from the repo root. Since 2026-10-29 it's the only version of the game: the private claude.ai page only links here. The preset formations aren't written in `index.html`; `build.mjs` fills them in from `packages/engine/src/formation.ts`, so a new preset appears without editing the page (it needs a display name in `PRESET_NAMES`, or shows its engine name).
 
 `rules-check.mjs` checks the rules engine against the spec's examples: `node spike/rules-check.mjs spike/index.html`.
 
