@@ -33,6 +33,19 @@ WEIGHTS.earthWall = { ...WEIGHTS.tuned, values: { unit: { ...VALUES.tuned.unit, 
 // the rule is off.
 WEIGHTS.castleWalk = { ...WEIGHTS.tuned, castleWalk: 0.5 };
 
+// Rules v0.4, learned like `tuned` but from 4,000 games of v0.4 (tune.mjs selfplayV04, 2026-10-30),
+// with the castle walk learned as one of the weights.
+WEIGHTS.v04Learned = {
+  values: { unit: {
+    fire1: 2.216, fire2: 2.617, fire3: 5.879, wind1: 1.15, wind2: 2.696, wind3: 8.484,
+    water1: 3.396, water2: 4.006, water3: 9.506, earth1: -4.617, earth2: -3.669, earth3: -4.392,
+  } },
+  mobility: 0.287, wizardPressure: 0.713, stackBonus: 3.429, castleWalk: 0.416,
+};
+// The learned castle walk only says how much being near the castle predicted a win in games where both
+// sides walked at 0.5; playing it at 1 beat today's bot by more (FINDINGS §21), so v0.4's bot uses 1.
+WEIGHTS.v04 = { ...WEIGHTS.v04Learned, castleWalk: 1 };
+
 // For readable pieces ({ o, wiz } or { o, els }), as game.mjs and Greedy use them.
 export function pieceValue(p, table = VALUES.standard) {
   if (!p || p.wiz) return 0;
@@ -70,7 +83,7 @@ export const SCORE_DEFAULTS = {
 // closer its Wizard is to the enemy castle. Only once the opponent is down to 4 attacking pieces or
 // fewer (before that, a Wizard walking into the enemy camp gets caught), and growing as it has fewer.
 // A Wizard that has used up its visit counts as one step further out, so it steps out and back in.
-function castleWalk(pos, o, enemyCapturers, weight, values) {
+export function castleWalk(pos, o, enemyCapturers, weight, values) {
   const w = pos.wizard[o];
   if (w < 0 || enemyCapturers > 4) return 0;
   let present = 0;

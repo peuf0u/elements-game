@@ -14,12 +14,13 @@ import { careful, deep } from '../playtest/players.mjs';
 import { WEIGHTS } from '../playtest/evaluate.mjs';
 
 // Ratings from playtest/FINDINGS.md §10 (chess Elo scale, Careful = 1000) and time per move on a Mac.
-// Medium and Hard also walk their Wizard toward the enemy castle late in the game (WEIGHTS.castleWalk,
-// FINDINGS §20); without the castle return that does nothing.
+// Medium and Hard use the values relearned for rules v0.4 and walk their Wizard toward the enemy
+// castle late in the game (WEIGHTS.v04, FINDINGS §21), which made them about 50 and 120 rating points
+// stronger than with the earlier values. Without the castle return the walk does nothing.
 const LEVELS = {
-  easy: () => careful(),                                       // 1000, 5 ms
-  medium: () => deep({ ...WEIGHTS.castleWalk, nodes: 2000 }),  // 1690, 7 ms
-  hard: () => deep({ ...WEIGHTS.castleWalk, nodes: 20000 }),   // 1942, 62 ms
+  easy: () => careful(),                                   // 1000, 5 ms
+  medium: () => deep({ ...WEIGHTS.v04, nodes: 2000 }),     // 1690, 7 ms
+  hard: () => deep({ ...WEIGHTS.v04, nodes: 20000 }),      // 1942, 62 ms
 };
 const players = {};
 

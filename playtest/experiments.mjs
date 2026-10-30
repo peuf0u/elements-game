@@ -1,7 +1,7 @@
 // The experiments from the plan. Each one is a list of games to play; run.mjs plays them.
 import fs from 'node:fs';
 import { DEFAULT_FORMATION, PRESETS, FIRST_PRESETS, mirror as mirrorFiles, without } from './formations.mjs';
-import { V03 } from './engine.mjs';
+import { V03, V04 } from './engine.mjs';
 
 let seed = 1;
 // n games of A against B, alternating colours: A is White in even games, Black in odd ones.
@@ -402,6 +402,99 @@ export const EXPERIMENTS = {
       ...rules.flatMap(([name, r]) => both(name, bot, bot, 400 * s, { fa: f, fb: f, ...ro, ...r })),
       ...rules.flatMap(([name, r]) => shared(`random formations: ${name}`, bot, 400 * s, { ...ro, ...r })),
       ...rules.flatMap(([name, r]) => both(`deep 20k: ${name}`, strong, strong, 400 * s, { fa: f, fb: f, ...ro, ...r })),
+    ];
+  },
+  // 13. Rules v0.4 (GAME_SPEC §6: the castle return) before it goes public: the key tests of 12 again,
+  // to set against the v0.3 results. The bots score with WEIGHTS.castleWalk, like the prototype's.
+  // a. Deep 20k from Wind 3 held back: equal games and the handicap test without Water 3, Fire 3 or Wind 3.
+  v04strong: s => {
+    const bot = { type: 'deep', nodes: 20000, weights: 'castleWalk' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000, ...V04 };
+    seed = 2800000;
+    return [
+      ...Array.from({ length: 200 * s }, () => ({ tag: 'v0.4: equal', a: 'w', seed: seed++, white: bot, black: bot, whiteFormation: f, blackFormation: f, ...ro })),
+      ...[['g2', 'water3'], ['d1', 'fire3'], ['c1', 'wind3']].flatMap(([square, piece]) =>
+        both(`v0.4: without ${piece} (${square})`, bot, bot, 100 * s, { fa: without(f, square), fb: f, ...ro })),
+    ];
+  },
+  // b. Deep 2k, as v03recheck: White's edge, and the handicap test for every piece.
+  v04recheck: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'castleWalk' }, f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000, ...V04 };
+    seed = 2900000;
+    const sameRandom = (tag, n, piece = null) => Array.from({ length: n }, (_, i) => ({
+      tag, a: i % 2 ? 'b' : 'w', seed: seed++, white: bot, black: bot, whiteFormation: 'random', blackFormation: 'same', ...ro,
+      ...(piece ? { remove: { side: i % 2 ? 'b' : 'w', piece } } : {}),
+    }));
+    return [
+      ...Array.from({ length: 400 * s }, () => ({ tag: 'colours: default formation', a: 'w', seed: seed++, white: bot, black: bot,
+        whiteFormation: f, blackFormation: f, ...ro })),
+      ...sameRandom('colours: same random formation', 400 * s),
+      ...Object.entries(f).filter(([, v]) => v !== 'wizard').flatMap(([square, [e, size]]) =>
+        both(`handicap: without ${e}${size} (${square})`, bot, bot, 100 * s, { fa: without(f, square), fb: f, ...ro })),
+      ...['fire', 'wind', 'water', 'earth'].flatMap(e => [3, 2, 1].flatMap(size =>
+        sameRandom(`handicap random: without ${e}${size}`, 100 * s, [e, size]))),
+    ];
+  },
+  // c. The style players against Careful, as v03styles; every player also walks its Wizard to the castle.
+  v04styles: s => {
+    const f = PRESETS.windHeldBack, x = { fa: f, fb: f, ...V04 }, walk = { castleWalk: 0.5 }, c = { ...careful, ...walk };
+    seed = 3000000;
+    return ['turtle', 'rusher', 'combiner', 'neverCombiner', 'hunter'].flatMap(t =>
+      both(`${t === 'neverCombiner' ? 'never-combiner' : t} v careful`, { type: t, ...walk }, c, 100 * s, x));
+  },
+  // d. The seven presets' round robin, as presetsV03.
+  presetsV04: s => presetRoundRobin({ type: 'deep', nodes: 2000, weights: 'castleWalk' }, 60 * s, 3100000, V04),
+  // e. The prototype's three levels against each other on v0.3 and on v0.4, for their ratings.
+  v04levels: s => {
+    // the names carry the rules, so run.mjs rates each level separately on each
+    const levels = name => ({ [`easy ${name}`]: careful, [`medium ${name}`]: { type: 'deep', nodes: 2000, weights: 'castleWalk' },
+      [`hard ${name}`]: { type: 'deep', nodes: 20000, weights: 'castleWalk' } });
+    seed = 3200000;
+    return [['v0.3', V03], ['v0.4', V04]].flatMap(([name, v]) => roundRobin(name, levels(name), 200 * s, { maxPlies: 1000, ...v }));
+  },
+  // f. Does the bot walk its Wizard to the castle well? Side A with a weaker or stronger pull
+  //    (castleWalk 0, 0.25, 1, 2) against the prototype's 0.5, from Wind 3 held back.
+  castleWalkSweep: s => {
+    const f = PRESETS.windHeldBack, ro = { fa: f, fb: f, randomOpening: 2, maxPlies: 1000, ...V04 };
+    const bot = (nodes, w) => ({ type: 'deep', nodes, weights: 'tuned', castleWalk: w });
+    seed = 3300000;
+    return [
+      ...[0, 0.25, 1, 2].flatMap(w => both(`deep 2k: walk ${w} v 0.5`, bot(2000, w), bot(2000, 0.5), 400 * s, ro)),
+      ...both('deep 20k: walk 0 v 0.5', bot(20000, 0), bot(20000, 0.5), 200 * s, ro),
+    ];
+  },
+  // g. Earth's comeback (§5), as earthComeback.
+  v04earthComeback: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'castleWalk' }, noEarth = { ...bot, noEarthCombine: true };
+    const f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000, ...V04 };
+    seed = 3400000;
+    return [
+      ...both('equal: no earth combines v normal', noEarth, bot, 400 * s, { fa: f, fb: f, ...ro }),
+      ...[['fire2', 'f1'], ['water3', 'g2']].flatMap(([piece, square]) => [
+        ...both(`without ${piece}: normal v normal`, bot, bot, 400 * s, { fa: without(f, square), fb: f, ...ro }),
+        ...both(`without ${piece}: no earth combines v normal`, noEarth, bot, 400 * s, { fa: without(f, square), fb: f, ...ro }),
+      ]),
+    ];
+  },
+  // h. Material for relearning the bot's values under v0.4 (tune.mjs, as selfplay): Deep 2k against
+  //    itself with today's v0.4 bot, half from Wind 3 held back and half from a shared random formation.
+  selfplayV04: s => Array.from({ length: 4000 * s }, (_, i) => ({
+    tag: i % 2 ? 'deep 2k v0.4, same random formation' : 'deep 2k v0.4, wind 3 held back', a: 'w', seed: 3500000 + i, randomOpening: 2, maxPlies: 1000,
+    white: { type: 'deep', nodes: 2000, weights: 'castleWalk' }, black: { type: 'deep', nodes: 2000, weights: 'castleWalk' },
+    whiteFormation: i % 2 ? 'random' : PRESETS.windHeldBack, blackFormation: i % 2 ? 'same' : PRESETS.windHeldBack, ...V04,
+  })),
+  // i. The relearned values (WEIGHTS.v04Learned) against the v0.4 bot before them (WEIGHTS.castleWalk),
+  //    and the same with the castle walk at 1 (WEIGHTS.v04), from Wind 3 held back and from random formations.
+  v04learned: s => {
+    const ro = { randomOpening: 2, maxPlies: 1000, ...V04 }, f = PRESETS.windHeldBack;
+    const today = nodes => ({ type: 'deep', nodes, weights: 'castleWalk' }), learned = nodes => ({ type: 'deep', nodes, weights: 'v04Learned' });
+    seed = 3600000;
+    return [
+      ...both('deep 2k: learned v today', learned(2000), today(2000), 400 * s, { fa: f, fb: f, ...ro }),
+      ...both('deep 2k, random formations: learned v today', learned(2000), today(2000), 400 * s, { fa: 'random', fb: 'random', ...ro }),
+      ...both('deep 2k: learned, walk 1 v today', { ...learned(2000), castleWalk: 1 }, today(2000), 400 * s, { fa: f, fb: f, ...ro }),
+      ...both('deep 20k: learned v today', learned(20000), today(20000), 200 * s, { fa: f, fb: f, ...ro }),
+      ...both('deep 2k, random formations: learned, walk 1 v today', { ...learned(2000), castleWalk: 1 }, today(2000), 400 * s, { fa: 'random', fb: 'random', ...ro }),
+      ...both('deep 20k: learned, walk 1 v today', { ...learned(20000), castleWalk: 1 }, today(20000), 200 * s, { fa: f, fb: f, ...ro }),
     ];
   },
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.

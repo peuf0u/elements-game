@@ -1,7 +1,8 @@
 // How games unfold, from recorded games: does an early lead snowball, how often the side behind comes
 // back, what Earth's comeback move (§5) does, and how draws come about. "Ahead by N" counts elements
 // (a stack is two), measured after the other side's reply, so an even trade doesn't count as a lead.
-// Run: node arc.mjs  (reads the v0.3 games of presetsV03, v03recheck, v03strong and v03topTwo)
+// Run: node arc.mjs      (reads the v0.3 games of presetsV03, v03recheck, v03strong and v03topTwo)
+//      node arc.mjs v04  (the v0.4 games of presetsV04, v04recheck and v04strong; to arc-v04.summary.json)
 import fs from 'node:fs';
 
 const load = name => JSON.parse(fs.readFileSync(new URL(`./results/${name}.json`, import.meta.url)));
@@ -14,6 +15,7 @@ const isEarthCombine = c => c.piece.split('+').some(x => x.startsWith('earth'));
 function leads(rec) {
   const lead = Array(rec.plies + 1).fill(0);
   for (const c of rec.captures) lead[c.ply + 1] += (c.by === 'w' ? 1 : -1) * units(c.piece);
+  for (const r of rec.returns ?? []) lead[r.ply + 1] += r.by === 'w' ? 1 : -1; // a piece brought back (v0.4)
   for (let t = 1; t <= rec.plies; t++) lead[t] += lead[t - 1];
   return lead.map((x, t) => {
     const y = lead[Math.min(t + 1, rec.plies)];
@@ -99,12 +101,13 @@ export function arc(records) {
 const median = xs => { const s = xs.slice().sort((a, b) => a - b); return s[s.length >> 1]; };
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const v03 = r => r.config.waterDiagonalBends && r.config.waterOneWay;
+  const v04 = process.argv[2] === 'v04';
+  const rules = r => r.config.waterDiagonalBends && r.config.waterOneWay && (r.config.castleReturn ?? 'off') === (v04 ? 'oncePerVisit' : 'off');
   const equal = r => !/handicap|without|v0\.2/.test(r.config.tag ?? '');
-  const games = ['presetsV03', 'v03recheck', 'v03strong', 'v03topTwo'].flatMap(load).filter(r => v03(r) && equal(r));
+  const games = (v04 ? ['presetsV04', 'v04recheck', 'v04strong'] : ['presetsV03', 'v03recheck', 'v03strong', 'v03topTwo']).flatMap(load).filter(r => rules(r) && equal(r));
   const nodes = r => r.config.white.nodes;
   const groups = { 'Deep 2k': games.filter(r => nodes(r) === 2000), 'Deep 20k': games.filter(r => nodes(r) === 20000) };
   const result = Object.fromEntries(Object.entries(groups).map(([k, rs]) => [k, arc(rs)]));
   console.log(JSON.stringify(result, null, 1));
-  fs.writeFileSync(new URL('./results/arc.summary.json', import.meta.url), JSON.stringify(result, null, 1));
+  fs.writeFileSync(new URL(`./results/${v04 ? 'arc-v04' : 'arc'}.summary.json`, import.meta.url), JSON.stringify(result, null, 1));
 }

@@ -124,7 +124,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
 <div class="wrap">
 
 <header class="stack">
-  <span class="eyebrow">Elements · computer playtest · 28–29 Oct 2026 · about 202,000 games</span>
+  <span class="eyebrow">Elements · computer playtest · 28–30 Oct 2026 · about 212,000 games</span>
   <h1>What the computer learned playing Elements</h1>
   <p class="lede">The core game is healthy: fair, decisive, with real depth and no unbeatable defence. <strong>Water is the strongest element.</strong> The first, weak bots made it look overwhelming and Fire useless, but a much stronger bot shows every attacking piece matters. If you want the elements even, one small rule change does it: <strong>Water captures only straight</strong>.</p>
 </header>
@@ -165,6 +165,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     <div class="verdict"><span class="q">Does seeing the other side's formation help?</span><span class="a">Barely. Formations are mostly just stronger or weaker, not counters to each other. Seeing the whole opposing formation and moving up to three pieces to beat it gained 0–6 points, within luck.</span><span class="pill ok">adds little</span></div>
     <div class="verdict"><span class="q">Does a Wizard bringing pieces back from the enemy castle cut the draws?</span><span class="a">Yes, as much as the strict castle (27% → 11–13%), without its quick losses, and games keep their usual length. Once per visit is enough. Adopted in rules v0.4, onto the own castle.</span><span class="pill ok">adopted</span></div>
     <div class="verdict"><span class="q">Does keeping the Wizard in a castle cut the draws?</span><span class="a">Yes, by about half: 23% → 10% from the default formation, 20% → 11% with the strong bot, about chess's level. The game stays fair, there are no stalemates, and games get shorter. The whole home zone helps much less.</span><span class="pill ok">worth trying</span></div>
+    <div class="verdict"><span class="q">Does the game stay healthy with the castle return (v0.4)?</span><span class="a">Yes. Draws halve in every test (22% → 11%, strong bot 20% → 7%), White's edge doesn't change, the pieces rank the same, and no style or preset takes over. Walking the Wizard to the castle is a real plan: a bot that never does scores 39–42%.</span><span class="pill ok">healthy</span></div>
     <div class="verdict"><span class="q">Does "Earth breaks Earth" cut the draws?</span><span class="a">No. Earth stacks that may take plain Earth break a wall in about a third of games, but draws stay at 21%. The cause is too few attackers left at the end, not Earth walls.</span><span class="pill warn">not against draws</span></div>
     <div class="verdict"><span class="q">Can these results be trusted?</span><span class="a">Checked on chess, where the answers are known: piece rankings come out right, exact sizes are understated, and White's edge can't be read off directly.</span><span class="pill ok">rankings: yes</span></div>
     <div class="verdict"><span class="q">A stronger bot?</span><span class="a">Deep, built from chess-engine techniques with learned piece values, rates about 430 points above Thinker at a sixth of its time.</span><span class="pill ok">new standard</span></div>
@@ -816,6 +817,74 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
   </ul>
 </section>
 
+<section class="stack" aria-labelledby="s21">
+  <span class="eyebrow">21 · Rules v0.4 checked</span>
+  <h2 id="s21">With the castle return, the game stays healthy and the draws halve</h2>
+  <p>Before the castle return goes into the public prototype, the key tests ran again under rules v0.4 and were set against v0.3: about 10,500 games. The bots walk their Wizard toward the enemy castle late in the game, like the prototype's Medium and Hard.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Deep 2k from Wind 3 held back unless noted</th><th>v0.3</th><th>v0.4</th></tr></thead>
+    <tbody>
+      <tr><td>Draws, Wind 3 held back</td><td class="n">22%</td><td class="n hi">11%</td></tr>
+      <tr><td>Draws, shared random formations</td><td class="n">32%</td><td class="n hi">13%</td></tr>
+      <tr><td>Draws, strongest bot (Deep 20k)</td><td class="n">20%</td><td class="n hi">7%</td></tr>
+      <tr><td>Draws, the seven presets against each other</td><td class="n">25%</td><td class="n hi">10%</td></tr>
+      <tr><td>White's share of decided games (held back / random / 20k)</td><td class="n">53 / 53 / 51%</td><td class="n">52 / 48 / 47%</td></tr>
+      <tr><td>Typical game, moves each (held back / random / 20k)</td><td class="n">50 / 59 / 49</td><td class="n">47 / 56 / 41</td></tr>
+      <tr><td>Typical drawn game, moves each</td><td class="n">110</td><td class="n hi">56</td></tr>
+      <tr><td>Without Wind 3 / Water 3 / Fire 3, score (Deep 2k)</td><td class="n">8 / 17 / 24%</td><td class="n">15 / 20 / 24%</td></tr>
+      <tr><td>Without Wind 3 / Water 3 / Fire 3, score (Deep 20k)</td><td class="n">10 / 17 / 18%</td><td class="n">6 / 9 / 14%</td></tr>
+      <tr><td>Combiner / never-combiner against Careful</td><td class="n">65 / 13%</td><td class="n">71 / 17%</td></tr>
+      <tr><td>A piece down: with / without Earth combines (Water 3 missing)</td><td class="n">21 / 13%</td><td class="n">19 / 12%</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="plain">
+    <li><strong>The draws halve everywhere,</strong> and the long 75-move draws nearly disappear (16% → 3% of games). Drawn games run half as long.</li>
+    <li><strong>The game stays fair:</strong> White's share of decided games is within luck of 50%, as before.</li>
+    <li><strong>Pieces come back in 29% of games,</strong> the first at a median of move 54. The side that brings back the first piece wins 80% of those games.</li>
+    <li><strong>The pieces rank the same:</strong> Wind 3, Water 3 and Fire 3 cost most, Earth costs nothing. A return doesn't rescue a side that starts a whole big piece down; with fewer draws to save it, it does a little worse.</li>
+    <li><strong>Leads count more both ways.</strong> The side one element ahead wins 61% (was 55%), and the side behind wins 30% (was 22%), instead of drawing.</li>
+    <li><strong>No style or preset takes over.</strong> Combining is still the strongest habit, and turtling still draws half its games. Among the presets, Wizard forward rose to level with the default (1015 against 1000, ±45): its Wizard starts closer to the enemy castle. The spread stays about 100 points.</li>
+    <li><strong>Earth's comeback still works</strong> for a side that's behind.</li>
+  </ul>
+  <h3>Does the bot use the rule well?</h3>
+  <p>The bot's score pulls its Wizard toward the enemy castle late in the game, with a strength of 0.5 in the prototype. Here one side plays with a different pull against 0.5 (400 games each):</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Pull toward the castle</th><th>0 (never walks)</th><th>0.25</th><th>0.5 (prototype)</th><th>1</th><th>2</th></tr></thead>
+    <tbody>
+      <tr><td>Score against 0.5</td><td class="n hi">42%</td><td class="n">45%</td><td class="n">50%</td><td class="n hi">54%</td><td class="n">47%</td></tr>
+      <tr><td>Games it brought a piece back / its opponent did</td><td class="n">7 / 97</td><td class="n">19 / 84</td><td class="n">–</td><td class="n">118 / 30</td><td class="n">114 / 12</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="plain">
+    <li><strong>Walking to the castle is a real plan.</strong> A bot that never walks scores 42%, and 39% with the strongest bot: about 55–75 rating points weaker.</li>
+    <li><strong>A pull of 1 may be a little better</strong> (54%, just inside luck); 2 sends the Wizard off too early. The best strength will come from relearning the bot's values under v0.4.</li>
+    <li>Easy lost all 400 games against Medium and Hard, under both rules. Medium against Hard: 13% under v0.3, 9% under v0.4.</li>
+  </ul>
+  <h3>Relearning the bot for v0.4</h3>
+  <p>The bot's piece values were learned from v0.2 games, before the new Water rule and the castle return. Relearned the same way from 4,000 games under v0.4, with the castle walk as one of the learned weights:</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Value in the bot's score</th><th>From v0.2 games</th><th>From v0.4 games</th></tr></thead>
+    <tbody>
+      <tr><td>Water 3 / Wind 3 / Fire 3</td><td class="n">11.8 / 6.2 / 5.1</td><td class="n hi">9.5 / 8.5 / 5.9</td></tr>
+      <tr><td>Water 2 / Wind 2 / Fire 2</td><td class="n">6.4 / 1.8 / 2.8</td><td class="n">4.0 / 2.7 / 2.6</td></tr>
+      <tr><td>Castle walk</td><td class="n">0.5 (by hand)</td><td class="n">0.42</td></tr>
+    </tbody>
+  </table></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Relearned bot against the one before it</th><th>Castle walk 0.42</th><th>Castle walk 1</th></tr></thead>
+    <tbody>
+      <tr><td>Deep 2k, Wind 3 held back</td><td class="n">53%</td><td class="n hi">55%</td></tr>
+      <tr><td>Deep 2k, random formations</td><td class="n">48%</td><td class="n hi">58%</td></tr>
+      <tr><td>Deep 20k, Wind 3 held back</td><td class="n">63%</td><td class="n hi">67%</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="plain">
+    <li><strong>Wind 3 rose almost to Water 3,</strong> and Water 3 lost a fifth of its value: the v0.3 Water rule shows in the numbers.</li>
+    <li><strong>Relearned values with a castle walk of 1 beat the old bot everywhere,</strong> by about 35–55 rating points at Medium strength and 120 at Hard. The prototype's Medium and Hard now play this way.</li>
+  </ul>
+  <p><strong>Verdict:</strong> v0.4 keeps everything healthy about v0.3 and halves the draws. It's ready for the public prototype.</p>
+</section>
+
 <section class="next" aria-labelledby="mean">
   <h2 id="mean">What this means, and your questions</h2>
   <ol>
@@ -828,6 +897,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     <li><strong>The setup's depth is in building well, not in reacting.</strong> Formations barely counter each other, so seeing the opponent's placements is worth a few points at most. Presets first fits this, and full games could build in secret at the same time without losing much.</li>
     <li><strong>Draws come from too little attacking material at the end, not from Earth walls.</strong> Letting Earth stacks take Earth doesn't cut them; a rule against draws has to act on material.</li>
     <li><strong>The castle return does the same without that cost:</strong> a Wizard that walks into the enemy castle brings back a captured piece, once per visit. Draws fall just as far, games keep their length, and it works both to finish a game and to come back. It's the rule from v0.4.</li>
+    <li><strong>Rules v0.4 keep everything else.</strong> Fairness, the pieces' order, the styles, the presets and Earth's comeback come out as under v0.3, with half the draws. Walking the Wizard to the enemy castle is a plan worth learning.</li>
     <li><strong>Keeping the Wizard in a 3×3 castle halves the draws,</strong> with nothing to count. The game stays fair and gets shorter, but a careless defence is punished harder.</li>
   </ol>
   <p>These are recorded as open questions 2 and 6–15 in <code>GAME_SPEC.md</code>, plus setup safety and bot difficulty in <code>PRODUCT_BRIEF.md</code>. The biggest one is a rule to decide: whether Water may capture at the end of a bent route. The computer's answer is to try "straight captures" at the table.</p>

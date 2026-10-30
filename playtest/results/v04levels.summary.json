@@ -1,0 +1,420 @@
+{
+ "experiment": "v04levels",
+ "scale": 1,
+ "seconds": 235,
+ "matchups": {
+  "v0.3: easy v0.3 v medium v0.3": {
+   "games": 200,
+   "aScore": 0,
+   "aScoreRange": [
+    0,
+    2
+   ],
+   "aWins": 0,
+   "bWins": 100,
+   "draws": 1,
+   "whiteWins": 50,
+   "blackWins": 50,
+   "whiteOfDecisive": 50,
+   "whiteOfDecisiveRange": [
+    43,
+    57
+   ],
+   "endings": {
+    "checkmate": 75,
+    "elimination": 25,
+    "draw:fifty": 1
+   },
+   "movesPerPlayer": {
+    "median": 27,
+    "shortest": 7.5,
+    "longest": 155
+   },
+   "combinesPerGame": 5.4,
+   "capturesPerGame": 7.4
+  },
+  "v0.3: easy v0.3 v hard v0.3": {
+   "games": 200,
+   "aScore": 0,
+   "aScoreRange": [
+    0,
+    2
+   ],
+   "aWins": 0,
+   "bWins": 100,
+   "draws": 0,
+   "whiteWins": 50,
+   "blackWins": 50,
+   "whiteOfDecisive": 50,
+   "whiteOfDecisiveRange": [
+    43,
+    57
+   ],
+   "endings": {
+    "checkmate": 88,
+    "elimination": 12
+   },
+   "movesPerPlayer": {
+    "median": 21,
+    "shortest": 7.5,
+    "longest": 62
+   },
+   "combinesPerGame": 5.5,
+   "capturesPerGame": 6.1
+  },
+  "v0.3: medium v0.3 v hard v0.3": {
+   "games": 200,
+   "aScore": 13,
+   "aScoreRange": [
+    9,
+    18
+   ],
+   "aWins": 5,
+   "bWins": 79,
+   "draws": 16,
+   "whiteWins": 45,
+   "blackWins": 39,
+   "whiteOfDecisive": 54,
+   "whiteOfDecisiveRange": [
+    46,
+    61
+   ],
+   "endings": {
+    "checkmate": 55,
+    "elimination": 30,
+    "draw:fifty": 11,
+    "draw:repetition": 6
+   },
+   "movesPerPlayer": {
+    "median": 35.5,
+    "shortest": 8.5,
+    "longest": 183
+   },
+   "combinesPerGame": 8.6,
+   "capturesPerGame": 7.3
+  },
+  "v0.4: easy v0.4 v medium v0.4": {
+   "games": 200,
+   "aScore": 0,
+   "aScoreRange": [
+    0,
+    2
+   ],
+   "aWins": 0,
+   "bWins": 100,
+   "draws": 1,
+   "whiteWins": 50,
+   "blackWins": 50,
+   "whiteOfDecisive": 50,
+   "whiteOfDecisiveRange": [
+    43,
+    57
+   ],
+   "endings": {
+    "checkmate": 80,
+    "elimination": 20,
+    "draw:repetition": 1
+   },
+   "movesPerPlayer": {
+    "median": 25,
+    "shortest": 7.5,
+    "longest": 122.5
+   },
+   "combinesPerGame": 5.5,
+   "capturesPerGame": 6.9
+  },
+  "v0.4: easy v0.4 v hard v0.4": {
+   "games": 200,
+   "aScore": 0,
+   "aScoreRange": [
+    0,
+    2
+   ],
+   "aWins": 0,
+   "bWins": 100,
+   "draws": 0,
+   "whiteWins": 50,
+   "blackWins": 50,
+   "whiteOfDecisive": 50,
+   "whiteOfDecisiveRange": [
+    43,
+    57
+   ],
+   "endings": {
+    "checkmate": 89,
+    "elimination": 12
+   },
+   "movesPerPlayer": {
+    "median": 21.5,
+    "shortest": 7,
+    "longest": 87.5
+   },
+   "combinesPerGame": 5.6,
+   "capturesPerGame": 5.9
+  },
+  "v0.4: medium v0.4 v hard v0.4": {
+   "games": 200,
+   "aScore": 9,
+   "aScoreRange": [
+    6,
+    14
+   ],
+   "aWins": 5,
+   "bWins": 87,
+   "draws": 8,
+   "whiteWins": 50,
+   "blackWins": 43,
+   "whiteOfDecisive": 54,
+   "whiteOfDecisiveRange": [
+    47,
+    61
+   ],
+   "endings": {
+    "checkmate": 57,
+    "elimination": 35,
+    "draw:repetition": 7,
+    "draw:fifty": 1
+   },
+   "movesPerPlayer": {
+    "median": 34,
+    "shortest": 9.5,
+    "longest": 202.5
+   },
+   "combinesPerGame": 8.6,
+   "capturesPerGame": 7.7
+  }
+ },
+ "pieces": {
+  "takenPerGame": {
+   "fire3+wind1": 0.86,
+   "wind2": 0.58,
+   "water3": 0.46,
+   "fire2": 0.42,
+   "wind3": 0.41,
+   "fire1+water2": 0.41,
+   "water1+wind3": 0.39,
+   "water2": 0.38,
+   "wind3+water1": 0.35,
+   "water1": 0.28,
+   "wind1": 0.28,
+   "fire1": 0.27,
+   "fire3": 0.27,
+   "water3+wind2": 0.19,
+   "fire1+water3": 0.15,
+   "wind2+water3": 0.1,
+   "wind2+fire2": 0.07,
+   "water3+fire2": 0.06,
+   "wind1+earth1": 0.06,
+   "water2+earth3": 0.05,
+   "wind1+earth3": 0.05,
+   "fire2+earth2": 0.04,
+   "earth1+water1": 0.04,
+   "earth1+wind3": 0.03,
+   "water2+wind2": 0.03,
+   "fire2+wind2": 0.03,
+   "fire3+water1": 0.03,
+   "earth2+wind2": 0.03,
+   "earth3+water2": 0.03,
+   "earth3+fire1": 0.03,
+   "wind2+water2": 0.02,
+   "earth1+water2": 0.02,
+   "water1+fire3": 0.02,
+   "water2+fire1": 0.02,
+   "earth2+fire2": 0.02,
+   "water1+earth1": 0.02,
+   "earth2+fire1": 0.02,
+   "wind3+water2": 0.02,
+   "earth3+wind1": 0.02,
+   "water2+fire2": 0.02,
+   "water2+wind1": 0.02,
+   "earth2+water3": 0.02,
+   "fire2+water3": 0.01,
+   "earth3+wind2": 0.01,
+   "water3+earth2": 0.01,
+   "fire2+earth3": 0.01,
+   "earth1+fire3": 0.01,
+   "earth1+wind1": 0.01,
+   "water2+wind3": 0.01,
+   "water3+fire1": 0.01,
+   "earth1+fire2": 0.01,
+   "wind1+fire3": 0.01,
+   "earth3+water1": 0.01,
+   "wind3+fire3": 0.01,
+   "wind1+water2": 0.01,
+   "fire2+earth1": 0.01,
+   "fire3+earth1": 0.01,
+   "earth3+fire2": 0.01,
+   "water2+earth1": 0.01,
+   "water2+fire3": 0.01,
+   "wind1+fire1": 0.01,
+   "wind3+fire2": 0.01,
+   "wind2+earth3": 0.01,
+   "fire2+water2": 0.01,
+   "wind2+earth1": 0,
+   "fire3+wind3": 0,
+   "wind1+earth2": 0,
+   "water1+wind1": 0,
+   "wind2+fire1": 0,
+   "fire1+earth2": 0,
+   "wind2+earth2": 0,
+   "fire3+water2": 0,
+   "wind3+earth3": 0,
+   "water2+earth2": 0,
+   "wind2+water1": 0,
+   "fire1+wind2": 0,
+   "fire1+wind1": 0,
+   "fire3+earth2": 0,
+   "earth1+fire1": 0,
+   "fire3+earth3": 0,
+   "fire2+wind3": 0,
+   "fire1+wind3": 0,
+   "water3+earth3": 0,
+   "fire2+wind1": 0,
+   "wind1+water1": 0,
+   "earth3+fire3": 0,
+   "water3+wind1": 0,
+   "earth1+wind2": 0,
+   "earth2+water2": 0,
+   "fire3+wind2": 0,
+   "fire1+earth3": 0,
+   "wind3+water3": 0,
+   "wind3+earth2": 0,
+   "wind2+fire3": 0,
+   "earth1+water3": 0,
+   "earth3+wind3": 0
+  },
+  "capturesMadePerGame": {
+   "fire3+wind1": 1.03,
+   "water1+wind3": 0.86,
+   "water3+wind2": 0.67,
+   "wind3+water1": 0.61,
+   "water3": 0.48,
+   "wizard": 0.44,
+   "fire1+water3": 0.42,
+   "fire1+water2": 0.41,
+   "wind3": 0.25,
+   "wind2+water3": 0.23,
+   "water2": 0.23,
+   "wind2": 0.22,
+   "water3+fire2": 0.12,
+   "fire2": 0.11,
+   "fire3": 0.09,
+   "wind2+fire2": 0.06,
+   "water2+earth3": 0.05,
+   "fire2+water3": 0.04,
+   "fire1": 0.04,
+   "earth3+water2": 0.04,
+   "water2+wind3": 0.03,
+   "wind1+earth3": 0.03,
+   "fire3+water1": 0.03,
+   "wind3+water2": 0.02,
+   "fire2+wind2": 0.02,
+   "earth1+wind3": 0.02,
+   "water3+fire1": 0.02,
+   "water1": 0.02,
+   "earth3+fire1": 0.02,
+   "wind2+water2": 0.02,
+   "water2+wind2": 0.02,
+   "water2+fire1": 0.01,
+   "water3+earth2": 0.01,
+   "fire2+earth2": 0.01,
+   "wind3+fire2": 0.01,
+   "water1+fire3": 0.01,
+   "earth2+wind2": 0.01,
+   "earth2+water3": 0.01,
+   "wind1+earth1": 0.01,
+   "wind2+fire1": 0.01,
+   "earth1+water2": 0.01,
+   "earth1+fire3": 0.01,
+   "earth2+fire2": 0.01,
+   "wind3+fire3": 0.01,
+   "wind1": 0.01,
+   "water2+wind1": 0.01,
+   "earth3+water1": 0.01,
+   "fire3+wind3": 0.01,
+   "fire3+water2": 0.01,
+   "earth3+wind1": 0.01,
+   "water2+fire2": 0.01,
+   "water2+earth1": 0.01,
+   "earth2+fire1": 0.01,
+   "wind2+water1": 0,
+   "fire3+earth1": 0,
+   "earth1+fire2": 0,
+   "fire2+earth1": 0,
+   "earth3+wind2": 0,
+   "fire2+wind3": 0,
+   "water2+fire3": 0,
+   "fire2+earth3": 0,
+   "fire2+water2": 0,
+   "wind1+fire2": 0,
+   "wind1+fire3": 0,
+   "earth1+water1": 0,
+   "water1+earth1": 0,
+   "wind1+water2": 0,
+   "water2+earth2": 0,
+   "earth1+wind1": 0,
+   "water3+wind1": 0,
+   "water3+earth3": 0,
+   "wind1+fire1": 0,
+   "wind2+earth3": 0,
+   "earth3+fire2": 0,
+   "earth1+wind2": 0,
+   "water1+wind2": 0,
+   "fire3+wind2": 0,
+   "wind3+water3": 0,
+   "fire1+wind1": 0,
+   "wind3+earth3": 0,
+   "wind2+fire3": 0,
+   "fire3+earth3": 0,
+   "fire1+wind3": 0,
+   "fire3+water3": 0,
+   "earth1+water3": 0,
+   "wind1+earth2": 0,
+   "water3+earth1": 0
+  }
+ },
+ "ratings": {
+  "hard v0.4": {
+   "rating": 2448,
+   "range": [
+    2258,
+    6865
+   ]
+  },
+  "hard v0.3": {
+   "rating": 2396,
+   "range": [
+    2185,
+    6800
+   ]
+  },
+  "medium v0.3": {
+   "rating": 2062,
+   "range": [
+    1868,
+    6435
+   ]
+  },
+  "medium v0.4": {
+   "rating": 2046,
+   "range": [
+    1865,
+    6420
+   ]
+  },
+  "easy v0.3": {
+   "rating": 1000,
+   "range": [
+    1000,
+    1000
+   ]
+  },
+  "easy v0.4": {
+   "rating": 989,
+   "range": [
+    -3481,
+    5502
+   ]
+  }
+ }
+}

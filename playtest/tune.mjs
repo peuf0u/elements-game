@@ -14,6 +14,7 @@ import { setVariant, startGame, positionOf } from './engine.mjs';
 import { parseSquare } from '../packages/engine/src/index.ts';
 import { pseudoMoves, inCheck, OWNER, IS_WIZARD, CAPTURER, N, fileOf, rankOf } from '../packages/engine/src/core.ts';
 import { rngFrom } from './game.mjs';
+import { castleWalk, codeValues, VALUES } from './evaluate.mjs';
 
 const ELEMENTS = ['fire', 'wind', 'water', 'earth'];
 // Features, each as White's count minus Black's.
@@ -22,25 +23,37 @@ export const FEATURES = [
   'mobility',        // moves available
   'wizard pressure', // capturing pieces within 3 squares of the enemy Wizard
   'stacks',          // combined pieces
+  'castle walk',     // castle return (v0.4): evaluate's castleWalk at weight 1, with the learned values
 ];
+const WALK_VALUES = codeValues(VALUES.tuned);
 const scratch = new Int32Array(512);
 const dist = (a, b) => Math.max(Math.abs(fileOf(a) - fileOf(b)), Math.abs(rankOf(a) - rankOf(b)));
 
 function features(pos) {
-  const f = new Float64Array(FEATURES.length), b = pos.board;
+  const f = new Float64Array(FEATURES.length), b = pos.board, capturers = [0, 0];
   for (let s = 0; s < 81; s++) {
     const p = b[s];
     if (!p) continue;
     const sign = OWNER[p] === 0 ? 1 : -1;
     f[12] += sign * pseudoMoves(pos, s, scratch, 0);
     if (IS_WIZARD[p]) continue;
+    capturers[OWNER[p]] += CAPTURER[p];
     f[((p >> 2) & 3) * 3 + ((p >> 4) & 3) - 1] += sign;
     if (p & 64) { f[((p >> 7) & 3) * 3 + ((p >> 9) & 3) - 1] += sign; f[14] += sign; }
     const ew = pos.wizard[OWNER[p] ^ 1];
     if (CAPTURER[p] && ew >= 0 && dist(s, ew) <= 3) f[13] += sign;
   }
+  if (pos.returnRule) f[15] = castleWalk(pos, 0, capturers[1], 1, WALK_VALUES) - castleWalk(pos, 1, capturers[0], 1, WALK_VALUES);
   return f;
 }
+
+// A recorded move: 'a1-a2', 'a1xa2', 'a1+a2', or a piece brought back, 'water3@e2' (game.mjs).
+const moveCode = mv => {
+  const at = mv.indexOf('@');
+  if (at < 0) return parseSquare(mv.slice(0, 2)) | (parseSquare(mv.slice(3)) << 8);
+  const unit = ELEMENTS.indexOf(mv.slice(0, at - 1)) * 3 + Number(mv[at - 1]) - 1;
+  return (81 + unit) | (parseSquare(mv.slice(at + 1)) << 8);
+};
 
 // Positions (features + White's result) from game records, grouped by game.
 export function positions(records) {
@@ -51,7 +64,7 @@ export function positions(records) {
     const pos = positionOf(startGame(rec.formations.w, rec.formations.b));
     const rows = [];
     rec.moves.forEach((mv, i) => {
-      pos.make(parseSquare(mv.slice(0, 2)) | (parseSquare(mv.slice(3)) << 8));
+      pos.make(moveCode(mv));
       if (i < 8 || mv[2] === 'x' || inCheck(pos, pos.side)) return;
       rows.push(features(pos));
     });
@@ -118,7 +131,12 @@ export function tune(records, { samples = 30 } = {}) {
     const d = boot.map(b => b[i]).sort((x, y) => x - y);
     out[name] = { value: +best[i].toFixed(2), range: [+d[Math.floor(samples * 0.05)].toFixed(2), +d[Math.floor(samples * 0.95)].toFixed(2)] };
   });
-  return { positions: games.reduce((s, g) => s + g.rows.length, 0), games: games.length, weights: out, raw: Array.from(fit(games)) };
+  // For the bot (evaluate.mjs WEIGHTS): the fitted scale, with the average attacking piece worth what
+  // it is in VALUES.standard (4.44), as WEIGHTS.tuned.
+  const raw = fit(games), scale = 39.95 / 9 / (raw.slice(0, 9).reduce((a, b) => a + b, 0) / 9), r3 = x => +(x * scale).toFixed(3);
+  const bot = { values: { unit: Object.fromEntries(FEATURES.slice(0, 12).map((n, i) => [n, r3(raw[i])])) },
+    mobility: r3(raw[12]), wizardPressure: r3(raw[13]), stackBonus: r3(raw[14]), castleWalk: r3(raw[15]) };
+  return { positions: games.reduce((s, g) => s + g.rows.length, 0), games: games.length, weights: out, raw: Array.from(raw), bot };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
@@ -128,4 +146,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const t = tune(records);
   console.log(`${t.games} games, ${t.positions} positions. Weights, average attacking piece = 1 (90% range):`);
   for (const [k, v] of Object.entries(t.weights)) console.log(`  ${k.padEnd(16)} ${String(v.value).padStart(6)}   ${v.range.join(' – ')}`);
+  console.log('As bot weights (evaluate.mjs WEIGHTS):', JSON.stringify(t.bot));
 }
