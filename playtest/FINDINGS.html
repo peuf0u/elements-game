@@ -905,6 +905,25 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
   </ul>
 </section>
 
+<section class="stack" aria-labelledby="s23">
+  <span class="eyebrow">23 · Nobody can win anymore</span>
+  <h2 id="s23">Elements has no dead positions</h2>
+  <p>Chess draws at once when no sequence of legal moves could end in checkmate, even with both players helping (king against king). The computer looked for the Elements version: positions where neither side could ever win, by elimination or checkmate, even if the other side helps.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Positions checked</th><th>Positions</th><th>Dead</th><th>Typical win, moves</th></tr></thead>
+    <tbody>
+      <tr><td>The 304 drawn v0.5 test games, every 10th position and the last</td><td class="n">4,237</td><td class="n hi">0</td><td class="n">2–3</td></tr>
+      <tr><td>Small endings: each side a Wizard, 1–2 attackers or a stack, 0–3 Earths</td><td class="n">25,534</td><td class="n hi">0</td><td class="n">1–2</td></tr>
+      <tr><td>The same endings without the castle return</td><td class="n">25,538</td><td class="n hi">0</td><td class="n">1–2</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="plain">
+    <li><strong>The reason is in the rules.</strong> A side without attackers has already lost, so in a running game both sides have one. Every attacker can be captured, and the Wizard captures too and reaches every square, so a lone Wind's square colour doesn't save it.</li>
+    <li>Chess's dead positions come from a king that can't be captured. In Elements the matching ending, Wizard against Wizard, is already a win.</li>
+    <li><strong>So a dead-position rule would never apply.</strong> Endings one side can't <em>force</em> a win in are left to the 50-move rule, as in chess.</li>
+  </ul>
+</section>
+
 <section class="next" aria-labelledby="mean">
   <h2 id="mean">What this means, and your questions</h2>
   <ol>
@@ -919,9 +938,10 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     <li><strong>The castle return does the same without that cost:</strong> a Wizard that walks into the enemy castle brings back a captured piece, once per visit. Draws fall just as far, games keep their length, and it works both to finish a game and to come back. It's the rule from v0.4.</li>
     <li><strong>Rules v0.4 keep everything else.</strong> Fairness, the pieces' order, the styles, the presets and Earth's comeback come out as under v0.3, with half the draws. Walking the Wizard to the enemy castle is a plan worth learning.</li>
     <li><strong>Chess's automatic draws change little.</strong> 50 moves each and the fifth repetition push the number of draws in opposite directions and together leave it about where it was.</li>
+    <li><strong>Elements needs no dead-position rule.</strong> Every attacker can be captured and the Wizard captures too, so a win is always still possible while both sides have attackers. Hopeless endings are left to the 50-move rule. You dropped the rule.</li>
     <li><strong>Keeping the Wizard in a 3×3 castle halves the draws,</strong> with nothing to count. The game stays fair and gets shorter, but a careless defence is punished harder.</li>
   </ol>
-  <p>These are recorded as open questions 2 and 6–15 in <code>GAME_SPEC.md</code>, plus setup safety and bot difficulty in <code>PRODUCT_BRIEF.md</code>. The biggest one is a rule to decide: whether Water may capture at the end of a bent route. The computer's answer is to try "straight captures" at the table.</p>
+  <p>These are recorded as open questions 2 and 6–16 in <code>GAME_SPEC.md</code>, plus setup safety and bot difficulty in <code>PRODUCT_BRIEF.md</code>. The biggest one is a rule to decide: whether Water may capture at the end of a bent route. The computer's answer is to try "straight captures" at the table.</p>
 </section>
 
 <section class="stack" aria-labelledby="lim">

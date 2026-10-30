@@ -1,0 +1,32 @@
+{
+ "v0.5": {
+  "positions": 25534,
+  "noWinFound": 0,
+  "medianPlies": 3,
+  "within100Plies": 25493,
+  "byCheckmate": 647,
+  "longest": {
+   "plies": 4078,
+   "nodes": 154528,
+   "how": "checkmate",
+   "winner": 1,
+   "board": "b:earth3@a1 b:earth2@g1 w:earth1@d2 b:wind1@f2 b:wizard@b4 b:earth1@c4 w:wizard@e4 b:water3@b5 w:earth3@a6 w:wind1@i6 w:earth2@g9, White to move"
+  },
+  "failed": []
+ },
+ "v0.5 without the castle return": {
+  "positions": 25538,
+  "noWinFound": 0,
+  "medianPlies": 3,
+  "within100Plies": 25487,
+  "byCheckmate": 415,
+  "longest": {
+   "plies": 1640,
+   "nodes": 54261,
+   "how": "elimination",
+   "winner": 1,
+   "board": "b:fire2@a1 b:wizard@g1 b:earth3@a2 b:earth2@c2 w:earth3@c3 b:earth1@c4 w:wizard@g5 b:wind2@f6 w:earth2@d7 w:earth1@a9 w:wind2@f9, White to move"
+  },
+  "failed": []
+ }
+}

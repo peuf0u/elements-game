@@ -1,0 +1,39 @@
+{
+ "drawnGames": 304,
+ "everyTenthPosition": {
+  "positions": 4237,
+  "noWinFound": 0,
+  "medianPlies": 5,
+  "within100Plies": 4234,
+  "byCheckmate": 531,
+  "longest": {
+   "plies": 1221,
+   "nodes": 42168,
+   "how": "checkmate",
+   "winner": 0,
+   "tag": "random formations: 50 moves",
+   "ply": 10,
+   "last": false,
+   "board": "w:fire2@a1 w:earth2@c1 w:wind3@d1 w:water2@e1 w:earth1@g1 w:wizard@h1 w:fire3@a2 w:earth3@b2 w:water1@d2 w:fire1@d3 w:wind1@f3 w:wind2@e5 b:wind3+fire3@i6 b:wind1@d7 b:fire1@f7 b:wizard@b8 b:water1@f8 b:earth3@h8 b:earth1@c9 b:water2@e9 b:earth2@g9 b:fire2@i9, White to move"
+  },
+  "failed": []
+ },
+ "lastPositions": {
+  "positions": 304,
+  "noWinFound": 0,
+  "medianPlies": 4,
+  "within100Plies": 304,
+  "byCheckmate": 44,
+  "longest": {
+   "plies": 17,
+   "nodes": 5196,
+   "how": "elimination",
+   "winner": 1,
+   "tag": "random formations: 50 moves",
+   "ply": 15,
+   "last": true,
+   "board": "w:wind1@b1 w:water3@f1 w:earth2@h1 w:water2@c2 w:wind3@d2 w:fire3@g2 w:earth1@a3 w:wind2@c3 w:fire1@f3 w:wizard@h3 w:earth3@i3 w:fire2+water1@a6 b:wizard@c6 b:earth3@a7 b:fire1@d7 b:wind2@g7 b:water1@h7 b:earth1@i7 b:fire3+wind3@f8 b:water2@g8 b:fire2@h8 b:earth2+water3@d9 b:wind1@h9, Black to move"
+  },
+  "failed": []
+ }
+}

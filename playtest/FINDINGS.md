@@ -2,7 +2,7 @@
 
 Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open in a browser), also online at https://claude.ai/artifact/V6KKL4vWUm7FLFiqehXhEJ (private until shared from the page's Share menu).
 
-*Run on 2026-10-28 to 30 (GAME_SPEC v0.2 to v0.4), about 216,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§16 were played on the real engine. §1–§14 use the v0.2 Water rule; §15 checks rules v0.3, with the new Water, §16 looks at how v0.3 games unfold, §17 at the setup phase, §18–§20 test rules against draws, §21 rechecks the key tests under rules v0.4, and §22 tests chess's automatic draws (rules v0.5). How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
+*Run on 2026-10-28 to 30 (GAME_SPEC v0.2 to v0.5), about 216,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§16 were played on the real engine. §1–§14 use the v0.2 Water rule; §15 checks rules v0.3, with the new Water, §16 looks at how v0.3 games unfold, §17 at the setup phase, §18–§20 test rules against draws, §21 rechecks the key tests under rules v0.4, §22 tests chess's automatic draws (rules v0.5), and §23 looks for dead positions. How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
 
 **How to read the numbers.** A "score" counts a win as 1 and a draw as ½, so 50% means even. The range in brackets is the 95% uncertainty range: if it includes 50%, the games can't tell the two sides apart. One "move" means one player's turn. §1–§9 come from bots that look 2–3 moves ahead (Careful and Thinker). §11 repeats the key tests with Deep, a much stronger bot (§10), and **where the two disagree, §11 is the better guide**. Treat anything that looks like a problem as a hint to try on the real board, not a verdict.
 
@@ -956,6 +956,22 @@ The designer chose draw rules closer to chess (GAME_SPEC §6 Draws): **50 moves 
 - The Deep 20k rows have only 200 games each, so 5% against 10% (10 against 20 games) is at the edge of luck. White's 62% of decided games in the v0.5 20k row is also likely luck: every other row is 48–55%.
 - Limit: the bots treat any repeated position as a draw when they look ahead, whatever the rule, so a side that's losing still steers toward repeating. People may play on longer under the fifth-repetition rule.
 
+## 23. Nobody can win anymore: are there dead positions?
+
+Chess draws at once when no sequence of legal moves at all could end in checkmate, even with both players helping ("dead position": king against king, king and bishop against king). The designer wants to look into an Elements version (GAME_SPEC open question 16). `node dead.mjs` looks for such a sequence, a "helpmate": both sides move together toward a win for either side, by elimination or checkmate. A position where none exists would be dead.
+
+| Positions checked | Positions | Dead | Typical helpmate, moves |
+|---|---|---|---|
+| The 304 drawn v0.5 test games (§22), every 10th position and the last | 4,237 | **0** | 2–3 |
+| Small endings on random squares: each side a Wizard, 1–2 attackers or a stack, 0–3 Earths | 25,534 | **0** | 1–2 |
+| The same endings without the castle return | 25,538 | **0** | 1–2 |
+
+- **Elements has no dead positions**, and the reason is in the rules, not in luck. A side without attackers has already lost, so in a running game both sides still have one. Every attacker can be captured (only plain Earth can't), and the Wizard captures too and can reach every square. So with the other side helping, one Wizard can always walk up and take the other side's attackers one by one. A lone Wind's square colour doesn't matter: the Wizard isn't bound to a colour.
+- The one position where nothing can happen, a side with no legal move, is already a draw as stalemate.
+- Chess has dead positions because a king can't be captured and a lone bishop or knight can't checkmate. In Elements the matching ending, Wizard against Wizard, is already a win: the side with attackers left has taken the others'.
+- So a dead-position rule would never apply. What remains is endings that one side can't **force** a win in, against good defence (a "fortress"). Chess doesn't call those dead either; its 50-move rule ends them, and so does Elements' since v0.5.
+- Limit: the search proves a win is possible when it finds one, and it found one every time. A few sequences were long (up to a few thousand half-moves, in spread-out positions where the short search gave up and a deep one took over), but over 99.8% fit inside the 50-move limit.
+
 ---
 
 ## What this means for the game
@@ -973,8 +989,9 @@ The designer chose draw rules closer to chess (GAME_SPEC §6 Draws): **50 moves 
 10. **The castle return does the same without that cost** (§20). A Wizard that walks into the enemy castle brings back a captured piece, once per visit. Draws fall just as far, games keep their length and quick losses don't rise. It works as a late-game plan for the side that's ahead and as a comeback for the side behind. It's the rule from v0.4.
 11. **Rules v0.4 keep everything else** (§21). Fairness, the pieces' order, the styles, the presets and Earth's comeback all come out as under v0.3, with half the draws. Walking the Wizard to the enemy castle is a plan worth learning: a player who never does it gives away about 8–11 points.
 12. **Chess's automatic draws change little** (§22). 50 moves each and the fifth repetition push the number of draws in opposite directions, and together leave it about where it was.
+13. **Elements needs no dead-position rule** (§23). Because every attacker can be captured and the Wizard captures too, a win is always still possible while both sides have attackers. Hopeless endings are left to the 50-move rule, as in chess. The designer dropped the rule (GAME_SPEC §6 Draws).
 
-The questions these raise are recorded in [GAME_SPEC.md](../GAME_SPEC.md) (open questions 2, 6–15) and [PRODUCT_BRIEF.md](../PRODUCT_BRIEF.md) (Open).
+The questions these raise are recorded in [GAME_SPEC.md](../GAME_SPEC.md) (open questions 2, 6–16) and [PRODUCT_BRIEF.md](../PRODUCT_BRIEF.md) (Open).
 
 ## Limits
 

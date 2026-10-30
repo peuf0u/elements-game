@@ -37,6 +37,7 @@ check.mjs ──▶ spike-rules.mjs ──▶ spike/index.html    the spike's ru
 | `spike-rules.mjs` | Loads the spike's rules (without copying them), only for `check.mjs`. |
 | `analyze.mjs` | Looks inside recorded games: who gives checkmate and by which route, captures by element, comebacks, quickest wins. |
 | `arc.mjs` | **How games unfold**, from the recorded v0.3 games: does a lead snowball, how often the side behind comes back, when Earth gets combined, how draws end (FINDINGS §16). Writes `results/arc.summary.json`. |
+| `dead.mjs` | **Dead positions** ("nobody can win anymore"): looks for any sequence of legal moves, both sides helping, that ends in a win, in the drawn v0.5 games (`games`) and in small endings on random squares (`endings`). None came up empty (FINDINGS §23). Writes nothing itself; the runs went to `results/dead-*.summary.json`. |
 | `setup-study.mjs` | **The setup phase**: does seeing the other side's formation help you choose yours? `matrix` checks, from games already played, how much a formation's score depends on which formation it meets. `counter` lets a search move up to three pieces of the default to beat one particular formation, then checks with fresh games whether that gain is real and only against that formation (FINDINGS §17). Writes `results/setup-study.summary.json`. |
 
 ## Rules versions
@@ -72,6 +73,8 @@ node setup-study.mjs counter # how much can seeing the opponent's formation gain
 node run.mjs earthBreaks     # does "Earth breaks Earth" (an Earth stack may take plain Earth) cut the draws?
 node run.mjs wizardZone      # does keeping the Wizard in its home zone or a 3×3 castle cut the draws?
 node run.mjs castleReturn    # does a Wizard bringing pieces back from the enemy castle cut the draws?
+node run.mjs v05draws        # chess's automatic draws (rules v0.5) against v0.4
+node dead.mjs games          # are any positions of the drawn v0.5 games dead? (also: endings)
 node search.mjs 1 v03       # the formation search under rules v0.3
 ```
 
