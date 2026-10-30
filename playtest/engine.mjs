@@ -20,15 +20,18 @@ export const hasCapturers = (board, o) => board.some(p => p && p.o === o && isCa
 
 // Variant toggles (GAME_SPEC.md "v1 scope"), applied to the games started after this call.
 let config = E.DEFAULT_CONFIG;
-// quietMoveLimit: moves each without a capture or combine before a draw (0 = no limit). 75 since
-// 2026-10-28; games recorded before that were played with 50, the chess rule.
+// quietMoveLimit: moves each without a capture or combine before a draw (0 = no limit). 75 from
+// 2026-10-28 to rules v0.4; games recorded before that were played with 50, the chess rule.
+// repetitionLimit: the same position this many times is a draw; 3 up to rules v0.4.
 // The Water switches default to the v0.2 rule here, so every earlier experiment replays exactly;
 // experiments of the v0.3 game (the engine's default) pass V03 below.
 export const V03 = Object.freeze({ waterDiagonalBends: true, waterOneWay: true });
 // Rules v0.4 (the engine's default since 2026-10-29): v0.3 plus the castle return, once per visit, into the own castle.
 export const V04 = Object.freeze({ ...V03, castleReturn: 'oncePerVisit', returnTo: 'castle' });
-export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, waterDiagonalBends = false, waterOneWay = false, earthBreaksEarth = false, wizardZone = 'anywhere', castleReturn = 'off', returnTo = 'home', quietMoveLimit = 75 } = {}) {
-  config = { exactRange, noWaterEdge, waterStraightCapture, waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay, earthBreaksEarth, wizardZone, castleReturn, returnTo, quietMoveLimit };
+// Rules v0.5 (the engine's default since 2026-10-30): v0.4 with chess's automatic draws, 50 moves each and the fifth repetition.
+export const V05 = Object.freeze({ ...V04, quietMoveLimit: 50, repetitionLimit: 5 });
+export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, waterDiagonalBends = false, waterOneWay = false, earthBreaksEarth = false, wizardZone = 'anywhere', castleReturn = 'off', returnTo = 'home', quietMoveLimit = 75, repetitionLimit = 3 } = {}) {
+  config = { exactRange, noWaterEdge, waterStraightCapture, waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay, earthBreaksEarth, wizardZone, castleReturn, returnTo, quietMoveLimit, repetitionLimit };
 }
 
 // A formation is { square: [element, size] | 'wizard' } as White sees it (rows 1–3).

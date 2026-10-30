@@ -124,7 +124,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
 <div class="wrap">
 
 <header class="stack">
-  <span class="eyebrow">Elements · computer playtest · 28–30 Oct 2026 · about 212,000 games</span>
+  <span class="eyebrow">Elements · computer playtest · 28–30 Oct 2026 · about 216,000 games</span>
   <h1>What the computer learned playing Elements</h1>
   <p class="lede">The core game is healthy: fair, decisive, with real depth and no unbeatable defence. <strong>Water is the strongest element.</strong> The first, weak bots made it look overwhelming and Fire useless, but a much stronger bot shows every attacking piece matters. If you want the elements even, one small rule change does it: <strong>Water captures only straight</strong>.</p>
 </header>
@@ -885,6 +885,26 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
   <p><strong>Verdict:</strong> v0.4 keeps everything healthy about v0.3 and halves the draws. It's ready for the public prototype.</p>
 </section>
 
+<section class="stack" aria-labelledby="s22">
+  <span class="eyebrow">22 · Rules v0.5</span>
+  <h2 id="s22">Chess's automatic draws: the two changes cancel out</h2>
+  <p>You chose draw rules closer to chess: <strong>50 moves each</strong> without a capture, combine or return (instead of 75), and a draw at the <strong>fifth</strong> repetition (instead of the third), both automatic. Tested against v0.4 and with each change alone, 400 games per row (200 for Deep 20k).</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Draws</th><th>v0.4</th><th>50 moves only</th><th>5th repetition only</th><th>v0.5 (both)</th></tr></thead>
+    <tbody>
+      <tr><td>Deep 2k, Wind 3 held back</td><td class="n">9%</td><td class="n">10%</td><td class="n hi">3%</td><td class="n">7%</td></tr>
+      <tr><td>Deep 2k, random formations</td><td class="n">12%</td><td class="n">11%</td><td class="n hi">4%</td><td class="n">9%</td></tr>
+      <tr><td>Deep 20k, Wind 3 held back</td><td class="n">5%</td><td class="n">4%</td><td class="n">7%</td><td class="n">10%</td></tr>
+      <tr><td>Typical game, moves each (2k / random / 20k)</td><td class="n">47 / 52 / 42</td><td class="n">45 / 52 / 46</td><td class="n">48 / 55 / 48</td><td class="n">47 / 53 / 48</td></tr>
+    </tbody>
+  </table></div>
+  <ul class="plain">
+    <li><strong>The changes pull in opposite directions.</strong> The fifth repetition alone cuts draws to a third; 50 moves turns some of those longer games back into draws. Together, draws stay about where they were.</li>
+    <li><strong>Games keep their length,</strong> and the 50-move limit trims the longest ones.</li>
+    <li>The Deep 20k rows have only 200 games, so 5% against 10% is at the edge of luck. The bots treat any repeated position as a draw when they look ahead, so people may play on longer than they do.</li>
+  </ul>
+</section>
+
 <section class="next" aria-labelledby="mean">
   <h2 id="mean">What this means, and your questions</h2>
   <ol>
@@ -898,6 +918,7 @@ footer { font-size: 0.85rem; color: var(--muted); border-top: 1px solid var(--ru
     <li><strong>Draws come from too little attacking material at the end, not from Earth walls.</strong> Letting Earth stacks take Earth doesn't cut them; a rule against draws has to act on material.</li>
     <li><strong>The castle return does the same without that cost:</strong> a Wizard that walks into the enemy castle brings back a captured piece, once per visit. Draws fall just as far, games keep their length, and it works both to finish a game and to come back. It's the rule from v0.4.</li>
     <li><strong>Rules v0.4 keep everything else.</strong> Fairness, the pieces' order, the styles, the presets and Earth's comeback come out as under v0.3, with half the draws. Walking the Wizard to the enemy castle is a plan worth learning.</li>
+    <li><strong>Chess's automatic draws change little.</strong> 50 moves each and the fifth repetition push the number of draws in opposite directions and together leave it about where it was.</li>
     <li><strong>Keeping the Wizard in a 3×3 castle halves the draws,</strong> with nothing to count. The game stays fair and gets shorter, but a careless defence is punished harder.</li>
   </ol>
   <p>These are recorded as open questions 2 and 6–15 in <code>GAME_SPEC.md</code>, plus setup safety and bot difficulty in <code>PRODUCT_BRIEF.md</code>. The biggest one is a rule to decide: whether Water may capture at the end of a bent route. The computer's answer is to try "straight captures" at the table.</p>

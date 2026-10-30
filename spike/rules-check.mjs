@@ -71,7 +71,7 @@ expect('Earth+Fire is not a bank for Water (c1/e1 come from the edge)', dests(b,
 // --- Capture of a combined piece: both elements lost ---
 st = R.fromPosition(board({ e1: P('w', 'wiz'), a9: P('b', 'wiz'), e3: P('w', 'fire', 2), e5: { o: 'b', els: [{ e: 'wind', s: 2 }, { e: 'water', s: 1 }] }, h8: P('b', 'fire', 1) }), 'w');
 st = R.makeMove(st, R.legalFrom(st.board, R.parse('e3')).find(m => m.to === R.parse('e5')));
-expect('captured stack recorded whole', st.captured.w[0].els.map(x => x.e), ['wind', 'water']);
+expect('captured stack: both elements lost, as single pieces', R.lostUnits(st.board, 'b').map(u => u.piece.els[0].e + u.piece.els[0].s).filter(n => n === 'wind2' || n === 'water1'), ['wind2', 'water1']);
 expect('game continues (Black still has Fire)', st.phase, 'play');
 
 // --- Check: may not leave Wizard attacked; Water gives check around Earth ---

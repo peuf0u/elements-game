@@ -1,6 +1,6 @@
 // Checks that the engine (packages/engine) plays exactly the same game as the spike's rules: on
 // every move of many random games, under each variant, the same legal moves in the same order and
-// the same result, including the 75-move rule.
+// the same result, including the move limit and repetition.
 // Run: node check.mjs
 import { Spike, setSpikeVariant } from './spike-rules.mjs';
 import * as E from '../packages/engine/src/index.ts';

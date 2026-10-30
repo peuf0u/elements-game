@@ -8,7 +8,7 @@ import { type Piece, type Side, OWNER, pieceCode, decodePiece, sideIndex, sideNa
 import { Position, type RulesConfig, DEFAULT_CONFIG, moveOf } from './position.ts';
 import { legalMoves, hasLegalMove, inCheck } from './movegen.ts';
 
-export const RULES_VERSION = '0.4';
+export const RULES_VERSION = '0.5';
 
 // from 81 + n brings captured unit n back onto `to` (castleReturn; pieces.ts unitOf).
 export type Action = { from: number; to: number };
@@ -23,7 +23,7 @@ export interface GameState {
   readonly toMove: Side;
   readonly board: readonly number[];   // 81 piece codes, 0 = empty. Read with pieceAt.
   readonly ply: number;                // moves played so far (one move = one player's turn)
-  readonly clock: number;              // turns since the last capture or combine (for the 75-move rule)
+  readonly clock: number;              // turns since the last capture, combine or return (for the move limit)
   readonly history: readonly string[]; // position hashes since the last capture or combine, current last
   readonly returned?: number;          // castleReturn: bit per side, brought a piece back on this visit
   readonly result: Result | null;
@@ -71,7 +71,7 @@ export function moveKind(state: GameState, { from, to }: Action): MoveKind {
 export const pieceAt = (state: GameState, s: number): Piece | null => decodePiece(state.board[s]);
 
 // Play a move and run the end checks in the spec's order (§6): the mover wins (elimination,
-// checkmate), then draws (stalemate, repetition, the 75-move rule). Throws on an illegal move.
+// checkmate), then draws (stalemate, repetition, the move limit). Throws on an illegal move.
 export function apply(state: GameState, action: Action): { state: GameState; events: GameEvent[] } {
   const pos = positionOf(state);
   const m = moveOf(action.from, action.to);
@@ -91,7 +91,7 @@ export function apply(state: GameState, action: Action): { state: GameState; eve
   const win = sideName(mover);
   if (pos.capturers[opp] === 0) result = { winner: win, reason: 'elimination' };
   else if (!hasLegalMove(pos)) result = inCheck(pos, opp) ? { winner: win, reason: 'checkmate' } : { winner: null, reason: 'stalemate' };
-  else if (history.filter(h => h === key).length >= 3) result = { winner: null, reason: 'repetition' };
+  else if (history.filter(h => h === key).length >= state.config.repetitionLimit) result = { winner: null, reason: 'repetition' };
   else if (state.config.quietMoveLimit && clock >= 2 * state.config.quietMoveLimit) result = { winner: null, reason: 'moveLimit' };
 
   const next: GameState = {

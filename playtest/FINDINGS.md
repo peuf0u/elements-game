@@ -2,7 +2,7 @@
 
 Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open in a browser), also online at https://claude.ai/artifact/V6KKL4vWUm7FLFiqehXhEJ (private until shared from the page's Share menu).
 
-*Run on 2026-10-28 to 30 (GAME_SPEC v0.2 to v0.4), about 212,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§16 were played on the real engine. §1–§14 use the v0.2 Water rule; §15 checks rules v0.3, with the new Water, §16 looks at how v0.3 games unfold, §17 at the setup phase, §18–§20 test rules against draws, and §21 rechecks the key tests under rules v0.4. How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
+*Run on 2026-10-28 to 30 (GAME_SPEC v0.2 to v0.4), about 216,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§16 were played on the real engine. §1–§14 use the v0.2 Water rule; §15 checks rules v0.3, with the new Water, §16 looks at how v0.3 games unfold, §17 at the setup phase, §18–§20 test rules against draws, §21 rechecks the key tests under rules v0.4, and §22 tests chess's automatic draws (rules v0.5). How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
 
 **How to read the numbers.** A "score" counts a win as 1 and a draw as ½, so 50% means even. The range in brackets is the 95% uncertainty range: if it includes 50%, the games can't tell the two sides apart. One "move" means one player's turn. §1–§9 come from bots that look 2–3 moves ahead (Careful and Thinker). §11 repeats the key tests with Deep, a much stronger bot (§10), and **where the two disagree, §11 is the better guide**. Treat anything that looks like a problem as a hint to try on the real board, not a verdict.
 
@@ -939,6 +939,23 @@ Easy lost every one of its 400 games against Medium and Hard, under v0.3 and und
 
 **Verdict:** rules v0.4 keep everything that was healthy about v0.3 and halve the draws. It's ready to play in the public prototype.
 
+## 22. Rules v0.5: chess's automatic draws
+
+The designer chose draw rules closer to chess (GAME_SPEC §6 Draws): **50 moves each** without a capture, combine or return (instead of 75), and a draw at the **fifth** repetition (instead of the third), both automatic, with no claims. Tested against v0.4 and with each change alone (`node run.mjs v05draws`, the relearned bot `WEIGHTS.v04` on both sides, 400 games per row at Deep 2k and 200 at Deep 20k).
+
+| Draws | v0.4 (75 moves, 3rd time) | 50 moves only | 5th repetition only | **v0.5** (both) |
+|---|---|---|---|---|
+| Deep 2k, Wind 3 held back | 9% | 10% | **3%** | 7% |
+| Deep 2k, shared random formations | 12% | 11% | **4%** | 9% |
+| Deep 20k, Wind 3 held back | 5% | 4% | 7% | 10% |
+| Typical game, moves each (2k / random / 20k) | 47 / 52 / 42 | 45 / 52 / 46 | 48 / 55 / 48 | 47 / 53 / 48 |
+| Longest 10% of games, past (2k / random / 20k) | 85 / 104 / 70 | 82 / 93 / 80 | 90 / 115 / 82 | 86 / 97 / 86 |
+
+- **The two changes pull in opposite directions and roughly cancel.** The fifth repetition alone cuts the Deep 2k draws to a third (most draws are now repetitions); 50 moves turns some of those longer games back into draws. Together, draws stay about where they were: 7–10% against 5–12%.
+- **Games keep their length.** The typical game stays at 45–55 moves each, and the 50-move limit trims the longest ones.
+- The Deep 20k rows have only 200 games each, so 5% against 10% (10 against 20 games) is at the edge of luck. White's 62% of decided games in the v0.5 20k row is also likely luck: every other row is 48–55%.
+- Limit: the bots treat any repeated position as a draw when they look ahead, whatever the rule, so a side that's losing still steers toward repeating. People may play on longer under the fifth-repetition rule.
+
 ---
 
 ## What this means for the game
@@ -955,6 +972,7 @@ Easy lost every one of its 400 games against Medium and Hard, under v0.3 and und
 9. **Keeping the Wizard in a 3×3 castle halves the draws** (§19), with nothing to count. The game stays fair and gets shorter. It also punishes a careless defence harder, which beginners would feel most.
 10. **The castle return does the same without that cost** (§20). A Wizard that walks into the enemy castle brings back a captured piece, once per visit. Draws fall just as far, games keep their length and quick losses don't rise. It works as a late-game plan for the side that's ahead and as a comeback for the side behind. It's the rule from v0.4.
 11. **Rules v0.4 keep everything else** (§21). Fairness, the pieces' order, the styles, the presets and Earth's comeback all come out as under v0.3, with half the draws. Walking the Wizard to the enemy castle is a plan worth learning: a player who never does it gives away about 8–11 points.
+12. **Chess's automatic draws change little** (§22). 50 moves each and the fifth repetition push the number of draws in opposite directions, and together leave it about where it was.
 
 The questions these raise are recorded in [GAME_SPEC.md](../GAME_SPEC.md) (open questions 2, 6–15) and [PRODUCT_BRIEF.md](../PRODUCT_BRIEF.md) (Open).
 

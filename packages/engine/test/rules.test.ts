@@ -175,20 +175,23 @@ test('§6 Stalemate is a draw', () => {
   assert.deepEqual(state.result, { winner: null, reason: 'stalemate' });
 });
 
-test('§6 Threefold repetition is a draw', () => {
-  const st = play(at('8f1/4z4/9/9/9/9/9/4Z4/F18 w'), 'a1-a2', 'i9-i8', 'a2-a1', 'i8-i9', 'a1-a2', 'i9-i8', 'a2-a1');
-  assert.equal(st.result, null);
+test('§6 The same position a fifth time is a draw', () => {
+  const twice = ['a1-a2', 'i9-i8', 'a2-a1', 'i8-i9'];
+  const st = play(at('8f1/4z4/9/9/9/9/9/4Z4/F18 w'), ...twice, ...twice, ...twice, 'a1-a2', 'i9-i8', 'a2-a1');
+  assert.equal(st.result, null, 'the fourth time is not');
   assert.deepEqual(apply(st, parseAction('i8-i9')).state.result, { winner: null, reason: 'repetition' });
+  const three = play(at('8f1/4z4/9/9/9/9/9/4Z4/F18 w', { repetitionLimit: 3 }), ...twice, 'a1-a2', 'i9-i8', 'a2-a1');
+  assert.deepEqual(apply(three, parseAction('i8-i9')).state.result, { winner: null, reason: 'repetition' }, 'a rule setting');
 });
 
-test('§6 The 75-move rule: 75 moves each without a capture or combine is a draw', () => {
-  const st = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w'), clock: 148 };
-  assert.equal(apply(st, parseAction('a1-a2')).state.result, null, '74½ moves each');
-  assert.deepEqual(apply({ ...st, clock: 149 }, parseAction('a1-a2')).state.result, { winner: null, reason: 'moveLimit' });
+test('§6 The 50-move rule: 50 moves each without a capture, combine or return is a draw', () => {
+  const st = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w'), clock: 98 };
+  assert.equal(apply(st, parseAction('a1-a2')).state.result, null, '49½ moves each');
+  assert.deepEqual(apply({ ...st, clock: 99 }, parseAction('a1-a2')).state.result, { winner: null, reason: 'moveLimit' });
 });
 
-test('§6 The move limit is a rule setting: 50 (the chess rule), or off', () => {
-  const st = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w', { quietMoveLimit: 50 }), clock: 99 };
+test('§6 The move limit is a rule setting: 75 (rules v0.4), or off', () => {
+  const st = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w', { quietMoveLimit: 75 }), clock: 149 };
   assert.deepEqual(apply(st, parseAction('a1-a2')).state.result, { winner: null, reason: 'moveLimit' });
   const off = { ...at('8f1/4z4/9/9/9/9/9/4Z4/F18 w', { quietMoveLimit: 0 }), clock: 999 };
   assert.equal(apply(off, parseAction('a1-a2')).state.result, null, '0 means no limit');

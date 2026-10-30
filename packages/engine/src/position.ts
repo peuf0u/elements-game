@@ -23,11 +23,13 @@ export interface RulesConfig {
   // or on every turn there. It goes on an empty square of the side's own home zone or own castle.
   castleReturn: 'off' | 'oncePerVisit' | 'everyTurn';
   returnTo: 'home' | 'castle';
-  quietMoveLimit: number;        // §6: moves each without a capture or combine before a draw (75); 0 = no limit
+  quietMoveLimit: number;        // §6: moves each without a capture, combine or return before a draw (50); 0 = no limit
+  repetitionLimit: number;       // §6: the same position this many times is a draw (5, as chess draws automatically)
 }
 export const DEFAULT_CONFIG: Readonly<RulesConfig> = Object.freeze({
   exactRange: false, noWaterEdge: false, waterStraightCapture: false, waterRiver: false, waterStraightSteps: false,
-  waterDiagonalBends: true, waterOneWay: true, earthBreaksEarth: false, wizardZone: 'anywhere', castleReturn: 'oncePerVisit', returnTo: 'castle', quietMoveLimit: 75,
+  waterDiagonalBends: true, waterOneWay: true, earthBreaksEarth: false, wizardZone: 'anywhere', castleReturn: 'oncePerVisit', returnTo: 'castle', quietMoveLimit: 50,
+  repetitionLimit: 5,
 });
 
 // A move is (from, to), packed into one number: from + to * 256. The board decides whether it

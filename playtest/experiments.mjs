@@ -1,7 +1,7 @@
 // The experiments from the plan. Each one is a list of games to play; run.mjs plays them.
 import fs from 'node:fs';
 import { DEFAULT_FORMATION, PRESETS, FIRST_PRESETS, mirror as mirrorFiles, without } from './formations.mjs';
-import { V03, V04 } from './engine.mjs';
+import { V03, V04, V05 } from './engine.mjs';
 
 let seed = 1;
 // n games of A against B, alternating colours: A is White in even games, Black in odd ones.
@@ -495,6 +495,20 @@ export const EXPERIMENTS = {
       ...both('deep 20k: learned v today', learned(20000), today(20000), 200 * s, { fa: f, fb: f, ...ro }),
       ...both('deep 2k, random formations: learned, walk 1 v today', { ...learned(2000), castleWalk: 1 }, today(2000), 400 * s, { fa: 'random', fb: 'random', ...ro }),
       ...both('deep 20k: learned, walk 1 v today', { ...learned(20000), castleWalk: 1 }, today(20000), 200 * s, { fa: f, fb: f, ...ro }),
+    ];
+  },
+  // 14. Rules v0.5 (GAME_SPEC §6 Draws): chess's automatic draws, 50 moves each and the fifth
+  //     repetition, against v0.4's 75 moves and third repetition, and each change alone. The v0.4 bot
+  //     (WEIGHTS.v04) on both sides.
+  v05draws: s => {
+    const bot = nodes => ({ type: 'deep', nodes, weights: 'v04' }), f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1500 };
+    const rules = [['v0.4', V04], ['50 moves', { ...V04, quietMoveLimit: 50 }], ['fifth repetition', { ...V04, repetitionLimit: 5 }], ['v0.5', V05]];
+    const shared = (tag, P, n, extra) => Array.from({ length: n }, () => ({ tag, a: 'w', seed: seed++, white: P, black: P, whiteFormation: 'random', blackFormation: 'same', ...extra }));
+    seed = 3700000;
+    return [
+      ...rules.flatMap(([name, r]) => Array.from({ length: 400 * s }, () => ({ tag: name, a: 'w', seed: seed++, white: bot(2000), black: bot(2000), whiteFormation: f, blackFormation: f, ...ro, ...r }))),
+      ...rules.flatMap(([name, r]) => shared(`random formations: ${name}`, bot(2000), 400 * s, { ...ro, ...r })),
+      ...rules.flatMap(([name, r]) => Array.from({ length: 200 * s }, () => ({ tag: `deep 20k: ${name}`, a: 'w', seed: seed++, white: bot(20000), black: bot(20000), whiteFormation: f, blackFormation: f, ...ro, ...r }))),
     ];
   },
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.

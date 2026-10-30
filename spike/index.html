@@ -435,8 +435,8 @@ var Rules = (() => {
     const replies = legalMoves(ns), check = inCheck(ns.board, opp);
     if (!replies.length && check) return end(mover, 'checkmate');
     if (!replies.length) return end(null, 'stalemate');
-    if (ns.reps[key] >= 3) return end(null, 'repetition');
-    if (ns.clock >= 150) return end(null, 'fifty'); // 75 moves each (GAME_SPEC §6)
+    if (ns.reps[key] >= 5) return end(null, 'repetition'); // the fifth time (GAME_SPEC §6)
+    if (ns.clock >= 100) return end(null, 'fifty'); // 50 moves each
     return ns;
   }
 
@@ -1132,8 +1132,8 @@ const reasonText = {
   elimination: (w, l) => `${who(l)} ${has(l)} no capturing pieces left.`,
   checkmate: () => 'Checkmate.',
   stalemate: (w, l, t) => `${who(t)} ${has(t)} no legal move (stalemate).`,
-  repetition: () => 'The same position came up three times.',
-  fifty: () => '75 moves each without a capture, a combine or a piece brought back.',
+  repetition: () => 'The same position came up five times.',
+  fifty: () => '50 moves each without a capture, a combine or a piece brought back.',
   agreement: () => 'Both players agreed to a draw.',
 };
 const nameOf = o => (o === 'w' ? 'White' : 'Black');
