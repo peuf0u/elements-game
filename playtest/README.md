@@ -36,6 +36,8 @@ check.mjs ──▶ spike-rules.mjs ──▶ spike/index.html    the spike's ru
 | `check.mjs` | Plays 200 random games with both the engine and the spike's rules, under each variant, and checks that both offer the same legal moves in the same order and reach the same result. |
 | `spike-rules.mjs` | Loads the spike's rules (without copying them), only for `check.mjs`. |
 | `analyze.mjs` | Looks inside recorded games: who gives checkmate and by which route, captures by element, comebacks, quickest wins. |
+| `arc.mjs` | **How games unfold**, from the recorded v0.3 games: does a lead snowball, how often the side behind comes back, when Earth gets combined, how draws end (FINDINGS §16). Writes `results/arc.summary.json`. |
+| `setup-study.mjs` | **The setup phase**: does seeing the other side's formation help you choose yours? `matrix` checks, from games already played, how much a formation's score depends on which formation it meets. `counter` lets a search move up to three pieces of the default to beat one particular formation, then checks with fresh games whether that gain is real and only against that formation (FINDINGS §17). Writes `results/setup-study.summary.json`. |
 
 ## Rules versions
 
@@ -63,7 +65,14 @@ node run.mjs mirrorCheck    # are the presets' mirror images as strong?
 node run.mjs presets20k     # the presets' round robin with the strongest bot (about 20 minutes)
 node run.mjs waterRules     # Water movement rules compared (also waterBends, waterOneWay; WATER-RULES.html)
 node run.mjs v03strong      # rules v0.3 against v0.2 with Deep 20k (also v03recheck, v03styles, presetsV03)
+node arc.mjs                # how games unfold: leads, comebacks, Earth combines, draws (needs the v0.3 runs' games)
+node run.mjs earthComeback  # does combining Earth help the side that's behind? (a bot that never does it)
+node setup-study.mjs matrix  # does a formation's score depend on the opponent's formation? (from earlier games)
+node setup-study.mjs counter # how much can seeing the opponent's formation gain? (about 1½ hours)
+node run.mjs earthBreaks     # does "Earth breaks Earth" (an Earth stack may take plain Earth) cut the draws?
+node run.mjs wizardZone      # does keeping the Wizard in its home zone or a 3×3 castle cut the draws?
+node run.mjs castleReturn    # does a Wizard bringing pieces back from the enemy castle cut the draws?
 node search.mjs 1 v03       # the formation search under rules v0.3
 ```
 
-The players don't play the placement phase: games start from finished formations.
+The players don't place pieces one at a time: games start from finished formations. `setup-study.mjs` measures what seeing the opponent's formation is worth, the most that placing in the open could give.

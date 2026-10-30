@@ -17,9 +17,12 @@ const VARIANTS = [{}, { exactRange: true }, { noWaterEdge: true }, { waterStraig
 const toPiece = (owner, v) => (v === 'wizard' ? { owner, kind: 'wizard' } : { owner, kind: 'element', units: [{ element: v[0], size: v[1] }] });
 const result = r => (r ? `${r.winner ?? 'draw'} ${r.reason}` : '');
 
-let positions = 0, bad = 0;
-// Each variant is written against the v0.2 Water rule; the engine's own default is v0.3.
-for (const v0 of VARIANTS) {
+let positions = 0, bad = 0, returns = 0;
+// Each variant is written against the v0.2 Water rule; the engine's own default is v0.3. Each runs
+// without castle return, and the v0.3 Water rule also with it (the v0.4 rules).
+const CASTLE = { castleReturn: 'oncePerVisit', returnTo: 'castle' };
+const V03 = { waterDiagonalBends: true, waterOneWay: true };
+for (const v0 of [...VARIANTS.map(v => ({ castleReturn: 'off', ...v })), { ...V03, ...CASTLE }, { ...V03, ...CASTLE, exactRange: true }, CASTLE]) {
   const v = { waterDiagonalBends: false, waterOneWay: false, ...v0 };
   setSpikeVariant(v);
   for (let g = 0; g < 40; g++) {
@@ -38,7 +41,9 @@ for (const v0 of VARIANTS) {
       const ma = Spike.legalMoves(a), mb = E.legalActions(b);
       const la = ma.map(m => m.from + '-' + m.to).join(' '), lb = mb.map(m => m.from + '-' + m.to).join(' ');
       if (la !== lb) { bad++; if (bad < 5) console.log('MOVES DIFFER', JSON.stringify(v), 'game', g, 'move', a.ply, '\n spike: ', la, '\n engine:', lb); break; }
-      const m = ma[Math.floor(rng() * ma.length)];
+      // a Wizard in the enemy castle brings a piece back half the time, so returns get tested
+      const back = ma.filter(m => m.kind === 'return'), m = back.length && rng() < 0.5 ? back[Math.floor(rng() * back.length)] : ma[Math.floor(rng() * ma.length)];
+      if (m.kind === 'return') returns++;
       a = Spike.makeMove(a, m);
       b = E.apply(b, { from: m.from, to: m.to }).state;
       const ra = result(a.result), rb = result(b.result && { winner: b.result.winner?.[0], reason: b.result.reason === 'moveLimit' ? 'fifty' : b.result.reason });
@@ -46,6 +51,6 @@ for (const v0 of VARIANTS) {
     }
   }
 }
-console.log(`${positions} positions compared, ${bad} differences`);
+console.log(`${positions} positions compared, ${returns} pieces brought back, ${bad} differences`);
 console.log(bad ? 'SOME FAILED' : 'ALL PASS');
 process.exit(bad ? 1 : 0);

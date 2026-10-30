@@ -1,0 +1,1190 @@
+{
+ "matrix": {
+  "presetsV03": {
+   "rules": "v0.3, Deep 2k",
+   "cells": 42,
+   "gamesPerCell": 60,
+   "leftoverSpread": 5.6,
+   "luckSpread": 4.6,
+   "counterSpread": 3.3,
+   "strengthSpread": 4.3
+  },
+  "presets2k": {
+   "rules": "v0.2, Deep 2k",
+   "cells": 42,
+   "gamesPerCell": 60,
+   "leftoverSpread": 6.8,
+   "luckSpread": 4.9,
+   "counterSpread": 4.7,
+   "strengthSpread": 3.2
+  },
+  "presets20k": {
+   "rules": "v0.2, Deep 20k",
+   "cells": 42,
+   "gamesPerCell": 60,
+   "leftoverSpread": 4.4,
+   "luckSpread": 5,
+   "counterSpread": 0,
+   "strengthSpread": 5.8
+  },
+  "formationStudy": {
+   "rules": "v0.2, Deep 2k",
+   "cells": 3878,
+   "gamesPerCell": 4,
+   "leftoverSpread": 19.1,
+   "luckSpread": 18.6,
+   "counterSpread": 4.5,
+   "strengthSpread": 14
+  }
+ },
+ "counter": {
+  "bot": {
+   "type": "deep",
+   "nodes": 2000,
+   "weights": "tuned"
+  },
+  "rules": "v0.3",
+  "base": "windHeldBack",
+  "targets": {
+   "windHeldBack": [
+    {
+     "piecesMoved": 0,
+     "moves": [],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       1
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ]
+     },
+     "searchScore": null,
+     "vsTarget": 51,
+     "vsTargetRange": [
+      46,
+      56
+     ],
+     "vsTargetDraws": 24,
+     "vsOthers": 58,
+     "vsOthersRange": [
+      52,
+      63
+     ]
+    },
+    {
+     "piecesMoved": 1,
+     "moves": [
+      "b2:W1",
+      "c2:·"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ],
+      "b2": [
+       "water",
+       1
+      ]
+     },
+     "searchScore": 61,
+     "vsTarget": 49,
+     "vsTargetRange": [
+      45,
+      54
+     ],
+     "vsTargetDraws": 23,
+     "vsOthers": 55,
+     "vsOthersRange": [
+      50,
+      60
+     ]
+    },
+    {
+     "piecesMoved": 2,
+     "moves": [
+      "b1:·",
+      "b2:W1",
+      "c2:·",
+      "i2:E1"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ],
+      "b2": [
+       "water",
+       1
+      ],
+      "i2": [
+       "earth",
+       1
+      ]
+     },
+     "searchScore": 66,
+     "vsTarget": 52,
+     "vsTargetRange": [
+      47,
+      57
+     ],
+     "vsTargetDraws": 28,
+     "vsOthers": 56,
+     "vsOthersRange": [
+      51,
+      61
+     ]
+    },
+    {
+     "piecesMoved": 3,
+     "moves": [
+      "b1:·",
+      "b2:W1",
+      "c2:·",
+      "e1:·",
+      "h2:Z",
+      "i2:E1"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "f1": [
+       "fire",
+       2
+      ],
+      "b2": [
+       "water",
+       1
+      ],
+      "i2": [
+       "earth",
+       1
+      ],
+      "h2": "wizard"
+     },
+     "searchScore": 63,
+     "vsTarget": 48,
+     "vsTargetRange": [
+      43,
+      53
+     ],
+     "vsTargetDraws": 26,
+     "vsOthers": 58,
+     "vsOthersRange": [
+      53,
+      63
+     ]
+    }
+   ],
+   "wizardForward": [
+    {
+     "piecesMoved": 0,
+     "moves": [],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       1
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ]
+     },
+     "searchScore": null,
+     "vsTarget": 56,
+     "vsTargetRange": [
+      51,
+      61
+     ],
+     "vsTargetDraws": 18,
+     "vsOthers": 58,
+     "vsOthersRange": [
+      53,
+      63
+     ]
+    },
+    {
+     "piecesMoved": 1,
+     "moves": [
+      "g1:F1",
+      "h3:·"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ],
+      "g1": [
+       "fire",
+       1
+      ]
+     },
+     "searchScore": 66,
+     "vsTarget": 49,
+     "vsTargetRange": [
+      44,
+      54
+     ],
+     "vsTargetDraws": 20,
+     "vsOthers": 54,
+     "vsOthersRange": [
+      49,
+      59
+     ]
+    },
+    {
+     "piecesMoved": 2,
+     "moves": [
+      "d3:F1",
+      "h3:·"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ],
+      "d3": [
+       "fire",
+       1
+      ]
+     },
+     "searchScore": 62,
+     "vsTarget": 54,
+     "vsTargetRange": [
+      49,
+      58
+     ],
+     "vsTargetDraws": 25,
+     "vsOthers": 56,
+     "vsOthersRange": [
+      51,
+      61
+     ]
+    },
+    {
+     "piecesMoved": 3,
+     "moves": [
+      "d3:F1",
+      "f1:·",
+      "f3:F2",
+      "h3:·"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "d3": [
+       "fire",
+       1
+      ],
+      "f3": [
+       "fire",
+       2
+      ]
+     },
+     "searchScore": 70,
+     "vsTarget": 59,
+     "vsTargetRange": [
+      54,
+      64
+     ],
+     "vsTargetDraws": 23,
+     "vsOthers": 55,
+     "vsOthersRange": [
+      50,
+      60
+     ]
+    }
+   ],
+   "original": [
+    {
+     "piecesMoved": 0,
+     "moves": [],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       1
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ]
+     },
+     "searchScore": null,
+     "vsTarget": 63,
+     "vsTargetRange": [
+      58,
+      68
+     ],
+     "vsTargetDraws": 20,
+     "vsOthers": 57,
+     "vsOthersRange": [
+      52,
+      62
+     ]
+    },
+    {
+     "piecesMoved": 1,
+     "moves": [
+      "g2:F1",
+      "h3:W3"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "water",
+       3
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "fire",
+       1
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ]
+     },
+     "searchScore": 76,
+     "vsTarget": 60,
+     "vsTargetRange": [
+      56,
+      65
+     ],
+     "vsTargetDraws": 23,
+     "vsOthers": 59,
+     "vsOthersRange": [
+      55,
+      64
+     ]
+    },
+    {
+     "piecesMoved": 2,
+     "moves": [
+      "b1:·",
+      "b3:E1",
+      "g2:F1",
+      "h3:W3"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "water",
+       3
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "fire",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ],
+      "b3": [
+       "earth",
+       1
+      ]
+     },
+     "searchScore": 74,
+     "vsTarget": 68,
+     "vsTargetRange": [
+      63,
+      72
+     ],
+     "vsTargetDraws": 24,
+     "vsOthers": 62,
+     "vsOthersRange": [
+      57,
+      67
+     ]
+    },
+    {
+     "piecesMoved": 3,
+     "moves": [
+      "b1:·",
+      "b3:E1",
+      "e3:·",
+      "g2:F1",
+      "h3:W3",
+      "i2:E3"
+     ],
+     "formation": {
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "water",
+       3
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "fire",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ],
+      "b3": [
+       "earth",
+       1
+      ],
+      "i2": [
+       "earth",
+       3
+      ]
+     },
+     "searchScore": 77,
+     "vsTarget": 66,
+     "vsTargetRange": [
+      61,
+      70
+     ],
+     "vsTargetDraws": 20,
+     "vsOthers": 57,
+     "vsOthersRange": [
+      52,
+      62
+     ]
+    }
+   ],
+   "fireForward": [
+    {
+     "piecesMoved": 0,
+     "moves": [],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       1
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "b1": [
+       "earth",
+       1
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ]
+     },
+     "searchScore": null,
+     "vsTarget": 44,
+     "vsTargetRange": [
+      39,
+      49
+     ],
+     "vsTargetDraws": 18,
+     "vsOthers": 55,
+     "vsOthersRange": [
+      50,
+      59
+     ]
+    },
+    {
+     "piecesMoved": 1,
+     "moves": [
+      "b1:·",
+      "i2:E1"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       1
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       2
+      ],
+      "i2": [
+       "earth",
+       1
+      ]
+     },
+     "searchScore": 65,
+     "vsTarget": 49,
+     "vsTargetRange": [
+      44,
+      54
+     ],
+     "vsTargetDraws": 19,
+     "vsOthers": 59,
+     "vsOthersRange": [
+      54,
+      64
+     ]
+    },
+    {
+     "piecesMoved": 2,
+     "moves": [
+      "b1:·",
+      "f1:F1",
+      "h3:F2",
+      "i2:E1"
+     ],
+     "formation": {
+      "e3": [
+       "earth",
+       3
+      ],
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       2
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       1
+      ],
+      "i2": [
+       "earth",
+       1
+      ]
+     },
+     "searchScore": 60,
+     "vsTarget": 48,
+     "vsTargetRange": [
+      43,
+      53
+     ],
+     "vsTargetDraws": 18,
+     "vsOthers": 66,
+     "vsOthersRange": [
+      62,
+      71
+     ]
+    },
+    {
+     "piecesMoved": 3,
+     "moves": [
+      "b1:·",
+      "b2:E3",
+      "e3:·",
+      "f1:F1",
+      "h3:F2",
+      "i2:E1"
+     ],
+     "formation": {
+      "g3": [
+       "earth",
+       2
+      ],
+      "h3": [
+       "fire",
+       2
+      ],
+      "c2": [
+       "water",
+       1
+      ],
+      "d2": [
+       "wind",
+       1
+      ],
+      "e2": [
+       "water",
+       2
+      ],
+      "f2": [
+       "wind",
+       2
+      ],
+      "g2": [
+       "water",
+       3
+      ],
+      "c1": [
+       "wind",
+       3
+      ],
+      "d1": [
+       "fire",
+       3
+      ],
+      "e1": "wizard",
+      "f1": [
+       "fire",
+       1
+      ],
+      "i2": [
+       "earth",
+       1
+      ],
+      "b2": [
+       "earth",
+       3
+      ]
+     },
+     "searchScore": 59,
+     "vsTarget": 50,
+     "vsTargetRange": [
+      45,
+      55
+     ],
+     "vsTargetDraws": 20,
+     "vsOthers": 56,
+     "vsOthersRange": [
+      51,
+      61
+     ]
+    }
+   ]
+  },
+  "notes": {
+   "original": "Run by mistake as 'fireForward' (a name the playtest's preset list leaves out, so the game fell back to the original formation). Its 'vsOthers' panel is all seven presets, the original itself included."
+  }
+ }
+}

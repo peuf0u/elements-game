@@ -7,7 +7,7 @@ const html = fs.readFileSync(fileURLToPath(new URL('../spike/index.html', import
 const code = html.match(/<script id="rules">([\s\S]*?)<\/script>/)[1];
 export const Spike = new Function(code + '; return Rules;')();
 
-export function setSpikeVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, waterDiagonalBends = false, waterOneWay = false } = {}) {
+export function setSpikeVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, waterDiagonalBends = false, waterOneWay = false, castleReturn = 'off' } = {}) {
   Spike.variant.exact = exactRange;
   Spike.variant.noWaterEdge = noWaterEdge;
   Spike.variant.waterStraightCapture = waterStraightCapture;
@@ -15,4 +15,5 @@ export function setSpikeVariant({ exactRange = false, noWaterEdge = false, water
   Spike.variant.waterStraightSteps = waterStraightSteps;
   Spike.variant.waterDiagonalBends = waterDiagonalBends;
   Spike.variant.waterOneWay = waterOneWay;
+  Spike.variant.castleReturn = castleReturn !== 'off'; // the spike has only once per visit, into the own castle
 }

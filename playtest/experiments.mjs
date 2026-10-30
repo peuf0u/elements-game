@@ -335,6 +335,75 @@ export const EXPERIMENTS = {
       return both(`${name}: fire forward v wind 3 held back`, bot, bot, n * s, { fa: ff, fb: PRESETS.windHeldBack, randomOpening: 2, maxPlies: 1000, ...V03 });
     });
   },
+  // 12. Does Earth's comeback (§5: combine Earth with an attacker) work? Deep 2k from Wind 3 held back
+  //     on v0.3, side A never combining Earth, from an equal start and from one piece down.
+  earthComeback: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, noEarth = { ...bot, noEarthCombine: true };
+    const f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000, ...V03 };
+    seed = 2400000;
+    return [
+      ...both('equal: no earth combines v normal', noEarth, bot, 400 * s, { fa: f, fb: f, ...ro }),
+      ...[['fire2', 'f1'], ['water3', 'g2']].flatMap(([piece, square]) => [
+        ...both(`without ${piece}: normal v normal`, bot, bot, 400 * s, { fa: without(f, square), fb: f, ...ro }),
+        ...both(`without ${piece}: no earth combines v normal`, noEarth, bot, 400 * s, { fa: without(f, square), fb: f, ...ro }),
+      ]),
+    ];
+  },
+  // 10j. "Earth breaks Earth" (GAME_SPEC open question 13): Earth combined with an attacker can
+  // capture plain Earth, to break the Earth walls behind which drawn endings stall (FINDINGS §16).
+  // Both sides score positions with WEIGHTS.earthWall; 'normal rules, tuned' is today's bot as a check.
+  earthBreaks: s => {
+    const tuned = { type: 'deep', nodes: 2000, weights: 'tuned' }, bot = { ...tuned, weights: 'earthWall' }, strong = { ...bot, nodes: 20000 };
+    const f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000, ...V03 }, on = { ...ro, earthBreaksEarth: true };
+    const shared = (tag, P, n, extra) => Array.from({ length: n }, () => ({ tag, a: 'w', seed: seed++, white: P, black: P, whiteFormation: 'random', blackFormation: 'same', ...extra }));
+    seed = 2500000;
+    return [
+      ...both('normal rules, tuned', tuned, tuned, 400 * s, { fa: f, fb: f, ...ro }),
+      ...both('normal rules', bot, bot, 400 * s, { fa: f, fb: f, ...ro }),
+      ...both('earth breaks earth', bot, bot, 400 * s, { fa: f, fb: f, ...on }),
+      ...shared('random formations: normal rules', bot, 400 * s, ro),
+      ...shared('random formations: earth breaks earth', bot, 400 * s, on),
+      ...both('deep 20k: normal rules', strong, strong, 400 * s, { fa: f, fb: f, ...ro }),
+      ...both('deep 20k: earth breaks earth', strong, strong, 400 * s, { fa: f, fb: f, ...on }),
+    ];
+  },
+  // 10k. The Wizard can't leave its zone (GAME_SPEC open question 14): its 3-row home zone, or the
+  // 3×3 castle d1–f3, against today's rule. Random formations put the Wizard in the castle, so all
+  // three rules start from the same kind of formation.
+  wizardZone: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'tuned' }, strong = { ...bot, nodes: 20000 };
+    const f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000, ...V03 };
+    const shared = (tag, P, n, extra) => Array.from({ length: n }, () => ({ tag, a: 'w', seed: seed++, white: P, black: P, whiteFormation: 'randomCastle', blackFormation: 'same', ...extra }));
+    const rules = [['anywhere', 'anywhere'], ['home zone', 'home'], ['castle', 'castle']];
+    seed = 2600000;
+    return [
+      ...rules.flatMap(([name, zone]) => both(`wizard ${name}`, bot, bot, 400 * s, { fa: f, fb: f, ...ro, wizardZone: zone })),
+      ...rules.flatMap(([name, zone]) => shared(`random formations: wizard ${name}`, bot, 400 * s, { ...ro, wizardZone: zone })),
+      ...rules.flatMap(([name, zone]) => both(`deep 20k: wizard ${name}`, strong, strong, 400 * s, { fa: f, fb: f, ...ro, wizardZone: zone })),
+    ];
+  },
+  // 10l. The castle return (GAME_SPEC open question 15): Wizards move freely, and a Wizard standing in
+  // the enemy castle (d7–f9 for White) may, instead of moving, bring back one captured piece onto its
+  // own home zone or own castle, once per visit or every turn. Against today's rule and the strict
+  // castle of 10k. Both sides score with WEIGHTS.castleWalk, which pulls a Wizard toward the enemy
+  // castle late in the game and is the same as `tuned` when the rule is off.
+  castleReturn: s => {
+    const bot = { type: 'deep', nodes: 2000, weights: 'castleWalk' }, strong = { ...bot, nodes: 20000 };
+    const f = PRESETS.windHeldBack, ro = { randomOpening: 2, maxPlies: 1000, ...V03 };
+    const shared = (tag, P, n, extra) => Array.from({ length: n }, () => ({ tag, a: 'w', seed: seed++, white: P, black: P, whiteFormation: 'randomCastle', blackFormation: 'same', ...extra }));
+    const rules = [
+      ['today', {}], ['strict castle', { wizardZone: 'castle' }],
+      ['return once per visit, home zone', { castleReturn: 'oncePerVisit', returnTo: 'home' }],
+      ['return once per visit, home castle', { castleReturn: 'oncePerVisit', returnTo: 'castle' }],
+      ['return every turn, home zone', { castleReturn: 'everyTurn', returnTo: 'home' }],
+    ];
+    seed = 2700000;
+    return [
+      ...rules.flatMap(([name, r]) => both(name, bot, bot, 400 * s, { fa: f, fb: f, ...ro, ...r })),
+      ...rules.flatMap(([name, r]) => shared(`random formations: ${name}`, bot, 400 * s, { ...ro, ...r })),
+      ...rules.flatMap(([name, r]) => both(`deep 20k: ${name}`, strong, strong, 400 * s, { fa: f, fb: f, ...ro, ...r })),
+    ];
+  },
   // 11. Chess calibration (chess/): the same pipeline on a game with known answers.
   // a. Deep 2k with naive values (every piece worth 1) against itself, to learn values from.
   chessSelfplay: s => Array.from({ length: 4000 * s }, (_, i) => ({

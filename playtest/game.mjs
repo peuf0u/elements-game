@@ -16,12 +16,20 @@ export function rngFrom(seed) { // mulberry32: small, seedable, good enough for 
 }
 
 const label = p => (p.wiz ? 'wizard' : p.els.map(x => x.e + x.s).join('+'));
-const formation = (f, rng) => (f === 'random' ? randomFormation(rng) : typeof f === 'string' ? FORMATIONS[f] : f);
+const unitLabel = k => ['fire', 'wind', 'water', 'earth'][(k / 3) | 0] + ((k % 3) + 1); // a returned piece (engine pieces.ts unitOf)
+const formation = (f, rng) => (f === 'random' || f === 'randomCastle' ? randomFormation(rng, f === 'randomCastle') : typeof f === 'string' ? FORMATIONS[f] : f);
 // A player config: { type, ...options }. values names a table in VALUES, weights a set in WEIGHTS.
 // avoid: { element, moves } keeps the player from moving any piece holding that element during its
 // first `moves` moves, unless nothing else is legal (restricted play: "what if you neglect Water?").
-const makePlayer = ({ type, values, weights, avoid, ...o }) => {
+// noEarthCombine: true keeps the player from ever combining Earth with another element (§5's comeback
+// move), unless nothing else is legal.
+const plainEarth = p => p && !p.wiz && p.els.length === 1 && p.els[0].e === 'earth';
+const makePlayer = ({ type, values, weights, avoid, noEarthCombine, ...o }) => {
   const p = PLAYERS[type]({ ...(weights ? WEIGHTS[weights] : {}), ...o, ...(values ? { values: VALUES[values] } : {}) });
+  if (noEarthCombine) return { ...p, choose(st, moves, rng) {
+    const f = moves.filter(m => m.kind !== 'combine' || !(plainEarth(st.board[m.from]) || plainEarth(st.board[m.to])));
+    return p.choose(st, f.length ? f : moves, rng);
+  } };
   if (!avoid) return p;
   return { ...p, choose(st, moves, rng) {
     if (st.ply < 2 * avoid.moves) {
@@ -51,14 +59,17 @@ export function playGame(config) {
   }
   const players = { w: makePlayer(config.white), b: makePlayer(config.black) };
   let st = startGame(wf, bf);
-  const rec = { moves: [], captures: [], combines: [], material: [], formations: { w: wf, b: bf } };
+  const rec = { moves: [], captures: [], combines: [], returns: [], material: [], formations: { w: wf, b: bf } };
   const max = config.maxPlies ?? 1500;
   const t0 = Date.now();
   while (st.phase === 'play' && st.ply < max) {
     const moves = legalMoves(st);
     const m = st.ply < (config.randomOpening ?? 0) ? moves[Math.floor(rng() * moves.length)] : players[st.turn].choose(st, moves, rng);
     const by = st.turn, target = st.board[m.to], mover = st.board[m.from];
-    rec.moves.push(name(m.from) + (m.kind === 'capture' ? 'x' : m.kind === 'combine' ? '+' : '-') + name(m.to));
+    if (m.kind === 'return') {
+      rec.moves.push(unitLabel(m.from - 81) + '@' + name(m.to));
+      rec.returns.push({ ply: st.ply, by, piece: unitLabel(m.from - 81) });
+    } else rec.moves.push(name(m.from) + (m.kind === 'capture' ? 'x' : m.kind === 'combine' ? '+' : '-') + name(m.to));
     if (m.kind === 'capture') rec.captures.push({ ply: st.ply, by, piece: label(target), with: label(mover) });
     if (m.kind === 'combine') rec.combines.push({ ply: st.ply, by, piece: label(mover) + '+' + label(target) });
     st = play(st, m);

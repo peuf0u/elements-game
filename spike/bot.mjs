@@ -4,7 +4,7 @@
 // in the same order (playtest/check.mjs), so a move found here is always legal there.
 //
 // Message in:  { id, level, config, start: [[square, piece]], startToMove, moves: [{ from, to }], board, toMove }
-//              config holds the rule switches (the Water trial); start is the board when play began,
+//              config holds the rule switches (the Water trial, the castle return); start is the board when play began,
 //              in the spike's form ({ o, wiz } or { o, els }), and moves are the moves since, so the
 //              engine sees the same repetitions and move count. board and toMove are the position
 //              now, used when the moves no longer replay (the Water rule changed mid-game).
@@ -14,10 +14,12 @@ import { careful, deep } from '../playtest/players.mjs';
 import { WEIGHTS } from '../playtest/evaluate.mjs';
 
 // Ratings from playtest/FINDINGS.md §10 (chess Elo scale, Careful = 1000) and time per move on a Mac.
+// Medium and Hard also walk their Wizard toward the enemy castle late in the game (WEIGHTS.castleWalk,
+// FINDINGS §20); without the castle return that does nothing.
 const LEVELS = {
   easy: () => careful(),                                       // 1000, 5 ms
-  medium: () => deep({ ...WEIGHTS.tuned, nodes: 2000 }),       // 1690, 7 ms
-  hard: () => deep({ ...WEIGHTS.tuned, nodes: 20000 }),        // 1942, 62 ms
+  medium: () => deep({ ...WEIGHTS.castleWalk, nodes: 2000 }),  // 1690, 7 ms
+  hard: () => deep({ ...WEIGHTS.castleWalk, nodes: 20000 }),   // 1942, 62 ms
 };
 const players = {};
 
@@ -25,7 +27,8 @@ const side = o => (o === 'w' ? 'white' : 'black');
 const piece = p => (p.wiz ? { owner: side(p.o), kind: 'wizard' }
   : { owner: side(p.o), kind: 'element', units: p.els.map(x => ({ element: x.e, size: x.s })) });
 
-const fromBoard = (pieces, toMove, config) => E.startFromPosition(pieces.map(([s, p]) => [s, piece(p)]), { toMove: side(toMove), config });
+// Without a castle-return switch in config (an older page), the bot plays without it.
+const fromBoard = (pieces, toMove, config) => E.startFromPosition(pieces.map(([s, p]) => [s, piece(p)]), { toMove: side(toMove), config: { castleReturn: 'off', ...config } });
 
 self.onmessage = ({ data: { id, level, config, start, startToMove, moves, board, toMove } }) => {
   try {

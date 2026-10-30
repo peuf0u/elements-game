@@ -25,8 +25,10 @@ let config = E.DEFAULT_CONFIG;
 // The Water switches default to the v0.2 rule here, so every earlier experiment replays exactly;
 // experiments of the v0.3 game (the engine's default) pass V03 below.
 export const V03 = Object.freeze({ waterDiagonalBends: true, waterOneWay: true });
-export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, waterDiagonalBends = false, waterOneWay = false, quietMoveLimit = 75 } = {}) {
-  config = { exactRange, noWaterEdge, waterStraightCapture, waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay, quietMoveLimit };
+// Rules v0.4 (the engine's default since 2026-10-29): v0.3 plus the castle return, once per visit, into the own castle.
+export const V04 = Object.freeze({ ...V03, castleReturn: 'oncePerVisit', returnTo: 'castle' });
+export function setVariant({ exactRange = false, noWaterEdge = false, waterStraightCapture = false, waterRiver = false, waterStraightSteps = false, waterDiagonalBends = false, waterOneWay = false, earthBreaksEarth = false, wizardZone = 'anywhere', castleReturn = 'off', returnTo = 'home', quietMoveLimit = 75 } = {}) {
+  config = { exactRange, noWaterEdge, waterStraightCapture, waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay, earthBreaksEarth, wizardZone, castleReturn, returnTo, quietMoveLimit };
 }
 
 // A formation is { square: [element, size] | 'wizard' } as White sees it (rows 1–3).

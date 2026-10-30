@@ -1,0 +1,180 @@
+{
+ "Deep 2k": {
+  "games": 2260,
+  "firstAhead": {
+   "1": {
+    "games": 90,
+    "wins": 55,
+    "draws": 24,
+    "losses": 22,
+    "atMove": 15
+   },
+   "2": {
+    "games": 63,
+    "wins": 71,
+    "draws": 18,
+    "losses": 12,
+    "atMove": 29
+   },
+   "3": {
+    "games": 38,
+    "wins": 86,
+    "draws": 9,
+    "losses": 5,
+    "atMove": 41
+   },
+   "4": {
+    "games": 23,
+    "wins": 94,
+    "draws": 4,
+    "losses": 2,
+    "atMove": 45
+   }
+  },
+  "decisive": 1681,
+  "winnerWasBehindBy": {
+   "1": 31,
+   "2": 10,
+   "3": 2
+  },
+  "winnerNeverAhead": 18,
+  "earthCombines": {
+   "perGame": 2.22,
+   "gamesWithOne": 90,
+   "behind": {
+    "sides": 438,
+    "score": 32
+   },
+   "even": {
+    "sides": 2263,
+    "score": 47
+   },
+   "ahead": {
+    "sides": 586,
+    "score": 67
+   }
+  },
+  "afterFallingBehind": {
+   "combined": {
+    "sides": 940,
+    "score": 37
+   },
+   "not": {
+    "sides": 1545,
+    "score": 30
+   }
+  },
+  "draws": 26,
+  "drawReasons": {
+   "fifty": 401,
+   "repetition": 178
+  },
+  "drawLeadAtEnd": {
+   "even": 191,
+   "by1": 235,
+   "by2plus": 153
+  },
+  "drawAttackersLeft": {
+   "median": 6,
+   "fewest": 3,
+   "most": 20
+  },
+  "decisiveReasons": {
+   "checkmate": 1044,
+   "elimination": 637
+  },
+  "medianMovesEach": {
+   "decisive": 43.5,
+   "draws": 110.5
+  }
+ },
+ "Deep 20k": {
+  "games": 300,
+  "firstAhead": {
+   "1": {
+    "games": 87,
+    "wins": 70,
+    "draws": 13,
+    "losses": 17,
+    "atMove": 21
+   },
+   "2": {
+    "games": 68,
+    "wins": 88,
+    "draws": 8,
+    "losses": 4,
+    "atMove": 32
+   },
+   "3": {
+    "games": 40,
+    "wins": 96,
+    "draws": 3,
+    "losses": 1,
+    "atMove": 38
+   },
+   "4": {
+    "games": 24,
+    "wins": 100,
+    "draws": 0,
+    "losses": 0,
+    "atMove": 41
+   }
+  },
+  "decisive": 250,
+  "winnerWasBehindBy": {
+   "1": 19,
+   "2": 4,
+   "3": 0
+  },
+  "winnerNeverAhead": 15,
+  "earthCombines": {
+   "perGame": 2.08,
+   "gamesWithOne": 94,
+   "behind": {
+    "sides": 30,
+    "score": 28
+   },
+   "even": {
+    "sides": 367,
+    "score": 46
+   },
+   "ahead": {
+    "sides": 63,
+    "score": 78
+   }
+  },
+  "afterFallingBehind": {
+   "combined": {
+    "sides": 80,
+    "score": 32
+   },
+   "not": {
+    "sides": 216,
+    "score": 19
+   }
+  },
+  "draws": 17,
+  "drawReasons": {
+   "fifty": 32,
+   "repetition": 18
+  },
+  "drawLeadAtEnd": {
+   "even": 18,
+   "by1": 19,
+   "by2plus": 13
+  },
+  "drawAttackersLeft": {
+   "median": 5,
+   "fewest": 4,
+   "most": 15
+  },
+  "decisiveReasons": {
+   "elimination": 96,
+   "checkmate": 154
+  },
+  "medianMovesEach": {
+   "decisive": 42.5,
+   "draws": 103.5
+  }
+ }
+}

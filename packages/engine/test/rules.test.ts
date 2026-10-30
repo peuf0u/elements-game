@@ -73,6 +73,51 @@ test('§3/§4 Earth blocks, can\'t capture and can\'t be captured', () => {
   assert.ok(!dests({ ...st, toMove: 'black' }, 'd5').includes('d4'), 'Fire can\'t take Earth');
 });
 
+test('Open question 13: Earth breaks Earth, only a stack holding Earth, only when switched on', () => {
+  // White Earth 2 + Fire 3 stack on e5 and plain Earth on d6; Black plain Earths on d7 and e7
+  // guarding the Wizard on e8.
+  const text = '9/4z4/3e1e14/3E15/4(F3E2)4/9/9/9/Z8 w';
+  assert.ok(!dests(at(text), 'e5').includes('e7'), 'normal rules: the Earth on e7 blocks');
+  const on = at(text, { earthBreaksEarth: true });
+  assert.ok(dests(on, 'e5').includes('e7'), 'the Earth + Fire stack takes the Earth on e7');
+  const after = play(on, 'e5-e7');
+  assert.deepEqual(pieceAt(after, parseSquare('e7')), {
+    owner: 'white', kind: 'element', units: [{ element: 'fire', size: 3 }, { element: 'earth', size: 2 }],
+  });
+  assert.ok(!dests(on, 'd6').includes('d7'), 'plain Earth still captures nothing');
+  const fire = at('9/4z4/3e1e14/9/4F34/9/9/9/Z8 w', { earthBreaksEarth: true });
+  assert.ok(!dests(fire, 'e5').includes('e7'), 'a plain Fire still can\'t take Earth');
+});
+
+test('Open question 14: the Wizard stays in its home zone or its castle, only when switched on', () => {
+  // White's Wizard on f3, the castle's corner and the home zone's top row.
+  const text = '4z4/9/9/9/F17f1/9/5Z3/9/9 w';
+  assert.deepEqual(dests(at(text), 'f3'), ['e2', 'e3', 'e4', 'f2', 'f4', 'g2', 'g3', 'g4']);
+  assert.deepEqual(dests(at(text, { wizardZone: 'home' }), 'f3'), ['e2', 'e3', 'f2', 'g2', 'g3']);
+  assert.deepEqual(dests(at(text, { wizardZone: 'castle' }), 'f3'), ['e2', 'e3', 'f2']);
+  assert.throws(() => startFromFormations({ ...DEFAULT_FORMATION, e1: { element: 'earth', size: 1 }, b1: 'wizard' }, DEFAULT_FORMATION,
+    { config: { wizardZone: 'castle' } }), /outside the castle/);
+});
+
+test('§6 Castles: a Wizard in the enemy castle brings a captured piece back, once per visit (or every turn)', () => {
+  // White's Wizard on e7, inside Black's castle; White has only Fire 1 left, so 11 units are captured.
+  const text = 'z8/9/4Z4/9/8f1/9/9/9/F18 w';
+  const returns = (st: GameState) => legalActions(st).filter(a => a.from >= 81);
+  assert.equal(returns(at(text, { castleReturn: 'off' })).length, 0, 'switched off');
+  const once = at(text);
+  assert.equal(returns(once).length, 11 * 9, 'each captured unit onto each square of the home castle');
+  assert.equal(returns(at(text, { returnTo: 'home' })).length, 11 * 26, 'or, as a variant, of the home zone (a1 is taken)');
+  const water3 = { from: 81 + 2 * 3 + 2, to: parseSquare('e2') };
+  const back = apply(once, water3).state;
+  assert.deepEqual(pieceAt(back, parseSquare('e2')), { owner: 'white', kind: 'element', units: [{ element: 'water', size: 3 }] });
+  assert.equal(back.clock, 0, 'a return restarts the 75-move count, like a capture');
+  assert.equal(returns(play(back, 'i5-i6')).length, 0, 'once per visit: not again while the Wizard stays');
+  const again = play(back, 'i5-i6', 'e7-e6', 'i6-i5', 'e6-e7', 'i5-i6');
+  assert.ok(returns(again).length > 0, 'after leaving the castle and coming back');
+  const every = apply(at(text, { castleReturn: 'everyTurn', returnTo: 'castle' }), water3).state;
+  assert.ok(returns(play(every, 'i5-i6')).length > 0, 'every turn: again on the next turn');
+});
+
 test('§5 Combining: Wind 3 onto Water 1 makes one piece that moves 3 as either element', () => {
   const st = play(at('4z3f1/9/9/9/9/9/1W37/2R16/Z8 w'), 'b3-c2', 'e9-e8');
   assert.deepEqual(pieceAt(st, parseSquare('c2')), {

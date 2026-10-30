@@ -25,6 +25,8 @@ const next = () => { // xorshift32
 const KEYS_LO = new Int32Array(ids * 81), KEYS_HI = new Int32Array(ids * 81);
 for (let i = 0; i < ids * 81; i++) { KEYS_LO[i] = next(); KEYS_HI[i] = next(); }
 export const SIDE_LO = next(), SIDE_HI = next();
+// Per side: its Wizard has already brought a piece back on this visit (castleReturn, position.ts).
+export const RETURNED_LO = [next(), next()], RETURNED_HI = [next(), next()];
 
 export const keyLo = (code: number, s: number): number => KEYS_LO[ID[code] * 81 + s];
 export const keyHi = (code: number, s: number): number => KEYS_HI[ID[code] * 81 + s];

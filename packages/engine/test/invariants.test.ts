@@ -11,7 +11,8 @@ const random = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return s
 const VARIANTS: Array<Partial<RulesConfig>> = [{}, { exactRange: true }, { noWaterEdge: true }, { waterStraightCapture: true },
   { waterRiver: true }, { waterStraightSteps: true }, { waterRiver: true, waterStraightSteps: true },
   { waterDiagonalBends: true }, { waterRiver: true, waterDiagonalBends: true },
-  { waterOneWay: true }, { waterDiagonalBends: true, waterOneWay: true }];
+  { waterOneWay: true }, { waterDiagonalBends: true, waterOneWay: true },
+  { castleReturn: 'off' }, { castleReturn: 'everyTurn', returnTo: 'home' }, { wizardZone: 'castle' }, { earthBreaksEarth: true }];
 
 test('make + unmake restores the position, and the running hash matches a fresh one', () => {
   const moves = new Int32Array(512);
@@ -23,7 +24,7 @@ test('make + unmake restores the position, and the running hash matches a fresh 
         const n = legalMoves(pos, moves);
         for (let i = 0; i < n; i++) {
           pos.make(moves[i]);
-          const fresh = Position.from(pos.board, pos.side, pos.config);
+          const fresh = Position.from(pos.board, pos.side, pos.config, pos.returnedBits());
           assert.equal(pos.key(), fresh.key());
           assert.deepEqual(Array.from(pos.capturers), Array.from(fresh.capturers));
           assert.ok(!inCheck(pos, pos.side ^ 1), 'a legal move never leaves the mover in check');

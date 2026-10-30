@@ -1,6 +1,6 @@
 // Scoring a position: how good it looks for one side, without looking ahead. Shared by every
 // look-ahead player, so differences between them come from how they search, not how they score.
-import { pseudoMoves, inCheck, OWNER, IS_WIZARD, CAPTURER, PLAIN_EARTH, VALID, N, fileOf, rankOf } from '../packages/engine/src/core.ts';
+import { pseudoMoves, inCheck, OWNER, IS_WIZARD, CAPTURER, PLAIN_EARTH, VALID, N, fileOf, rankOf, CASTLE, UNIT_BITS, UNITS, unitCode, unitOf } from '../packages/engine/src/core.ts';
 
 // Piece values are a guess, so there are two tables; experiments can run with both.
 export const VALUES = {
@@ -22,6 +22,16 @@ export const VALUES = {
 export const WEIGHTS = {
   tuned: { values: VALUES.tuned, mobility: 0.278, wizardPressure: 0.408, stackBonus: 4.29 },
 };
+// For "Earth breaks Earth" (GAME_SPEC open question 13), where plain Earth can be captured: the learned
+// Earth values are negative, so a bot would be glad to lose its Earth. Here every Earth counts +2
+// (about a Fire 1 or Wind 2), alone or in a stack, so combining Earth is worth exactly what it is
+// with `tuned` and only losing or taking an Earth changes. Both sides of a comparison use it.
+WEIGHTS.earthWall = { ...WEIGHTS.tuned, values: { unit: { ...VALUES.tuned.unit, earth1: 2, earth2: 2, earth3: 2 } } };
+// For the castle return (GAME_SPEC open question 15): walking the Wizard to the enemy castle takes
+// more moves than the search sees, so the score pulls it there once the opponent is down to a few
+// attackers (see castleWalk in evaluate). Both sides of a comparison use it; it does nothing when
+// the rule is off.
+WEIGHTS.castleWalk = { ...WEIGHTS.tuned, castleWalk: 0.5 };
 
 // For readable pieces ({ o, wiz } or { o, els }), as game.mjs and Greedy use them.
 export function pieceValue(p, table = VALUES.standard) {
@@ -53,8 +63,26 @@ const scratch = new Int32Array(512);
 // The weights for evaluate. Style players change some of them.
 export const SCORE_DEFAULTS = {
   values: VALUES.standard, materialWeight: 1, wizardPressure: 0.1, advance: 0, stackBonus: 0,
-  earthGuard: 0, mobility: 0.02, hunt: 0,
+  earthGuard: 0, mobility: 0.02, hunt: 0, castleWalk: 0,
 };
+
+// The castle return (castleReturn): a share of the best piece side o could bring back, larger the
+// closer its Wizard is to the enemy castle. Only once the opponent is down to 4 attacking pieces or
+// fewer (before that, a Wizard walking into the enemy camp gets caught), and growing as it has fewer.
+// A Wizard that has used up its visit counts as one step further out, so it steps out and back in.
+function castleWalk(pos, o, enemyCapturers, weight, values) {
+  const w = pos.wizard[o];
+  if (w < 0 || enemyCapturers > 4) return 0;
+  let present = 0;
+  for (let s = 0; s < 81; s++) { const c = pos.board[s]; if (c && OWNER[c] === o) present |= UNIT_BITS[c]; }
+  let best = 0;
+  for (let k = 0; k < UNITS; k++) if (!(present >> k & 1)) best = Math.max(best, values[unitCode(o, ...unitOf(k))]);
+  if (!best) return 0;
+  let d = 9;
+  for (let s = 0; s < 81; s++) if (CASTLE[(o ^ 1) * 81 + s]) d = Math.min(d, dist(w, s));
+  if (d === 0 && pos.returnRule === 1 && pos.returned[o]) d = 2;
+  return weight * best * (5 - enemyCapturers) / 4 * (8 - d) / 8;
+}
 
 // Score from the point of view of `me` (0 White, 1 Black). Positive = good for me.
 export function evaluate(pos, me, opts, values) {
@@ -82,6 +110,7 @@ export function evaluate(pos, me, opts, values) {
   }
   // Elimination danger: the last few capturing pieces are worth extra.
   for (const o of [0, 1]) if (capturers[o] <= 3) score += (o === me ? -1 : 1) * (4 - capturers[o]) * 2;
+  if (opts.castleWalk && pos.returnRule) for (const o of [0, 1]) score += (o === me ? 1 : -1) * castleWalk(pos, o, capturers[o ^ 1], opts.castleWalk, values);
   if (opts.mobility) {
     let m = 0;
     for (let s = 0; s < 81; s++) if (b[s]) m += (OWNER[b[s]] === me ? 1 : -1) * pseudoMoves(pos, s, scratch, 0);

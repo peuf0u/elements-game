@@ -1,7 +1,7 @@
 // Formations (GAME_SPEC §6): a player's starting setup inside their own three rows, written from
 // White's side. Black gets the same formation from their side of the table, rotated 180°, so
 // White's b3 is Black's h7.
-import { SQUARES, parseSquare } from './squares.ts';
+import { SQUARES, CASTLE, parseSquare } from './squares.ts';
 import type { Piece, Side, Unit } from './pieces.ts';
 import { startFromPosition, type GameState } from './game.ts';
 import type { RulesConfig } from './position.ts';
@@ -54,6 +54,8 @@ export function startFromFormations(
     for (const [name, v] of Object.entries(f)) {
       const s = parseSquare(name), at = owner === 'white' ? s : SQUARES - 1 - s;
       if (owner === 'white' ? at >= 27 : at < 54) throw new Error(`${name} is outside the home zone`);
+      if (v === 'wizard' && options.config?.wizardZone === 'castle' && !CASTLE[(owner === 'white' ? 0 : SQUARES) + at])
+        throw new Error(`the Wizard on ${name} is outside the castle`);
       pieces.push([at, v === 'wizard' ? { owner, kind: 'wizard' } : { owner, kind: 'element', units: [v] }]);
     }
   return startFromPosition(pieces, options);

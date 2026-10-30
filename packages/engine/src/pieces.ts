@@ -32,6 +32,16 @@ const CODES = 2048;
 const single = (owner: number, e: number, size: number) => owner | (e << 2) | (size << 4);
 export const wizardCode = (owner: number): number => owner | 2;
 export const unitCode = (owner: number, e: number, size: number): number => single(owner, e, size);
+// Each side has one of each element and size: 12 units, numbered element * 3 + size - 1. A piece
+// brought back from the captured ones (castleReturn) is a move from square 81 + that number.
+export const UNITS = 12;
+export const unitOf = (k: number): [number, number] => [(k / 3) | 0, (k % 3) + 1];
+// The units a piece holds, as bits of that numbering.
+export const UNIT_BITS = new Uint16Array(CODES);
+for (let c = 0; c < CODES; c++) if (c & 60 && !(c & 2)) {
+  UNIT_BITS[c] = 1 << (((c >> 2) & 3) * 3 + ((c >> 4) & 3) - 1);
+  if (c & 64) UNIT_BITS[c] |= 1 << (((c >> 7) & 3) * 3 + ((c >> 9) & 3) - 1);
+}
 
 // Per-code tables, filled below for every valid code.
 export const VALID = new Uint8Array(CODES);
@@ -40,6 +50,7 @@ export const IS_WIZARD = new Uint8Array(CODES);
 export const RANGE = new Uint8Array(CODES);
 export const PLAIN_EARTH = new Uint8Array(CODES); // a lone Earth: blocks, banks Water, can't capture or be captured
 export const CAPTURER = new Uint8Array(CODES);    // counts for the elimination win (§6): not the Wizard, not plain Earth
+export const EARTH_STACK = new Uint8Array(CODES); // Earth combined with an attacker (§5): breaks Earth under earthBreaksEarth
 export const SINGLE = new Uint8Array(CODES);      // one element, so it can still combine
 export const ELEMENT_A = new Int8Array(CODES).fill(-1);
 // MOVES[code * 2], MOVES[code * 2 + 1]: its ways of moving, -1 if only one. Slides come before Water,
@@ -54,6 +65,7 @@ function fill(code: number, units: Array<[number, number]>, owner: number, wizar
   RANGE[code] = wizard ? 1 : Math.max(...units.map(u => u[1]));
   PLAIN_EARTH[code] = !wizard && units.length === 1 && units[0][0] === EARTH ? 1 : 0;
   CAPTURER[code] = !wizard && units.some(u => u[0] !== EARTH) ? 1 : 0;
+  EARTH_STACK[code] = !wizard && units.length === 2 && units.some(u => u[0] === EARTH) ? 1 : 0;
   SINGLE[code] = !wizard && units.length === 1 ? 1 : 0;
   if (!wizard) ELEMENT_A[code] = units[0][0];
   let ways: number[];

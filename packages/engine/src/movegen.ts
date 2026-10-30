@@ -2,9 +2,9 @@
 // Pseudo-legal moves follow each piece's movement rules; legal moves also keep the mover's own
 // Wizard out of attack. Moves are listed square by square from a1, and for each piece in a fixed
 // order (slides before Water), one move per destination.
-import { NEIGHBOR, RAY, BANK_DIRS, EDGE_DIRS, DIRS, UP, DOWN, fileOf, distance } from './squares.ts';
+import { NEIGHBOR, RAY, BANK_DIRS, EDGE_DIRS, DIRS, UP, DOWN, fileOf, distance, SQUARES, CASTLE } from './squares.ts';
 import {
-  OWNER, IS_WIZARD, RANGE, PLAIN_EARTH, MOVES, HAS_MOVE, canCombine, wizardCode,
+  OWNER, IS_WIZARD, RANGE, PLAIN_EARTH, EARTH_STACK, MOVES, HAS_MOVE, canCombine, wizardCode, UNITS, UNIT_BITS,
   MOVE_FIRE, MOVE_WIND, MOVE_WATER, MOVE_EARTH, MOVE_WIZARD,
 } from './pieces.ts';
 import type { Position } from './position.ts';
@@ -65,10 +65,12 @@ export function stillAround(pos: Position, c: number, n: number, earths: number)
 }
 
 // Can the piece `mover`, moving as `way`, end its move on a square holding `target`?
-// Onto an enemy: capture, if `way` isn't Earth and the target isn't plain Earth (§4).
-// Onto your own piece: combine (§5).
-const landable = (mover: number, target: number, way: number): boolean =>
-  OWNER[target] !== OWNER[mover] ? way !== MOVE_EARTH && !PLAIN_EARTH[target] : canCombine(mover, target);
+// Onto an enemy: capture, if `way` isn't Earth and the target isn't plain Earth (§4), except that
+// under earthBreaksEarth a stack holding Earth may take plain Earth. Onto your own piece: combine (§5).
+export const landable = (pos: Position, mover: number, target: number, way: number): boolean =>
+  OWNER[target] !== OWNER[mover]
+    ? way !== MOVE_EARTH && (!PLAIN_EARTH[target] || (pos.earthBreaks && EARTH_STACK[mover] === 1))
+    : canCombine(mover, target);
 
 // The move being generated, shared with the Water walk below.
 let gPos: Position, gOut: Int32Array | number[], gN = 0, gFrom = 0, gPiece = 0, gRange = 0, gCall = 0;
@@ -87,7 +89,7 @@ function walk(c: number, k: number, around: number, dir: number): void {
     if (!t) {
       if (ok) add(nx);
       if (taken < gRange) { onPath[nx] = 1; walk(nx, taken, pos.river ? stillAround(pos, c, nx, earths) : 0, dir || RISE[a]); onPath[nx] = 0; }
-    } else if (ok && landable(gPiece, t, MOVE_WATER) && (!pos.straight || OWNER[t] === OWNER[gPiece] || fileOf(nx) === fileOf(c))) add(nx);
+    } else if (ok && landable(pos, gPiece, t, MOVE_WATER) && (!pos.straight || OWNER[t] === OWNER[gPiece] || fileOf(nx) === fileOf(c))) add(nx);
   }
 }
 
@@ -110,10 +112,10 @@ export function pseudoMoves(pos: Position, from: number, out: Int32Array | numbe
       const r = (from * 8 + d) * 3;
       for (let k = 1; k <= max; k++) {
         const s = RAY[r + k - 1];
-        if (s < 0) break;
+        if (s < 0 || (wizard && pos.wizardKeep && !pos.wizardKeep[OWNER[p] * 81 + s])) break;
         const t = b[s], ok = !exact || k === max || wizard;
         if (!t) { if (ok) add(s); continue; }
-        if (ok && landable(p, t, way)) add(s);
+        if (ok && landable(pos, p, t, way)) add(s);
         break;
       }
     }
@@ -214,6 +216,31 @@ function mightExpose(pos: Position, m: number, w: number): boolean {
   return IS_WIZARD[p] === 1 || distance(from, w) <= 3 || (PLAIN_EARTH[p] === 1 && !pos.board[to] && distance(to, w) <= 3);
 }
 
+// Bringing a captured piece back (castleReturn): which of the side's units are captured, if its
+// Wizard stands in the enemy castle and may bring one back now; 0 otherwise. Not while in check: a
+// piece placed at home can't block an attack on a Wizard in the enemy camp.
+function returnable(pos: Position, checked: boolean): number {
+  const side = pos.side, w = pos.wizard[side];
+  if (!pos.returnRule || checked || w < 0 || !CASTLE[(side ^ 1) * SQUARES + w] || (pos.returnRule === 1 && pos.returned[side])) return 0;
+  let present = 0;
+  for (let s = 0; s < SQUARES; s++) { const c = pos.board[s]; if (c && OWNER[c] === side) present |= UNIT_BITS[c]; }
+  return ~present & ((1 << UNITS) - 1);
+}
+// The return moves: each captured unit onto each empty square it may go to. A piece placed at home
+// is at least 4 rows from its Wizard, so it can't expose it to an attack.
+function returns(pos: Position, units: number, out: Int32Array | number[], n: number): number {
+  const keep = pos.returnKeep, base = pos.side * SQUARES;
+  for (let k = 0; k < UNITS; k++) {
+    if (!(units >> k & 1)) continue;
+    for (let s = 0; s < SQUARES; s++) if (keep[base + s] && !pos.board[s]) out[n++] = (SQUARES + k) | (s << 8);
+  }
+  return n;
+}
+const hasEmpty = (pos: Position): boolean => {
+  for (let s = 0; s < SQUARES; s++) if (pos.returnKeep[pos.side * SQUARES + s] && !pos.board[s]) return true;
+  return false;
+};
+
 // Legal moves for the side to move, written to out. Returns how many.
 export function legalMoves(pos: Position, out: Int32Array | number[]): number {
   const b = pos.board, side = pos.side, w = pos.wizard[side];
@@ -238,7 +265,8 @@ export function legalMoves(pos: Position, out: Int32Array | number[]): number {
     }
     n = k;
   }
-  return n;
+  const units = returnable(pos, checked);
+  return units ? returns(pos, units, out, n) : n;
 }
 
 const probe = new Int32Array(256);
@@ -257,7 +285,7 @@ export function hasLegalMove(pos: Position): boolean {
       if (ok) return true;
     }
   }
-  return false;
+  return returnable(pos, checked) !== 0 && hasEmpty(pos);
 }
 
 export const isWizard = (code: number): boolean => IS_WIZARD[code] === 1;

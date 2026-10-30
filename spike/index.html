@@ -154,6 +154,7 @@ button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-c
     <label class="toggle"><input type="radio" name="water" value="riverDiagonal"><span>River + diagonal bends</span><small>Bends only around an Earth in its column, and diagonally. The edge slide stays in every version.</small></label>
   </fieldset>
   <label class="toggle"><input id="optOneWay" type="checkbox"><span>One way per move (Water, v0.3)</span><small>In one move Water goes only forward or only backward, never both. Sideways steps are fine. Works with any of the rules above.</small></label>
+  <label class="toggle"><input id="optCastle" type="checkbox"><span>Castle return (v0.4)</span><small>When your Wizard stands in the enemy castle, you may bring back one piece you lost, onto an empty square of your own castle. That's your move. Once per visit, and not while in check.</small></label>
   <div class="menu-row">
     <button id="drawBtn" type="button">Agree to a draw</button>
     <button id="editBtn" type="button">Set up a position (debug)</button>
@@ -165,7 +166,7 @@ button[aria-pressed="true"] { background: var(--brass); color: #231a08; border-c
     <span><svg viewBox="-10 -10 20 20"><path d="M0,-9C1.4,-5.6 6.4,-2 6.4,1.9A6.4,6.4 0 0 1 -6.4,1.9C-6.4,-2 -1.4,-5.6 0,-9Z" fill="#2d7fd6"/></svg>Water · river</span>
     <span><svg viewBox="-10 -10 20 20"><path d="M8.3,3.4L3.4,8.3L-3.4,8.3L-8.3,3.4L-8.3,-3.4L-3.4,-8.3L3.4,-8.3L8.3,-3.4Z" fill="#94603a"/></svg>Earth · any way, can't capture</span>
   </div>
-  <p class="hint">The shape shows how a piece moves. Size = dots (1–3) and piece size. The rim and the colour shade show the owner: lighter colours are White's, deeper ones Black's. The star is the Wizard. A small shape sitting on a bigger one is a combined piece; the outline underneath is the bigger element, or the attacker when Earth has joined it. Tap or drag a piece; dots show where it can go, a red ring is a capture, a gold + is a combine. Tap an opponent's piece to see where it can reach.</p>
+  <p class="hint">The shape shows how a piece moves. Size = dots (1–3) and piece size. The rim and the colour shade show the owner: lighter colours are White's, deeper ones Black's. The star is the Wizard. A small shape sitting on a bigger one is a combined piece; the outline underneath is the bigger element, or the attacker when Earth has joined it. Tap or drag a piece; dots show where it can go, a red ring is a capture, a gold + is a combine. Tap an opponent's piece to see where it can reach. The pale 3×3 in each home zone is that side's castle: when your Wizard stands in the enemy castle, your tray shows the pieces you lost, and you can bring one back into your own castle.</p>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@8.22.0/dist/pixi.min.js"></script>
@@ -180,7 +181,8 @@ var Rules = (() => {
   const ALL = ORTH.concat(DIAG);
   // Variant toggles. noWaterEdge / waterStraightCapture are Water experiments from playtest/ (GAME_SPEC open question 6);
   // waterRiver / waterStraightSteps are the designer's candidates from open question 10.
-  const variant = { exact: false, noWaterEdge: false, waterStraightCapture: false, waterRiver: false, waterStraightSteps: false, waterDiagonalBends: false, waterOneWay: false };
+  // castleReturn: the castle rule of v0.4 (§6), once per visit and into the own castle.
+  const variant = { exact: false, noWaterEdge: false, waterStraightCapture: false, waterRiver: false, waterStraightSteps: false, waterDiagonalBends: false, waterOneWay: false, castleReturn: false };
 
   const sq = (x, y) => y * N + x;
   const X = s => s % N;
@@ -290,6 +292,7 @@ var Rules = (() => {
   }
 
   function applyBoard(board, m) {
+    if (m.kind === 'return') { const b = board.slice(); b[m.to] = { o: m.piece.o, els: m.piece.els.map(x => ({ ...x })) }; return b; }
     const b = board.slice(), p = b[m.from], t = b[m.to];
     b[m.from] = null;
     b[m.to] = m.kind === 'combine' ? combine(p, t) : p;
@@ -315,10 +318,36 @@ var Rules = (() => {
   function legalMoves(st) {
     const out = [];
     st.board.forEach((p, s) => { if (p && p.o === st.turn) out.push(...legalFrom(st.board, s)); });
+    return out.concat(returnMoves(st));
+  }
+
+  // ---------- Castles (§6) ----------
+  // A castle is the 3×3 middle of a home zone.
+  const inCastle = (o, s) => inZone(o, s) && X(s) >= 3 && X(s) <= 5;
+  // The pieces a side has lost: its starting pieces missing from the board, a stack counting as its
+  // two elements. k numbers them in the engine's order (pieces.ts unitOf): Fire 1–3, Wind, Water, Earth.
+  function lostUnits(board, o) {
+    const here = new Set();
+    for (const p of board) if (p && p.o === o && !p.wiz) for (const x of p.els) here.add(x.e + x.s);
+    const out = [];
+    ELS.forEach((e, i) => { for (let s = 1; s <= 3; s++) if (!here.has(e + s)) out.push({ k: i * 3 + s - 1, piece: { o, els: [{ e, s }] } }); });
     return out;
   }
+  // Castle return: a Wizard standing in the enemy castle may bring back one lost piece onto an empty
+  // square of its own castle, once per visit and not while in check. Each is a move
+  // {from: 81 + k, to, kind: 'return', piece}, listed after the board moves like the engine's.
+  function returnMoves(st) {
+    const o = st.turn, w = wizardSq(st.board, o);
+    if (!variant.castleReturn || w < 0 || !inCastle(other(o), w) || (st.returned && st.returned[o]) || inCheck(st.board, o)) return [];
+    const out = [];
+    for (const { k, piece } of lostUnits(st.board, o))
+      for (let s = 0; s < N * N; s++) if (!st.board[s] && inCastle(o, s)) out.push({ from: N * N + k, to: s, path: [s], kind: 'return', piece });
+    return out;
+  }
+
   const posKey = st =>
-    st.board.map(p => (!p ? '.' : p.o + (p.wiz ? 'Z' : p.els.map(x => x.e[0] + x.s).sort().join('')))).join('') + st.turn;
+    st.board.map(p => (!p ? '.' : p.o + (p.wiz ? 'Z' : p.els.map(x => x.e[0] + x.s).sort().join('')))).join('') + st.turn +
+    (st.returned && st.returned.w ? 'W' : '') + (st.returned && st.returned.b ? 'B' : '');
 
   // ---------- Game state ----------
   function reserveFor(o) {
@@ -330,7 +359,7 @@ var Rules = (() => {
     return {
       board: Array(N * N).fill(null), phase: 'setup', turn: 'w',
       reserve: { w: reserveFor('w'), b: reserveFor('b') },
-      captured: { w: [], b: [] }, // pieces each player has taken
+      returned: { w: false, b: false }, // castle return: brought a piece back on this visit
       last: null, clock: 0, reps: {}, result: null, ply: 0,
     };
   }
@@ -389,11 +418,15 @@ var Rules = (() => {
 
   // Play a legal move, then run the end checks in spec order (§6).
   function makeMove(st, m) {
-    const mover = st.turn, opp = other(mover), taken = st.board[m.to];
+    const mover = st.turn, opp = other(mover);
+    // a Wizard leaving the enemy castle ends its visit
+    const returned = { w: false, b: false, ...st.returned };
+    if (m.kind === 'return') returned[mover] = true;
+    else if (returned[mover] && st.board[m.from].wiz && !inCastle(opp, m.to)) returned[mover] = false;
+    // a capture, combine or return can't be undone, so the positions before it can't come back
     const ns = {
-      ...st, board: applyBoard(st.board, m), turn: opp, ply: st.ply + 1, last: m,
-      captured: m.kind === 'capture' ? { ...st.captured, [mover]: st.captured[mover].concat([taken]) } : st.captured,
-      clock: m.kind === 'move' ? st.clock + 1 : 0, reps: { ...st.reps },
+      ...st, board: applyBoard(st.board, m), turn: opp, ply: st.ply + 1, last: m, returned,
+      clock: m.kind === 'move' ? st.clock + 1 : 0, reps: m.kind === 'move' ? { ...st.reps } : {},
     };
     const key = posKey(ns);
     ns.reps[key] = (ns.reps[key] || 0) + 1;
@@ -408,7 +441,7 @@ var Rules = (() => {
   }
 
   return {
-    N, ELS, variant, sq, X, Y, name, parse, other, inZone, isCapturer, canCombine, combine, range,
+    N, ELS, variant, sq, X, Y, name, parse, other, inZone, inCastle, lostUnits, returnMoves, isCapturer, canCombine, combine, range,
     pseudoMoves, legalFrom, legalMoves, inCheck, wizardSq, newGame, fromPosition, presets: Object.keys(PRESETS), presetBoard, presetPlacement, canPick, placeTargets,
     place, makeMove, reserveFor,
   };
@@ -432,11 +465,11 @@ const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ----- app state -----
 let history = [R.newGame()];
-let settings = { orient: 'fixed', opponent: 'medium', side: 'w', water: 'diagonal', oneWay: true };
+let settings = { orient: 'fixed', opponent: 'medium', side: 'w', water: 'diagonal', oneWay: true, castle: true };
 // orient: 'fixed' | 'turn' | 'face' (two players only); opponent: 'easy' | 'medium' | 'hard' | 'human';
-// side: the colour you play against the computer;
+// side: the colour you play against the computer; castle: the castle return of v0.4;
 // water: 'normal' | 'river' | 'straight' | 'both' | 'diagonal' | 'riverDiagonal'; diagonal + oneWay is the v0.3 rule
-let sel = null;          // {type:'board', sq} | {type:'tray', idx} | {type:'palette', piece} | {type:'remove'}
+let sel = null;          // {type:'board', sq} | {type:'tray', idx} | {type:'return', k} | {type:'palette', piece} | {type:'remove'}
 let targets = new Map(); // square -> move (board) or true (placement)
 let peek = null;         // {sq, moves} opponent piece being inspected
 let flip = false;        // view rotated 180°
@@ -450,10 +483,12 @@ try { Object.assign(settings, JSON.parse(localStorage.getItem('elements-spike-se
 // older versions stored a rotate on/off switch
 const migrate = s => {
   if (!s.orient) s.orient = s.rotate ? 'turn' : 'fixed'; delete s.rotate;
-  if (s.rules !== '0.3') { s.water = 'diagonal'; s.oneWay = true; s.rules = '0.3'; } // v0.3 became the rule (GAME_SPEC §3)
+  if (s.rules !== '0.3' && s.rules !== '0.4') { s.water = 'diagonal'; s.oneWay = true; } // v0.3 became the rule (GAME_SPEC §3)
+  if (s.rules !== '0.4') { s.castle = true; s.rules = '0.4'; } // and v0.4 the castle return (§6)
 };
-// The Water movement trial (GAME_SPEC open question 10): sets the rules' two Water switches.
-const applyWater = () => {
+// The rule switches: the Water movement trial (GAME_SPEC open question 10) and the castle return.
+const applyRules = () => {
+  R.variant.castleReturn = settings.castle !== false;
   R.variant.waterRiver = ['river', 'both', 'riverDiagonal'].includes(settings.water);
   R.variant.waterStraightSteps = settings.water === 'straight' || settings.water === 'both';
   R.variant.waterDiagonalBends = settings.water === 'diagonal' || settings.water === 'riverDiagonal';
@@ -479,7 +514,7 @@ async function boot(data) {
   if (data && data.history && data.history.length) history = data.history;
   if (data && data.settings) { Object.assign(settings, data.settings); migrate(settings); }
   R.variant.exact = false; // the exact-range variant isn't offered (GAME_SPEC §3)
-  applyWater();
+  applyRules();
   await app.init({
     resizeTo: stageEl, antialias: true, autoDensity: true, backgroundAlpha: 0,
     resolution: Math.min(window.devicePixelRatio || 1, 3),
@@ -635,11 +670,12 @@ function drawBoard() {
   const ti = tileInset(), tr = q * 0.08;
   for (let s = 0; s < 81; s++) {
     const p = sqPos(s), y = R.Y(s);
-    const base = y >= 3 && y <= 5 ? C.mid : C.home;
+    const base = y >= 3 && y <= 5 ? C.mid : isCastle(s) ? CASTLE_STONE : C.home;
     const n = ((s * 2654435761) >>> 0) % 15 - 7;  // small, fixed tone variation per tile
     g.roundRect(p.x - q / 2 + ti, p.y - q / 2 + ti, q - 2 * ti, q - 2 * ti, tr).fill(shade(base, n));
     g.roundRect(p.x - q / 2 + ti, p.y + q / 2 - ti - q * 0.045, q - 2 * ti, q * 0.045, q * 0.02).fill({ color: 0x000000, alpha: 0.1 });
   }
+  drawCastles(g, ti, tr);
   layers.board.addChild(g);
   const fs = Math.max(9, q * 0.15);
   for (let i = 0; i < 9; i++) {
@@ -651,6 +687,20 @@ function drawBoard() {
   }
 }
 const tileInset = () => Math.max(1.5, L.q * 0.03);
+const isCastle = s => R.X(s) >= 3 && R.X(s) <= 5 && (R.Y(s) <= 2 || R.Y(s) >= 6);
+// The castles (GAME_SPEC §6), the 3×3 middle of each home zone: a paler raised slab with its own gap,
+// like the zone plates.
+const CASTLE_STONE = 0xf3eddf;
+function drawCastles(g, ti, tr) {
+  const { q } = L;
+  for (const [r0, r1] of [[0, 2], [6, 8]]) {
+    const a = sqPos(R.sq(3, r0)), b = sqPos(R.sq(5, r1));
+    const x0 = Math.min(a.x, b.x) - q / 2, x1 = Math.max(a.x, b.x) + q / 2;
+    const y0 = Math.min(a.y, b.y) - q / 2, y1 = Math.max(a.y, b.y) + q / 2, w = x1 - x0, h = y1 - y0;
+    g.roundRect(x0 - ti, y0 - ti, w + 2 * ti, h + 2 * ti, tr * 2).stroke({ width: Math.max(4, q * 0.12), color: C.grout });
+    g.roundRect(x0 + ti, y1 - ti - q * 0.05, w - 2 * ti, q * 0.09, tr).fill({ color: 0x000000, alpha: 0.28 });
+  }
+}
 const shade = (c, d) => [16, 8, 0].reduce((acc, sh) => acc | (Math.max(0, Math.min(255, ((c >> sh) & 255) + d)) << sh), 0);
 
 function drawHighlights(st) {
@@ -660,7 +710,7 @@ function drawHighlights(st) {
   const ti = tileInset();
   const box = (s, color, alpha) => { const p = sqPos(s); g.roundRect(p.x - q / 2 + ti, p.y - q / 2 + ti, q - 2 * ti, q - 2 * ti, q * 0.08).fill({ color, alpha }); };
   if (st.last) {
-    if (!st.last.place) box(st.last.from, C.last, 0.45);
+    if (!st.last.place && st.last.kind !== 'return') box(st.last.from, C.last, 0.45);
     box(st.last.to, C.last, 0.6);
   }
   if (sel && sel.type === 'board') box(sel.sq, C.sel, 0.6);
@@ -719,11 +769,14 @@ function drawPieces(st) {
   if (anim && anim.gfx) stepAnim(0);
 }
 
-// tray: setup = pieces to place, play = pieces taken, edit = palette
+// tray: setup = pieces to place, play = pieces taken (or your lost pieces while your Wizard can bring
+// one back), edit = palette
+const canReturn = (st, o) => !editing && st.phase === 'play' && st.turn === o && !botTurn() && R.returnMoves(st).length > 0;
 function trayItems(st, o) {
   if (editing) return R.reserveFor(o).map((p, i) => ({ p, i, on: true, chosen: sel && sel.type === 'palette' && sel.piece.o === o && sameKind(sel.piece, p) }));
   if (st.phase === 'setup') return st.reserve[o].map((p, i) => ({ p, i, on: st.turn === o && R.canPick(st, i), chosen: sel && sel.type === 'tray' && st.turn === o && sel.idx === i }));
-  return st.captured[o].map((p, i) => ({ p, i, on: false, small: true }));
+  if (canReturn(st, o)) return R.lostUnits(st.board, o).map(({ k, piece }) => ({ p: piece, i: k, on: true, chosen: sel && sel.type === 'return' && sel.k === k }));
+  return R.lostUnits(st.board, R.other(o)).map(({ k, piece }) => ({ p: piece, i: k, on: false, small: true }));
 }
 const sameKind = (a, b) => (a.wiz && b.wiz) || (!a.wiz && !b.wiz && a.els[0].e === b.els[0].e && a.els[0].s === b.els[0].s);
 
@@ -748,7 +801,8 @@ function drawTrays(st) {
     else {
       if (st.phase === 'over') label += st.result.winner === o ? ' · wins' : st.result.winner ? ' · lost' : ' · draw';
       else if (active) label += R.inCheck(st.board, o) ? ' · your move · Check!' : ' · your move';
-      label += items.length ? ` · took ${items.length}` : '';
+      if (canReturn(st, o)) label += ' · bring one back?';
+      else label += items.length ? ` · took ${items.length}` : '';
     }
     const lt = text(label, Math.max(12, Math.min(16, L.q * 0.24)), active ? C.brass : C.muted, '700');
     lt.position.set(t.x + 10, t.y + 6);
@@ -772,7 +826,7 @@ function drawTrays(st) {
       const pg = pieceGfx(it.p, cell);
       pg.position.set(cx, cy);
       if (!it.on && !it.small) pg.alpha = 0.45;
-      if (drag && drag.active && drag.src.type === 'tray' && drag.src.idx === it.i && st.turn === o) pg.alpha = 0.25;
+      if (drag && drag.active && st.turn === o && (drag.src.type === 'tray' && drag.src.idx === it.i || drag.src.type === 'return' && drag.src.k === it.i)) pg.alpha = 0.25;
       box.addChild(pg);
       const [sx, sy] = t.turned ? [2 * tcx - cx, 2 * tcy - cy] : [cx, cy];
       L.slots.push({ o, i: it.i, p: it.p, x: sx, y: sy, r: cell / 2, on: it.on });
@@ -794,7 +848,7 @@ function render() {
 
 // ----- move animation -----
 function startAnim(m) {
-  if (reduceMotion) return;
+  if (reduceMotion || m.path.length < 2) return;
   const pts = m.path.map(sqPos);
   const steps = pts.length - 1;
   // one glide per square of the route, easing in and out, with a short rest on each square
@@ -863,7 +917,7 @@ function scheduleBot() {
       return;
     }
     const { waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay } = R.variant;
-    const config = { waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay };
+    const config = { waterRiver, waterStraightSteps, waterDiagonalBends, waterOneWay, castleReturn: R.variant.castleReturn ? 'oncePerVisit' : 'off', returnTo: 'castle' };
     bot.postMessage({ id: ask, level: settings.opponent, config, board: st.board, toMove: st.turn, ...playLine() });
   }, wait);
 }
@@ -920,6 +974,10 @@ function selectTray(idx) {
   sel = { type: 'tray', idx }; peek = null;
   targets = new Map(R.placeTargets(cur(), idx).map(s => [s, true]));
 }
+function selectReturn(k) {
+  sel = { type: 'return', k }; peek = null;
+  targets = new Map(R.returnMoves(cur()).filter(m => m.from === R.N * R.N + k).map(m => [m.to, m]));
+}
 function deselect() { sel = null; targets = new Map(); peek = null; }
 
 function editApply(s) {
@@ -949,6 +1007,7 @@ function draggableSrc(h) {
   if (editing || !h || st.phase === 'over' || anim || botTurn()) return null;
   if (st.phase === 'setup' && h.type === 'slot' && h.o === st.turn && h.on) return { type: 'tray', idx: h.i };
   if (st.phase === 'play' && h.type === 'sq' && st.board[h.sq] && st.board[h.sq].o === st.turn) return { type: 'board', sq: h.sq };
+  if (st.phase === 'play' && h.type === 'slot' && h.o === st.turn && h.on) return { type: 'return', k: h.i };
   return null;
 }
 
@@ -974,6 +1033,7 @@ function bindInput() {
       drag.active = true;
       if (drag.src.type === 'board' && !(sel && sel.type === 'board' && sel.sq === drag.src.sq)) selectBoard(drag.src.sq);
       if (drag.src.type === 'tray' && !(sel && sel.type === 'tray' && sel.idx === drag.src.idx)) selectTray(drag.src.idx);
+      if (drag.src.type === 'return' && !(sel && sel.type === 'return' && sel.k === drag.src.k)) selectReturn(drag.src.k);
       render();
     } else if (drag.active) drawDrag();
   });
@@ -1034,6 +1094,8 @@ function tap(h) {
       deselect();
       if (!same) peek = { sq: h.sq, moves: R.pseudoMoves(st.board, h.sq) };
     } else deselect();
+  } else if (h.type === 'slot' && h.o === st.turn && h.on) {
+    if (sel && sel.type === 'return' && sel.k === h.i) deselect(); else selectReturn(h.i);
   } else deselect();
   render();
 }
@@ -1042,7 +1104,9 @@ function drawDrag() {
   clear(layers.drag);
   if (!drag || !drag.active) return;
   const st = cur();
-  const p = drag.src.type === 'board' ? st.board[drag.src.sq] : st.reserve[st.turn][drag.src.idx];
+  const p = drag.src.type === 'board' ? st.board[drag.src.sq]
+    : drag.src.type === 'return' ? (R.lostUnits(st.board, st.turn).find(u => u.k === drag.src.k) || {}).piece
+    : st.reserve[st.turn][drag.src.idx];
   if (!p) return;
   const cx = drag.x, cy = drag.y + drag.offY;
   const s = sqAt(cx, cy);
@@ -1069,7 +1133,7 @@ const reasonText = {
   checkmate: () => 'Checkmate.',
   stalemate: (w, l, t) => `${who(t)} ${has(t)} no legal move (stalemate).`,
   repetition: () => 'The same position came up three times.',
-  fifty: () => '75 moves each without a capture or a combine.',
+  fifty: () => '75 moves each without a capture, a combine or a piece brought back.',
   agreement: () => 'Both players agreed to a draw.',
 };
 const nameOf = o => (o === 'w' ? 'White' : 'Black');
@@ -1094,7 +1158,8 @@ function updateUi(st) {
       : `${nameOf(st.turn)}: place a piece (${left} left)`;
   } else if (st.phase === 'play') {
     const check = R.inCheck(st.board, st.turn);
-    status.innerHTML = `${vsBot() ? 'Your move' : `${nameOf(st.turn)} to move`}${check ? ' · <span class="check">Check!</span>' : ''}`;
+    const back = canReturn(st, st.turn) ? ' · your Wizard can bring a piece back' : '';
+    status.innerHTML = `${vsBot() ? 'Your move' : `${nameOf(st.turn)} to move`}${check ? ' · <span class="check">Check!</span>' : ''}${back}`;
   } else {
     const r = st.result;
     status.textContent = r.winner ? `${who(r.winner)} ${vsBot() && r.winner === settings.side ? 'win' : 'wins'}` : 'Draw';
@@ -1119,6 +1184,7 @@ function updateUi(st) {
   $('orientChoice').hidden = vsBot();
   for (const r of document.querySelectorAll('input[name="water"]')) r.checked = r.value === settings.water;
   $('optOneWay').checked = !!settings.oneWay;
+  $('optCastle').checked = settings.castle !== false;
   if (editing) {
     $('eTurnW').setAttribute('aria-pressed', String(editing.turn === 'w'));
     $('eTurnB').setAttribute('aria-pressed', String(editing.turn === 'b'));
@@ -1177,10 +1243,13 @@ function bindUi() {
     settings.side = b.dataset.side; settingsChanged();
   });
   for (const r of document.querySelectorAll('input[name="water"]')) r.addEventListener('change', e => {
-    settings.water = e.target.value; applyWater(); settingsChanged();
+    settings.water = e.target.value; applyRules(); settingsChanged();
   });
   $('optOneWay').addEventListener('change', e => {
-    settings.oneWay = e.target.checked; applyWater(); settingsChanged();
+    settings.oneWay = e.target.checked; applyRules(); settingsChanged();
+  });
+  $('optCastle').addEventListener('change', e => {
+    settings.castle = e.target.checked; applyRules(); settingsChanged();
   });
   $('drawBtn').addEventListener('click', () => {
     const st = cur();

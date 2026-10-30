@@ -25,7 +25,7 @@ It is written in TypeScript. Node 24 runs the `.ts` files directly, so there's n
 |---|---|
 | `squares.ts` | The 9×9 board: square numbers, names like `e1`, and the directions, worked out once at startup. |
 | `pieces.ts` | Pieces as small numbers ("piece codes"), with a lookup table for each property: owner, range, how it moves, whether it's plain Earth. |
-| `position.ts` | The fast board: make and take back moves, plus the rule toggles (`RulesConfig`). Since rules v0.3 two of them are on by default: Water bends diagonally and goes one way per move (`waterDiagonalBends`, `waterOneWay`). Turning both off gives the v0.2 Water for comparison. |
+| `position.ts` | The fast board: make and take back moves, plus the rule toggles (`RulesConfig`). Since rules v0.3 two of them are on by default: Water bends diagonally and goes one way per move (`waterDiagonalBends`, `waterOneWay`). Turning both off gives the v0.2 Water for comparison. Since v0.4 the castle return is on too (`castleReturn`, `returnTo`): a move with a from of 81 or more brings a captured piece back, and the position remembers whether each Wizard has used its current visit (`returned`, part of the hash). |
 | `movegen.ts` | Which moves are possible (GAME_SPEC §3–§6), including Water's routes around Earth and along the edge, and whether a Wizard is attacked. |
 | `zobrist.ts` | A 64-bit fingerprint of each position, updated cheaply on every move. Used for threefold repetition, and later for the bots' memory. |
 | `game.ts` | The immutable API and the end-of-game checks, in the spec's order. |

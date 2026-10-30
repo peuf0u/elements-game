@@ -2,9 +2,9 @@
 // passes, for animation and for analysing games. Not needed to play: a move is just (from, to).
 // The shortest route wins; on a tie, the first way listed (slides before Water).
 import { NEIGHBOR, RAY, BANK_DIRS, EDGE_DIRS, UP, DOWN, fileOf } from './squares.ts';
-import { OWNER, RANGE, PLAIN_EARTH, MOVES, canCombine, MOVE_FIRE, MOVE_WIND, MOVE_WATER, MOVE_EARTH, MOVE_WIZARD } from './pieces.ts';
+import { OWNER, RANGE, MOVES, MOVE_FIRE, MOVE_WIND, MOVE_WATER, MOVE_WIZARD } from './pieces.ts';
 import type { Position } from './position.ts';
-import { bankable, stillAround } from './movegen.ts';
+import { bankable, stillAround, landable } from './movegen.ts';
 import { rankOf } from './squares.ts';
 
 export type Way = 'fire' | 'wind' | 'water' | 'earth' | 'wizard';
@@ -20,9 +20,6 @@ function waterNext(pos: Position, c: number, earths: number): number[] {
   if (!pos.noEdge) EDGE_DIRS[c].forEach(push);
   return out;
 }
-
-const landable = (mover: number, target: number, way: number) =>
-  OWNER[target] !== OWNER[mover] ? way !== MOVE_EARTH && !PLAIN_EARTH[target] : canCombine(mover, target);
 
 // The route of the piece on `from` to `to`, or null if it can't get there (Wizard safety ignored).
 export function route(pos: Position, from: number, to: number): { way: Way; path: number[] } | null {
@@ -40,7 +37,7 @@ export function route(pos: Position, from: number, to: number): { way: Way; path
           if (path.includes(n) || (pos.oneWay && dir !== 0 && rise === -dir)) continue;
           const t = b[n], ok = !pos.exact || path.length === range;
           path.push(n);
-          if (n === to && ok && (!t || (landable(p, t, way) && (!pos.straight || OWNER[t] === OWNER[p] || fileOf(n) === fileOf(c)))))
+          if (n === to && ok && (!t || (landable(pos, p, t, way) && (!pos.straight || OWNER[t] === OWNER[p] || fileOf(n) === fileOf(c)))))
             { if (!best || path.length < best.path.length) best = { way: 'water', path: path.slice() }; }
           else if (!t && path.length <= range) walk(n, pos.river ? stillAround(pos, c, n, earths) : 0, dir || rise);
           path.pop();
@@ -57,7 +54,7 @@ export function route(pos: Position, from: number, to: number): { way: Way; path
         if (s < 0) break;
         const t = b[s], ok = !pos.exact || k === max || way === MOVE_WIZARD;
         path.push(s);
-        if (s === to && ok && (!t || landable(p, t, way))) { if (!best || path.length < best.path.length) best = { way: WAYS[way], path: path.slice() }; }
+        if (s === to && ok && (!t || landable(pos, p, t, way))) { if (!best || path.length < best.path.length) best = { way: WAYS[way], path: path.slice() }; }
         if (t) break;
       }
     }

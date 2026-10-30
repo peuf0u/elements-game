@@ -4,14 +4,15 @@
 // Covers the play phase. The formation phase (alternate placement, GAME_SPEC §6) comes next;
 // until then a game starts from a finished position (startFromPosition).
 import { SQUARES, parseSquare } from './squares.ts';
-import { type Piece, type Side, OWNER, pieceCode, decodePiece, sideIndex, sideName } from './pieces.ts';
+import { type Piece, type Side, OWNER, pieceCode, decodePiece, sideIndex, sideName, unitCode, unitOf } from './pieces.ts';
 import { Position, type RulesConfig, DEFAULT_CONFIG, moveOf } from './position.ts';
 import { legalMoves, hasLegalMove, inCheck } from './movegen.ts';
 
-export const RULES_VERSION = '0.3';
+export const RULES_VERSION = '0.4';
 
+// from 81 + n brings captured unit n back onto `to` (castleReturn; pieces.ts unitOf).
 export type Action = { from: number; to: number };
-export type MoveKind = 'move' | 'capture' | 'combine';
+export type MoveKind = 'move' | 'capture' | 'combine' | 'return';
 export type EndReason = 'elimination' | 'checkmate' | 'stalemate' | 'repetition' | 'moveLimit';
 export type Result = { winner: Side | null; reason: EndReason };
 
@@ -24,11 +25,12 @@ export interface GameState {
   readonly ply: number;                // moves played so far (one move = one player's turn)
   readonly clock: number;              // turns since the last capture or combine (for the 75-move rule)
   readonly history: readonly string[]; // position hashes since the last capture or combine, current last
+  readonly returned?: number;          // castleReturn: bit per side, brought a piece back on this visit
   readonly result: Result | null;
 }
 
 export type GameEvent =
-  | { type: 'moved' | 'captured' | 'combined'; from: number; to: number; piece: Piece; taken: Piece | null }
+  | { type: 'moved' | 'captured' | 'combined' | 'returned'; from: number; to: number; piece: Piece; taken: Piece | null }
   | { type: 'gameOver'; result: Result };
 
 // A game from a finished position: { square: piece }, squares as 'e1' or 0–80.
@@ -48,7 +50,7 @@ export function startFromPosition(
 }
 
 // The fast core position for a state, for bots and tools that look ahead.
-export const positionOf = (state: GameState): Position => Position.from(state.board, sideIndex(state.toMove), state.config);
+export const positionOf = (state: GameState): Position => Position.from(state.board, sideIndex(state.toMove), state.config, state.returned ?? 0);
 
 const buffer = new Int32Array(512);
 
@@ -61,6 +63,7 @@ export function legalActions(state: GameState): Action[] {
 }
 
 export function moveKind(state: GameState, { from, to }: Action): MoveKind {
+  if (from >= SQUARES) return 'return';
   const t = state.board[to];
   return !t ? 'move' : OWNER[t] === OWNER[state.board[from]] ? 'combine' : 'capture';
 }
@@ -76,7 +79,8 @@ export function apply(state: GameState, action: Action): { state: GameState; eve
   if (!buffer.subarray(0, n).includes(m)) throw new Error(`Illegal move: ${JSON.stringify(action)}`);
 
   const kind = moveKind(state, action), mover = pos.side, opp = mover ^ 1;
-  const piece = decodePiece(state.board[action.from])!, taken = decodePiece(state.board[action.to]);
+  const piece = kind === 'return' ? decodePiece(unitCode(mover, ...unitOf(action.from - SQUARES)))! : decodePiece(state.board[action.from])!;
+  const taken = decodePiece(state.board[action.to]);
   pos.make(m);
   const key = pos.key();
   const irreversible = kind !== 'move';
@@ -91,10 +95,11 @@ export function apply(state: GameState, action: Action): { state: GameState; eve
   else if (state.config.quietMoveLimit && clock >= 2 * state.config.quietMoveLimit) result = { winner: null, reason: 'moveLimit' };
 
   const next: GameState = {
-    ...state, board: Array.from(pos.board), toMove: sideName(opp), ply: state.ply + 1, clock, history, result,
+    ...state, board: Array.from(pos.board), toMove: sideName(opp), ply: state.ply + 1, clock, history, result, returned: pos.returnedBits(),
     phase: result ? 'over' : 'play',
   };
-  const events: GameEvent[] = [{ type: kind === 'move' ? 'moved' : kind === 'capture' ? 'captured' : 'combined', from: action.from, to: action.to, piece, taken }];
+  const type = kind === 'move' ? 'moved' : kind === 'capture' ? 'captured' : kind === 'combine' ? 'combined' : 'returned';
+  const events: GameEvent[] = [{ type, from: action.from, to: action.to, piece, taken }];
   if (result) events.push({ type: 'gameOver', result });
   return { state: next, events };
 }

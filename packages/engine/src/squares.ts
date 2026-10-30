@@ -53,3 +53,15 @@ export const BANK_DIRS: ReadonlyArray<readonly number[]> = DIRS.map(([ex, ey]) =
 // EDGE_DIRS[s] lists those directions (empty for squares off the edge).
 export const EDGE_DIRS: ReadonlyArray<readonly number[]> = Array.from({ length: SQUARES }, (_, s) =>
   onEdge(s) ? [0, 1, 2, 3].filter(d => NEIGHBOR[s * 8 + d] >= 0 && onEdge(NEIGHBOR[s * 8 + d])) : []);
+
+// Where a Wizard may stand under the wizardZone rule (open question 14), by side * 81 + square:
+// its own 3-row home zone, or the 3×3 castle in the middle of it (d1–f3 for White, d7–f9 for Black).
+export const HOME_ZONE = new Uint8Array(2 * SQUARES);
+export const CASTLE = new Uint8Array(2 * SQUARES);
+for (let s = 0; s < SQUARES; s++) {
+  const r = rankOf(s), f = fileOf(s);
+  HOME_ZONE[s] = r <= 2 ? 1 : 0;
+  HOME_ZONE[SQUARES + s] = r >= 6 ? 1 : 0;
+  CASTLE[s] = HOME_ZONE[s] && f >= 3 && f <= 5 ? 1 : 0;
+  CASTLE[SQUARES + s] = HOME_ZONE[SQUARES + s] && f >= 3 && f <= 5 ? 1 : 0;
+}

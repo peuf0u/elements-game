@@ -2,7 +2,7 @@
 
 Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open in a browser), also online at https://claude.ai/artifact/V6KKL4vWUm7FLFiqehXhEJ (private until shared from the page's Share menu).
 
-*Run on 2026-10-28 (GAME_SPEC v0.2), about 120,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§15 were played on the real engine. §1–§14 use the v0.2 Water rule; §15 checks rules v0.3, with the new Water. How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
+*Run on 2026-10-28 and 29 (GAME_SPEC v0.2 and v0.3), about 202,000 games in total, 10,000 of them chess. §1–§9 were played on the spike's rules and replay move for move on the real engine (`packages/engine`); §10–§16 were played on the real engine. §1–§14 use the v0.2 Water rule; §15 checks rules v0.3, with the new Water, §16 looks at how v0.3 games unfold, §17 at the setup phase, and §18–§20 test rules against draws. How the players work and where the methods come from: [README.md](README.md) and [docs/research/automated-playtesting.md](../docs/research/automated-playtesting.md). Every number below comes from `results/<experiment>.summary.json` or `node analyze.mjs <experiment>`.*
 
 **How to read the numbers.** A "score" counts a win as 1 and a draw as ½, so 50% means even. The range in brackets is the 95% uncertainty range: if it includes 50%, the games can't tell the two sides apart. One "move" means one player's turn. §1–§9 come from bots that look 2–3 moves ahead (Careful and Thinker). §11 repeats the key tests with Deep, a much stronger bot (§10), and **where the two disagree, §11 is the better guide**. Treat anything that looks like a problem as a hint to try on the real board, not a verdict.
 
@@ -30,6 +30,12 @@ Easier-to-read version with drawn boards: [FINDINGS.html](FINDINGS.html) (open i
 | Can a formation tame Water? | No. Moving Fire forward changes nothing, and Earth beside the Wizard makes Water far *more* dangerous | ❌ not by formation |
 | Can a rule change tame Water? | Yes: **"Water captures only straight"** makes Water, Wind and Fire about equal and keeps the game fair. Games get about a quarter longer and draws rise a little (33% → 37% with the strong bot) | ✅ worth playtesting |
 | Rules v0.3: does the new Water rule work? | Yes. Water bends diagonally and goes one way per move. Water 3 is no longer the piece you can't lose, the game stays fair, and draws stay about the same (§15) | ✅ adopted |
+| Does an early lead decide the game? | One element up is an edge (Deep 20k wins 70%); two up nearly decides it (88%); three up is the end. The winner had been behind in a fifth to a third of decided games (§16) | ✅ healthy |
+| Does Earth's comeback work? | Yes: being able to combine Earth is worth 7–8 points to a side that's a piece down, against 3 from an even start. But the bots use it from the opening, not as a comeback (§16) | ⚠️ works, used early |
+| Does seeing the other side's formation help? | Barely. Formations are mostly just stronger or weaker, not counters to each other. Seeing the whole opposing formation and moving up to three pieces to beat it gained 0–6 points, about White's first-move edge and within luck (§17) | ℹ️ open placement adds little |
+| Does keeping the Wizard in a 3×3 castle cut the draws? | **Yes, by about half**: 23% → 10% from the default formation, 20% → 11% with the strong bot, about chess's level. The game stays fair, no stalemates, and games get shorter (about 31–35 moves each instead of 47–49). Confining it to the whole home zone helps much less (§19) | ✅ worth playtesting |
+| Does a Wizard bringing pieces back from the enemy castle cut the draws? | **Yes, as much as the strict castle** (27% → 11–13%, strong bot 18% → 11–13%), without its quick losses, and games keep their usual length. Once per visit is enough; every turn adds nothing (§20). **Adopted in rules v0.4**, onto the own castle | ✅ adopted |
+| Does "Earth breaks Earth" cut the draws? | No. Earth stacks that may capture plain Earth break a wall in about a third of games, but draws stay at 21%. The real cause is too few attackers left at the end (1–2 for the side ahead), not Earth walls (§18) | ❌ not against draws |
 | Can these results be trusted? | Checked on chess, where the answers are known (§12): piece rankings and ratios come out right, the sizes of effects are understated, and bots this weak can't measure White's edge reliably | ✅ rankings, ⚠️ exact numbers |
 | A stronger bot? | **Deep**, built from chess-engine techniques with piece values learned from 8,000 games, rates about 430 points above Thinker at a sixth of its time (§10) | ✅ new standard bot |
 
@@ -635,6 +641,195 @@ All results below start from Wind 3 held back unless stated, under the 75-move r
 - **Combining matters more**, probably because a single Water now reaches less, so Water stacks pay off.
 - **Wind 3 held back stays a good default.** Fire forward became the seventh preset (designer, 2026-10-29).
 
+## 16. How games unfold: leads, comebacks, Earth and draws
+
+Read from games already played under v0.3, between equal sides: 2,260 games of Deep 2k and 300 of Deep 20k (the presets' round robin, the v0.3 recheck, the strong-bot check and the Fire forward match; `node arc.mjs`). **"Ahead by 1"** means one side has captured one more of the other side's elements (a stack counts as two). It's counted after the other side has replied, so an even trade doesn't count as a lead.
+
+**The first time a side gets ahead, how does that side do?**
+
+| Ahead by | Happens in | Deep 2k: wins / draws / losses | Deep 20k: wins / draws / losses | Around move |
+|---|---|---|---|---|
+| 1 | 90% of games | 55 / 24 / 22% | 70 / 13 / 17% | 15–20 |
+| 2 | 65% | 71 / 18 / 12% | 88 / 8 / 4% | 30 |
+| 3 | 40% | 86 / 9 / 5% | 96 / 3 / 1% | 40 |
+| 4 | 24% | 94 / 4 / 2% | 100 / 0 / 0% | 43 |
+
+- **One element up is an edge, not a win.** With Deep 2k a third of those games still end drawn or lost.
+- **Two up nearly decides it with strong play** (88% wins), and three up is the end. The better the players, the more surely a lead turns into a win, as in chess.
+- **Comebacks happen, but small ones.** Of the decided games, the winner had been one element behind in 31% (Deep 2k) and 19% (Deep 20k), two behind in 10% and 4%, and three behind in 2% and 0%.
+- **15–18% of wins come without ever being ahead**: a checkmate out of an even position.
+- v0.2 looked much the same with Deep 20k (two up: 90% wins), so the new Water rule didn't change how games unfold.
+
+**Earth's comeback move** (§5 of the spec: combine Earth with an attacker, so it can attack):
+- **The bots use it early and often, not as a comeback.** It happens in 90% of games, about twice per game. Each side's first one comes around move 7, and a quarter come within the first two moves, mostly while the material is still even. A quarter of all combines involve Earth.
+- **Does it help the side that's behind?** `node run.mjs earthComeback`: Deep 2k from Wind 3 held back, 400 games per row with both colours. Side A either plays normally or never combines Earth:
+
+| Side A starts | A may combine Earth | A never combines Earth | What not combining costs |
+|---|---|---|---|
+| Even | 50% (both the same bot) | 47% (42–51) | 3 points |
+| Without Fire 2 | 31% (26–35) | 24% (20–28) | 7 points |
+| Without Water 3 | 21% (18–26) | 13% (10–16) | 8 points |
+
+- **It works as you meant it:** it's worth two to three times as much to the side that's a piece down as from an even start. For a side without Water 3, losing the option drops its score from about 1 in 5 to about 1 in 8.
+- But because it's allowed from the first move, the bots treat it as an ordinary way to strengthen a piece, not something saved for a comeback. (The bots' scoring also likes stacks in general, which may push them to combine early.)
+
+**Draws:**
+- 26% of these games were drawn with Deep 2k and 17% with Deep 20k. Two thirds ended by the 75-move rule and the rest by repetition. There were no stalemates.
+- **Drawn games are long grinds:** a median of about 105–110 moves each, against 43 for decided games.
+- **A quarter of draws end with one side two or more elements up** that it couldn't turn into a win. A typical ending is two attacking stacks against one Water stack, with two plain Earths guarding the Wizard. A third of draws end level, and the rest one element apart.
+
+## 17. The setup phase: does seeing the other side's formation help?
+
+Your rule has players place one piece at a time, in the open (GAME_SPEC §6). That gives a real decision only if the best formation depends on what the other side builds. If one formation is best whatever the opponent shows, open placement adds turns but no choices. Two tests (`node setup-study.mjs matrix`, then `counter`), Deep 2k with learned values.
+
+**Do formations counter each other?** From games already played: how much a formation's score depends on which formation it meets, beyond its overall strength. A model gives each formation one strength. What it leaves unexplained, beyond what luck gives, is the part that depends on the opponent.
+
+| Games | Typical difference in overall strength | Extra difference from who it meets |
+|---|---|---|
+| 554 formations against the 7 presets (v0.2, 15,500 games) | 14 points | **4–5 points** |
+| The presets against each other, v0.3, Deep 2k | 4 points | 3 points |
+| The presets against each other, v0.2, Deep 2k | 3 points | 5 points |
+| The presets against each other, v0.2, Deep 20k | 6 points | **none measurable** |
+
+Formations are mostly just stronger or weaker. Which formation they meet shifts their score by a few points, and with the strongest bot not measurably.
+
+**The most seeing could be worth.** A player sees the whole opposing formation, then may move up to three pieces of Wind 3 held back to beat it. The search tried all 257 one-piece changes (a piece to another square, swapping if it's taken), 16 games each against the target. The best 8 played 48 more, the best one was kept, and the search went on to a second and a third piece. Then fresh games measured each step: 400 against the target, and 60 against each of the other presets. About 67,000 games in all, rules v0.3.
+
+Score of Wind 3 held back, as is and with its pieces moved, **against the formation it saw** (and against the other presets, in brackets):
+
+| Formation seen | As is | 1 piece moved | 2 moved | 3 moved |
+|---|---|---|---|---|
+| Wind 3 held back (itself) | 51% (58%) | 49% (55%) | 52% (56%) | 48% (58%) |
+| Fire forward | 44% (55%) | 49% (59%) | 48% (66%) | 50% (56%) |
+| Wizard forward | 56% (58%) | 49% (54%) | 54% (56%) | 59% (55%) |
+| Original | 63% (57%) | 60% (59%) | 68% (62%) | 66% (57%) |
+
+Each score is uncertain by about ±5 points. In the search these same changes had scored 59–77% against the target.
+
+- **Seeing gains a few points at most.** The best counters gained 1–6 points against the formation they were built for. Some of that came against the other presets too, so it wasn't a counter, just a slightly different good formation. That's about the size of White's first-move edge, and within luck.
+- **The search fooled itself every time.** Changes that scored 59–77% in the search scored 48–68% in fresh games. With 16–64 games a lucky formation looks great, the same lesson as the narrow peaks in §14.
+- **One lead worth a recheck.** Wind 3 held back with Fire 1 and Fire 2 swapped and Earth 1 moved to i2 scored 66% (62–71) against the other presets, against 55% for the unchanged formation in the same games. It's one result among sixteen, so it may be luck:
+
+```
+ Wind 3 held back                       Fire swapped, Earth 1 to i2
+ 3  ·  ·  ·  ·  E3 ·  E2 F1 ·           3  ·  ·  ·  ·  E3 ·  E2 F2 ·
+ 2  ·  ·  R1 W1 R2 W2 R3 ·  ·           2  ·  ·  R1 W1 R2 W2 R3 ·  E1
+ 1  ·  E1 W3 F3 Z  F2 ·  ·  ·           1  ·  ·  W3 F3 Z  F1 ·  ·  ·
+    a  b  c  d  e  f  g  h  i              a  b  c  d  e  f  g  h  i
+```
+
+**What this means for the setup phase:**
+- **For these bots, open placement adds turns but few decisions.** What you see of the other side barely changes what you should build. The decisions that matter are in building a good formation at all (a random one scores 25% against the presets, §14), and those exist whether the placement is open or hidden.
+- **Placing last doesn't help Black either.** Under the current rule Black places the last piece, but seeing everything is worth too little to balance White's first move.
+- So building both formations at the same time, in secret, then revealing them (the spec's "Hidden setup" variant) would lose little. In the app it also saves 26 turns of waiting. Open, alternating placement can stay if it feels good at the table: it isn't harmful, just not where the depth is.
+- **Limits:** the search started from the default and moved at most three pieces, and people may read a formation in ways these bots can't (spotting an exposed Wizard, say). The 554-formation test covers far more varied formations and agrees.
+
+## 18. Earth breaks Earth: does it cut the draws?
+
+§16 found that a quarter of draws end with one side two or more elements up, and the defender's plain Earths beside its Wizard looked like the reason. The idea (GAME_SPEC open question 13): **an Earth combined with an attacker may capture plain Earth**, so the only thing that breaks an Earth wall is another Earth that has turned into an attacker. It's a rules switch, `earthBreaksEarth`, off by default (`node run.mjs earthBreaks`, 400 games per row, rules v0.3).
+
+The learned piece values score a plain Earth as worth minus 3, because Earth was never captured. Under this rule a bot would then be glad to lose its Earths. So both sides of every comparison here count every Earth as +2 (`WEIGHTS.earthWall`). With today's values the same games looked the same (52%, 23% draws).
+
+```
+ 8  ·   ·   z   ·   ·       Black's Wizard on e8 behind two plain Earths.
+ 7  ·   e   e   ·   ·       Today the Earth on e7 blocks White's Earth + Fire stack.
+ 6  ·   ·   ·   ·   ·       With the rule, the stack may take it (e5 → e7).
+ 5  ·   ·   EF3 ·   ·
+    c   d   e   f   g
+```
+
+| | Normal rules | Earth breaks Earth |
+|---|---|---|
+| **Draws**, Wind 3 held back, Deep 2k | 21% | **21%** |
+| **Draws**, shared random formations, Deep 2k | 33% | **31%** |
+| **Draws**, Wind 3 held back, Deep 20k | 20% | **21%** |
+| White's score (Deep 2k / random / Deep 20k) | 52 / 53 / 51% | 53 / 52 / 47% |
+| Typical game, moves each | 46 / 62 / 49 | 49 / 68 / 44 |
+| Won by elimination (Deep 2k / Deep 20k) | 28 / 28% | 32 / 31% |
+| Earth captured | never | in about 1 game in 3 (0.4–0.5 per game) |
+| Two elements up, then wins (Deep 2k / Deep 20k) | 79 / 80% | 83 / 82% |
+
+- **The rule works as a move**: Earth gets broken in about a third of the games, the game stays fair, and games are about as long.
+- **But it doesn't cut the draws.** The walls weren't the real cause. In the drawn games under the new rule, the side that's behind has only 0–1 plain Earth left, so its walls *are* broken, and the side that's ahead still has an Earth stack in most of them. What it lacks is attackers: a median of **1–2 attacking pieces** left. That's too little to checkmate a Wizard or catch the last enemy attacker, much like a chess ending with too little material.
+- So the draws come from **too little attacking material at the end**, not from Earth. A rule that targets them would have to act on that: for example, the side that's well ahead wins at the move limit, or a side down to its last attacking piece loses.
+- Small upside: a lead converts a little more often (two up: 79 → 83%), and elimination wins rise a little. Earth's character changes, though: it's no longer the piece that can never be taken.
+
+## 19. The Wizard stays home: does it cut the draws?
+
+§18 showed that draws come from too few attackers left at the end: one or two attacking pieces can't trap a Wizard that runs across the board. And today's Wizards do run. In the test games they reached every row, the opponent's back row included. The designer's idea (GAME_SPEC open question 14): **the Wizard may never leave its zone**. Two versions were tested against today's rule, as a rules switch `wizardZone` (`node run.mjs wizardZone`, 400 games per row, rules v0.3):
+
+```
+ Home zone (27 squares)                Castle (9 squares)
+ 3  ▢  ▢  ▢  ▢  ▢  ▢  ▢  ▢  ▢          3  ·  ·  ·  ▢  ▢  ▢  ·  ·  ·
+ 2  ▢  ▢  ▢  ▢  ▢  ▢  ▢  ▢  ▢          2  ·  ·  ·  ▢  ▢  ▢  ·  ·  ·
+ 1  ▢  ▢  ▢  ▢  Z  ▢  ▢  ▢  ▢          1  ·  ·  ·  ▢  Z  ▢  ·  ·  ·
+    a  b  c  d  e  f  g  h  i             a  b  c  d  e  f  g  h  i
+```
+
+- **Home zone:** the Wizard moves anywhere in its own three rows, never into the middle.
+- **Castle:** the Wizard stays on d1–f3 (Black: d7–f9) and must start there. All seven presets already do. Chinese chess (xiangqi) keeps its king in a 3×3 palace the same way.
+
+Random formations here put the Wizard on a castle square, so all three rules start from the same kind of formation.
+
+| | Anywhere (today) | Home zone | Castle |
+|---|---|---|---|
+| **Draws**, Wind 3 held back, Deep 2k | 23% (19–28) | 20% | **10%** (8–14) |
+| **Draws**, shared random formations, Deep 2k | 31% | 24% | **15%** |
+| **Draws**, Wind 3 held back, Deep 20k | 20% (16–24) | 14% | **11%** (8–14) |
+| White's share of decided games (Deep 2k / random / 20k) | 50 / 54 / 48% | 55 / 53 / 52% | 50 / 51 / 50% |
+| Typical game, moves each (Deep 2k / random / 20k) | 49 / 65 / 47 | 38 / 53 / 41 | **31 / 34 / 35** |
+| Longest 10% of games, past (Deep 2k / 20k) | 119 / 105 | 103 / 88 | 68 / 59 |
+| Won by checkmate / elimination (Deep 20k) | 50 / 31% | 54 / 32% | 59 / 30% |
+| Won within 20 moves each (Deep 2k / random / 20k) | 4 / 5 / 3% | 7 / 8 / 3% | 12 / 19 / 4% |
+| Stalemates | 0 | 0 | 0 |
+
+- **The castle halves the draws** in all three settings and brings them to about chess's level with the same bots (§12). Draws by the 75-move rule almost disappear (2–4% of games, from 10–26%). What's left is mostly repetition.
+- **The game stays fair.** White's share of decided games is 50–51%.
+- **No stalemates**, even with the Wizard boxed into nine squares.
+- **Games get shorter**, mostly at the long end: the longest tenth of games ends by move 59–68 instead of 105–119. The typical game drops from about 48 to 33 moves each.
+- **Both ways to win stay.** Elimination still decides 21–30% of games, and checkmate a little more than before.
+- **Comebacks stay.** The winner had been behind by one element in 33% of decided Deep 2k games (27% today) and 21% with Deep 20k (24%).
+- **One thing to watch: quick wins.** A Wizard that can't run can be caught early. Between the strong bots this barely shows (4% of games won within 20 moves each, against 3%). But the weaker bot loses 12% of games that fast, and with random formations 19%. A careless formation or a careless opening gets punished hard, so beginners would feel this most.
+- **The home zone helps much less**: 23 → 20%, 31 → 24% and 20 → 14%. Nine files are still enough room for a Wizard to run.
+
+## 20. The castle return: the Wizard brings pieces back
+
+The strict castle (§19) halves the draws but takes away the Wizard's freedom and punishes a careless defence hard. The designer's next idea (GAME_SPEC open question 15): **Wizards move freely, and a Wizard standing in the enemy castle may, instead of moving, bring back one of its side's captured pieces.** It's a rules switch, `castleReturn` with `returnTo` (`node run.mjs castleReturn`, 400 games per row, rules v0.3).
+
+```
+ 9  ·  ·  ·  ▢  ▢  ▢  ·  ·  ·     Black's castle d7–f9.
+ 8  ·  ·  ·  ▢  ▢  ▢  ·  ·  ·     White's Wizard has walked in to e7.
+ 7  ·  ·  ·  ▢  Z  ▢  ·  ·  ·     Instead of a move, White brings back
+ 6  ·  ·  ·  ·  ·  ·  ·  ·  ·     a captured piece, e.g. Water 3 onto e2.
+    a  b  c  d  e  f  g  h  i
+```
+
+- **Once per visit:** after bringing a piece back, the Wizard has to leave the castle and come back in before it can bring another. Tested against **every turn** in the castle, as a comparison.
+- The piece goes onto an empty square of the side's **own home zone** or, in the second version, its **own castle**.
+- A return restarts the 75-move count, like a capture. No return while in check.
+- Walking a Wizard across the board takes more moves than Deep looks ahead, so both sides score a Wizard closer to the enemy castle as worth part of the best piece it could bring back, once the opponent is down to 4 attacking pieces or fewer (`WEIGHTS.castleWalk`). It changes nothing when the rule is off.
+
+| | Today | Strict castle (§19) | Once per visit, home zone | Once per visit, home castle | Every turn, home zone |
+|---|---|---|---|---|---|
+| **Draws**, Wind 3 held back, Deep 2k | 27% (23–31) | 13% | **11%** (9–15) | **13%** | 11% |
+| **Draws**, shared random formations | 30% | 16% | **12%** | **14%** | 14% |
+| **Draws**, Wind 3 held back, Deep 20k | 18% (14–22) | 11% | **13%** | **11%** (8–14) | 12% |
+| White's share of decided games (Deep 2k / random / 20k) | 53 / 54 / 48% | 58 / 51 / 54% | 53 / 57 / 46% | 59 / 49 / 53% | 49 / 52 / 51% |
+| Typical game, moves each (Deep 2k / random / 20k) | 50 / 68 / 47 | 31 / 35 / 34 | 48 / 59 / 52 | 47 / 58 / 49 | 46 / 52 / 47 |
+| Longest 10% of games, past (Deep 2k / 20k) | 126 / 106 | 69 / 63 | 103 / 99 | 93 / 101 | 91 / 95 |
+| Won within 20 moves each (Deep 2k / random / 20k) | 5 / 5 / 2% | 13 / 16 / 8% | 5 / 7 / 3% | 5 / 6 / 3% | 6 / 8 / 1% |
+| Games with a return (Deep 2k / random / 20k) | | | 23 / 38 / 17% | 25 / 34 / 13% | 26 / 32 / 14% |
+
+- **It cuts the draws as much as the strict castle**: from 27–30% to 11–14% with Deep 2k, and from 18% to 11–13% with Deep 20k. Draws by the 75-move rule fall to 2–7% of games.
+- **Without the strict castle's cost.** Quick losses stay at today's level (1–8% of games won within 20 moves each, against 8–16% with the strict castle), and the typical game keeps its length. Only the longest games get shorter.
+- **It's a late-game rule.** Returns happen in 13–38% of games, the first one at a median of move 57, when the board has thinned out. The piece brought back is usually Water 3, Wind 3 or Fire 3.
+- **Mostly it finishes games, sometimes it turns them.** The side that brings back the first piece wins 80–88% of those games (once per visit). It was ahead on material at the time in about half of them, and behind in 27–31%, and the side behind still won 53–73% of those. So it converts stuck endings and also gives a real comeback.
+- **Once per visit is enough.** Every turn doubles the number of returns but cuts no more draws: the extra pieces just go to a side that's already winning.
+- **Home zone or own castle makes no measurable difference.**
+- **Adopted** (2026-10-29): rules v0.4 make it the default, once per visit, onto the own castle (GAME_SPEC §6 Castles). Experiments of v0.4 pass `V04` (engine.mjs).
+- White's share of decided games moves between 46% and 59% across rows, within luck for about 350 decided games per row, with no pattern by rule.
+- Limit: how often the bots use the rule depends on the walking nudge they were given. People may use it earlier or later, so watch this at the table.
+
 ---
 
 ## What this means for the game
@@ -645,20 +840,26 @@ All results below start from Wind 3 held back unless stated, under the 75-move r
 4. **Exact range makes the game slower and more drawish.** Keep it off by default, as it is now. (Not yet rechecked with the strong bot.)
 5. **Formations matter a little and are hard to build well** (§14). Your default came last with strong play, and the new default and presets are clearly better. No formation wins by itself, and their mirror images are just as good. A strong formation is a finely tuned whole, so presets are worth offering, and the placement phase rewards experience.
 
-The questions these raise are recorded in [GAME_SPEC.md](../GAME_SPEC.md) (open questions 6–9) and [PRODUCT_BRIEF.md](../PRODUCT_BRIEF.md) (Open).
+6. **Leads matter, but one capture doesn't decide the game** (§16). Two elements up nearly always wins with strong play, and comebacks of one element are common. Earth's comeback works, but it gets used from the opening. Drawn games run very long, about 110 moves each.
+7. **The setup's depth is in building well, not in reacting** (§17). Formations barely counter each other, so seeing the opponent's placements is worth a few points at most. Presets first (PRODUCT_BRIEF D15) fits this, and full games could build in secret at the same time without losing much.
+8. **Draws come from too little attacking material at the end, not from Earth walls** (§18). Letting Earth stacks take Earth doesn't cut them. A rule against draws has to act on material (open question 13).
+9. **Keeping the Wizard in a 3×3 castle halves the draws** (§19), with nothing to count. The game stays fair and gets shorter. It also punishes a careless defence harder, which beginners would feel most.
+10. **The castle return does the same without that cost** (§20). A Wizard that walks into the enemy castle brings back a captured piece, once per visit. Draws fall just as far, games keep their length and quick losses don't rise. It works as a late-game plan for the side that's ahead and as a comeback for the side behind. It's the rule from v0.4.
+
+The questions these raise are recorded in [GAME_SPEC.md](../GAME_SPEC.md) (open questions 2, 6–15) and [PRODUCT_BRIEF.md](../PRODUCT_BRIEF.md) (Open).
 
 ## Limits
 
 - **Bot strength.** §11 shows how much this matters: "Fire is useless" was an artifact of weak bots. Deep is much stronger, but still looks only a few moves ahead and doesn't plan. A strong human might break things it can't, or avoid traps it falls into.
-- **No placement phase.** Games start from finished formations. We know nothing yet about how players choose their setups or react to each other's placements.
+- **No placement phase.** Games start from finished formations. §17 measures what seeing the opponent's formation is worth, but no bot places pieces one at a time, and we know nothing about how people build their setups.
 - **Sample sizes.** Most Thinker results are based on 50–100 games each, so differences under about 10 points there could be luck. §9 shows how easily that happens: 60 games said 37%, and 200 said 52%.
 - **Bots repeat themselves.** A bot that always picks its best move can replay the same game. Careful games varied enough. For Thinker, §9 adds random first moves.
 - **Piece values.** Careful and Thinker use guessed values. Deep's are learned from games (§10), which made it much stronger.
 
 ## Next steps worth doing
 
-- If draws still bother at the table, look at the endgame: Earth walls that a few attackers can't break (§13).
+- Try the castle return (rules v0.4, §20) at the table: add it to the public prototype. Recheck the presets under it, and teach the app's bot to use it.
 - Recheck the exact-range variant and the cheat hunt (§6, §7) with the strong bot.
 - Try straight captures at the table, and if it stays, rerun the formation search under it: the best formations may change once Water strikes straight.
 - A catalogue of strong formations in different styles (a quality-diversity search, `catalogue.mjs`), so the presets can cover more ways to play.
-- A formation-builder player for the alternating placement phase.
+- Recheck the lead from §17 (Wind 3 held back with the Fires swapped and Earth 1 on i2) with fresh games against the presets.

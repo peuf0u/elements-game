@@ -110,6 +110,7 @@ export function elementsGame(opts) {
     // Sort key for a move that changes material: captures (most valuable victim first, cheapest
     // attacker first), then combines. 0 for a quiet move.
     tactical(pos, m) {
+      if ((m & 255) >= 81) return 6e7; // bringing a piece back (castleReturn), right after captures
       const b = pos.board, t = b[m >> 8];
       if (!t) return 0;
       return OWNER[t] !== pos.side ? 1e8 + values[t] * 1000 - values[b[m & 255]] : 5e7;

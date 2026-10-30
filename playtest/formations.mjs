@@ -7,13 +7,15 @@ const ELEMENTS = ['fire', 'wind', 'water', 'earth'];
 const ZONE = [];
 for (const f of 'abcdefghi') for (const r of [1, 2, 3]) ZONE.push(f + r);
 
-// All 13 pieces on random squares of the home zone.
-export function randomFormation(rng) {
+// All 13 pieces on random squares of the home zone. castle: the Wizard on one of d1–f3
+// (the wizardZone rule's castle), so the same formations work under every Wizard rule.
+export function randomFormation(rng, castle = false) {
   const squares = ZONE.slice();
   for (let i = squares.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [squares[i], squares[j]] = [squares[j], squares[i]];
   }
+  if (castle) { const k = squares.findIndex(s => 'def'.includes(s[0])); [squares[0], squares[k]] = [squares[k], squares[0]]; }
   const f = { [squares[0]]: 'wizard' };
   let k = 1;
   for (const e of ELEMENTS) for (const s of [3, 2, 1]) f[squares[k++]] = [e, s];
