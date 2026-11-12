@@ -1,6 +1,12 @@
 # Elements
 
-A digital version of **Elements**, an abstract two-player strategy board game (chess-inspired, with Fire, Wind, Earth and Water pieces and a Wizard). The goal is to play it with friends on iPad and iPhone first, then on Android and the web.
+A digital version of **Elements**, an abstract two-player strategy board game I designed (chess-inspired, with Fire, Wind, Earth and Water pieces and a Wizard). The goal is to play it with friends on iPad and iPhone first, then on Android and the web.
+
+You can already play the prototype against the computer: https://elements-game-kappa.vercel.app
+
+![The prototype at the start of a game: both sides in formation, White to move](docs/images/prototype.png)
+
+The game itself isn't licensed for reuse. All rights reserved.
 
 ## Where things are
 
