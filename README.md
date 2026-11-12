@@ -42,14 +42,36 @@ The full rules, with the reasons behind each decision, are in [GAME_SPEC.md](GAM
 
 ## Playtesting with computer players
 
-Before asking people to test every rule change, I had the computer play. [playtest/](playtest/) has bots ranging from random moves up to Deep, a search player built from chess-engine techniques with piece values learned from 8,000 games. In about 216,000 games they answered:
+Before asking people to test every rule change, I had the computer play. [playtest/](playtest/) has bots ranging from random moves up to Deep, a search player built from chess-engine techniques with piece values learned from 8,000 games. They've played about 216,000 games so far.
 
-- **Is it fair?** White's first-move edge is small, close to what it is in chess.
-- **Does skill matter?** Each bot that looked further ahead beat the one below it 92–99% of the time, and the weaker one never won.
-- **Is there a cheap way to win?** No. An Earth wall can't hold, there's no forced quick win, and rushing, hunting the Wizard or turtling all lose to balanced play.
-- **Are the pieces balanced?** Water came out strongest and gave most of the checkmates. After I also found its attacks hard to see at the table, the bots compared ten versions of the Water rule, and the current one (diagonal bends, one direction per move) is what came out of that.
-- **Which formation is best?** My own formation from the physical prototype came last of nine strong ones. The default is now one that a formation search found, and mine is still there as one of seven other presets.
-- **How often are games drawn?** Up to a third of games ended in a draw, usually because too few attackers were left to finish the game. With the castle return and chess's draw rules, that's down to 7–10%, about as often as the same bots draw at chess.
+Most of the numbers below come from Deep playing against itself under the current rules, starting from the default formation. The skill and play-style rows use the simpler bots.
+
+### Balance
+
+| Question | Result |
+|---|---|
+| Does moving first win? | Barely. White wins 47–52% of decided games between equal bots. The same bots score 48% with White at chess. |
+| Does skill matter? | A lot. Each bot that looks further ahead beat the one below it 92–99% of the time. In the prototype, Easy lost all 400 of its games against Medium and Hard. |
+| Does every piece pull its weight? | Start a side without one piece and it scores 15% without Wind 3, 20% without Water 3, 24% without Fire 3, 28–34% without a size-2 piece and 42% without Fire 1. Every attacking piece counts, the big ones most. Missing an Earth costs nothing on its own. |
+| Is there one way to play that always wins? | No. Against a standard bot, a bot that hunts the Wizard scores 43%, hiding behind Earth 37%, rushing 30% and never combining 17%. Combining a lot is the strongest habit (71%), which is how it should be, since combining is the heart of the game. |
+| Does the formation decide the game? | Not much. The presets are within about 100 rating points of each other, so the best one would score about 64% against the weakest. |
+
+### Playability
+
+| Question | Result |
+|---|---|
+| Do games end? | Always, with no endless loops. A typical game takes 45–55 moves each. |
+| How are games won? | 52% by checkmate, 38% by capturing all attackers and about 10% are drawn, so both ways to win matter. |
+| How often is it a draw? | 7–10% of games under the current rules. The same bots draw 10% at chess. Before the castle return it was up to a third. |
+| Can you come back from behind? | Yes. In 36% of decided games the winner had been a whole element down at some point. One element up wins 61% of the time, two up 78% and three up 91%. |
+| Does the castle return get used? | Pieces come back in 29% of games. A bot that never walks its Wizard to the enemy castle scores only 39–42%, so it's a real plan and not a gimmick. |
+| Does Earth's comeback work? | A piece down, being allowed to combine Earth lifts the score from 26% to 30% (Fire 2 missing) and from 12% to 19% (Water 3 missing). |
+
+### What changed because of it
+
+- **Water came out strongest** and gave most of the checkmates. After I also found its attacks hard to see at the table, the bots compared ten versions of the Water rule, and the current one (diagonal bends, one direction per move) is what came out of that.
+- **My own formation came last** of nine strong ones. The default is now one that a formation search found, and mine is still there as one of seven other presets.
+- **The castle return was added** because draws came from too few attackers being left at the end, not from Earth walls. It halved the draws without making games longer.
 
 To find out how far the bots can be trusted, I ran the same tests on chess, where the answers are known. The rankings come out right, but the exact numbers less so. Everything is in [playtest/FINDINGS.md](playtest/FINDINGS.md).
 
